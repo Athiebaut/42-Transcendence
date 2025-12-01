@@ -9,14 +9,16 @@ datasource db {
 }
 
 model User {
-  id            Int      @id @default(autoincrement())
-  email         String   @unique
-  emailLower    String   @unique // pour recherche/contrainte insensible à la casse
-  username      String   @unique
-  avatarUrl     String?
-  usernameLower String   @unique
-  passwordHash  String
-  createdAt     DateTime @default(now())
+  id                               Int      @id @default(autoincrement())
+  email                            String   @unique
+  emailLower                       String   @unique // pour recherche/contrainte insensible à la casse
+  username                         String   @unique
+  avatarUrl                        String?
+  usernameLower                    String   @unique
+  passwordHash                     String
+  createdAt                        DateTime @default(now())
+  twoFactorAuthenticationSecret    String?
+  isTwoFactorAuthenticationEnabled Boolean  @default(false)
 
   sentFriendRequests     Friend[] @relation("SentFriendRequests")
   receivedFriendRequests Friend[] @relation("ReceivedFriendRequests")
