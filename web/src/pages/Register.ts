@@ -103,7 +103,7 @@ export default function Register(): string {
                 </div>
 
                 <!-- Formulaire -->
-                <form class="space-y-4">
+                <form class="space-y-4" id="registrationForm">
                   <div class="space-y-1">
                     <label
                       for="pseudo"
@@ -114,7 +114,7 @@ export default function Register(): string {
                     <input
                       id="pseudo"
                       type="text"
-                      name="pseudo"
+                      name="username"
                       autocomplete="nickname"
                       class="w-full rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/70 focus:border-emerald-400/80"
                       placeholder="HonkMaster3000"
@@ -196,6 +196,42 @@ export default function Register(): string {
                     <span>🦢</span>
                   </button>
                 </form>
+                <!-- script vers backend   -->
+                <script type="module">
+                    document.getElementById('registrationForm').addEventListener('submit', async function(event) { // ID du form corrigé
+                        event.preventDefault();
+                        console.log('%cMon message important est en rouge et gras !', 'color: red; font-weight: bold; font-size: 14px;');
+                        const formElement = event.target;
+						const formData = new FormData(formElement);
+						const dataToSend = {
+							username: formData.get('username'), 
+							email: formData.get('email'),
+                            password: formData.get('password'), 
+                        };
+                        console.log('Données prêtes :', dataToSend);
+                        try {
+                            const response = await fetch('http://localhost:3042/auth/register', {
+                                method: 'POST',
+                                headers: {
+                                 'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(dataToSend) 
+                            });
+						
+                            const result = await response.json();
+                            if (response.ok) {
+                                console.log('Inscription réussie !', result);
+                                alert('Inscription réussie !');
+                            } else {
+                                console.error('Erreur du serv:', result.message);
+						        alert('Erreur lors de l\\'inscription: ' + result.message);
+                            }
+                        } catch (error) {
+                            console.error('Erreur réseau ou du client', error);
+							alert('Erreur de connexion au serveur.'); // Ajout d'une alerte en cas d'erreur réseau
+                        }
+				    });
+                </script>
 
                 <!-- Séparateur -->
                 <div class="flex items-center gap-3 text-[0.7rem] text-slate-500">

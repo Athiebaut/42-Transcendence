@@ -11,13 +11,13 @@ services:
     command: sh -c "npm run dev"
   back_to_back:
     build:
-      context: .
+      context: ./back_to_back
       dockerfile: Dockerfile.backend
     env_file:
       - .env
     volumes:
       - ./back_to_back/src:/app/back_to_back/src
-      - ./prisma:/app/prisma
+      - ./back_to_back/prisma:/app/prisma
       - ./back_to_back/avatar:/app/back_to_back/avatar
       - /app/back_to_back/node_modules
     ports:
@@ -29,7 +29,7 @@ services:
     container_name: nginx
     image: nginx:1.27-alpine
     depends_on:
-      - api
+        - api
     ports:
       - "8443:443"
     volumes:

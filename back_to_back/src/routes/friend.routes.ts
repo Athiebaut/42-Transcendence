@@ -5,6 +5,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import jwt from "jsonwebtoken";
 import { z } from "zod";
+import * as repl from "node:repl";
 
 const prisma = new PrismaClient();
 
@@ -20,7 +21,6 @@ export default async function friendRoutes(app: FastifyInstance) {
 		if (sendId === receiverId) {
 			return reply.status(400).send({error: "cannit send friend request to yourself" });
 		}
-
 		try {
 			const existingFriendship = await prisma.Friend.findFirst({
 				WHERE: {
@@ -84,5 +84,40 @@ export default async function friendRoutes(app: FastifyInstance) {
 			console.error(error);
 			reply.status(500).send({ error: "Failed to respond to request." });
 		}
+	});
+
+	app.get("/friend", async (request, reply) => {
+		const userId = (request.user as any).userId;
+		const friendship = await prisma.Friend.findMany({
+			where: {
+				OR: [
+					{ senderId: userId },
+					{ receiverId: userId },
+				],
+			},
+			include: {
+				sender: { select: {id: true, username: true } },
+				receiver: { select: { id: true, username: true } },
+			},
+		});
+
+		const response = {
+			accepted: [],
+			pendingSent: [],
+			pendingReceived: [],
+		};
+		friendship.forEach(f => {
+			const otherUser = f.senderId === userId ? f.receiver : f.sender;
+			if (f.status === 'ACCEPTED') {
+				response.accepted.push(otherUser);
+			} else if (f.status === 'PENDING'){
+				if (f.senderId === userId) {
+					response.pendingSent.push(otherUser);
+				} else {
+					response.pendingReceived.push(otherUser);
+				}
+			}
+		});
+		reply.send(response);
 	});
 }
