@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 
 export default async function authRoutes(fastify: FastifyInstance) {
 	fastify.post("/register", async (request, reply) => {
-		const { email, password, username } = request.body as {
+		const {email, password, username} = request.body as {
 			email: string;
 			password: string;
 			username: string;

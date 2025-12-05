@@ -94,7 +94,6 @@ export default async function profileRoutes(app: FastifyInstance) {
 		if (validatedData.email !== undefined) {
 			updateData.email = validatedData.email.toLowerCase();
 		}
-
 		try {
 			const updateUser = await prisma.user.update({
 				where: {id: userId},

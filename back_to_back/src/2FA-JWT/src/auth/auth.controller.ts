@@ -4,17 +4,20 @@ import { UsersService } from '../users/users.service';
 import { AuthGuard } from '@nestjs/passport';
 import { JwtTwoFactorGuard } from './guards/jwt-2fa.guard';
 
+// export function register2FA(@Req() req) {
+//   const { otpauthUrl } = await this.authService.generateTwoFactorAuthenticationSecret(req.user);
+//
+//   return {
+//     qrCodeUrl: await this.authService.generateQrCodeDataURL(otpauthUrl)
+//   };
+// }
+
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly usersService: UsersService,
   ) {}
-
-  @Post('register')
-  async register(@Body() body) {
-    return this.usersService.create(body);
-  }
 
   @Post('login')
   async login(@Body() body) {
@@ -23,16 +26,6 @@ export class AuthController {
       throw new UnauthorizedException('Identifiants incorrects');
     }
     return this.authService.login(user);
-  }
-
-  @UseGuards(AuthGuard('jwt'))
-  @Get('2fa/generate')
-  async register2FA(@Req() req) {
-    const { otpauthUrl } = await this.authService.generateTwoFactorAuthenticationSecret(req.user);
-
-    return {
-      qrCodeUrl: await this.authService.generateQrCodeDataURL(otpauthUrl)
-    };
   }
 
   @UseGuards(AuthGuard('jwt'))

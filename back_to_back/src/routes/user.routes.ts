@@ -21,7 +21,6 @@ export default async function userRoutes(app: FastifyInstance) {
 			return reply.status(401).send({ error: 'Invalid credentials' });
 		const isValid = await bcrypt.compare(LogPassword, user.passwordHash);
 		if (!isValid) return reply.status(401).send({ error: 'Invalid credentials' });
-		const dfa = new AuthService()
 		const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 		reply.send({ message: 'Login successful', token });
 	});

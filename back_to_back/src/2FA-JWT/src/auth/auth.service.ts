@@ -5,6 +5,18 @@ import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
 import * as bcrypt from 'bcrypt';
 
+export function generateTwoFactorAuthenticationSecret(user: any) {
+  const secret = authenticator.generateSecret();
+  const otpauthUrl = authenticator.keyuri(user.email, 'FT_TRANSCENDENCE', secret);
+  await this.usersService.setTwoFactorAuthenticationSecret(secret, user.id);
+  return { secret, otpauthUrl };
+}
+
+export function generateQrCodeDataURL(otpAuthUrl: string) {
+  return toDataURL(otpAuthUrl);
+}
+
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -45,17 +57,6 @@ export class AuthService {
     return {
       access_token: this.jwtService.sign(payload),
     };
-  }
-
-  async generateTwoFactorAuthenticationSecret(user: any) {
-    const secret = authenticator.generateSecret();
-    const otpauthUrl = authenticator.keyuri(user.email, 'FT_TRANSCENDENCE', secret);
-    await this.usersService.setTwoFactorAuthenticationSecret(secret, user.id);
-    return { secret, otpauthUrl };
-  }
-
-  async generateQrCodeDataURL(otpAuthUrl: string) {
-    return toDataURL(otpAuthUrl);
   }
 
   isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user: any) {
