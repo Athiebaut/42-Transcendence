@@ -7,18 +7,21 @@ FROM node:20
 WORKDIR /app/back_to_back
 
 # Copier package.json et tsconfig.json
-COPY back_to_back/package*.json ./
-COPY back_to_back/tsconfig.json ./
+COPY package*.json ./
+COPY tsconfig.json ./
 
 # Installer toutes les dépendances, y compris devDependencies
 RUN npm install --include=dev
 
 # Copier le code source et Prisma
-COPY back_to_back/src ./src
-COPY prisma ../prisma
+COPY prisma/ ./prisma
+
+RUN ls /app/back_to_back/prisma/schema.prisma
 
 # Générer le client Prisma
-RUN npx prisma generate --schema ../prisma/schema.prisma
+RUN npx prisma generate --schema /app/back_to_back/prisma/schema.prisma
+
+COPY src ./src
 
 # Exposer le port utilisé par l'app
 EXPOSE 3042

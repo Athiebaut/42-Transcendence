@@ -1,0 +1,64 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"] // ✔ pour Alpine
+}
+
+datasource db {
+  provider = "sqlite" // en dev; Postgres en prod recommandé
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                               Int      @id @default(autoincrement())
+  email                            String   @unique
+  emailLower                       String   @unique // pour recherche/contrainte insensible à la casse
+  username                         String   @unique
+  avatarUrl                        String?
+  usernameLower                    String   @unique
+  passwordHash                     String
+  createdAt                        DateTime @default(now())
+  twoFactorAuthenticationSecret    String?
+  isTwoFactorAuthenticationEnabled Boolean  @default(false)
+
+  sentFriendRequests     Friend[] @relation("SentFriendRequests")
+  receivedFriendRequests Friend[] @relation("ReceivedFriendRequests")
+
+  accounts    OAuthAccount[]
+  GameHistory GameHistory[]
+
+  @@index([createdAt])
+}
+
+model GameHistory {
+  id     Int      @id @default(autoincrement())
+  user   User     @relation(fields: [userId], references: [id])
+  userId Int
+  score  Int
+  date   DateTime @default(now())
+}
+
+model Friend {
+  id         Int      @id @default(autoincrement())
+  senderId   Int
+  sender     User     @relation("SentFriendRequests", fields: [senderId], references: [id])
+  receiverId Int
+  receiver   User     @relation("ReceivedFriendRequests", fields: [receiverId], references: [id])
+  status     String   @default("PENDING")
+  creatAt    DateTime @default(now())
+  updateAt   DateTime @updatedAt
+
+  @@unique([senderId, receiverId])
+  @@index([receiverId])
+}
+
+model OAuthAccount {
+  id         Int      @id @default(autoincrement())
+  provider   String
+  providerId String
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([provider, providerId])
+  @@index([userId])
+}

@@ -3,11 +3,11 @@ import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import * as repl from "node:repl";
+import { AuthService } from "../2FA-JWT/src/auth/auth.service.js";
 
 const prisma = new PrismaClient();
 
 export default async function userRoutes(app: FastifyInstance) {
-	// Connexion
 	app.post('/login', async (request, reply) => {
 		const { LogEmail, LogPassword } = request.body as { LogEmail: string; LogPassword: string };
 
@@ -21,7 +21,7 @@ export default async function userRoutes(app: FastifyInstance) {
 			return reply.status(401).send({ error: 'Invalid credentials' });
 		const isValid = await bcrypt.compare(LogPassword, user.passwordHash);
 		if (!isValid) return reply.status(401).send({ error: 'Invalid credentials' });
-
+		const dfa = new AuthService()
 		const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 		reply.send({ message: 'Login successful', token });
 	});

@@ -14,9 +14,6 @@ COPY tsconfig.json ./tsconfig.json
 COPY prisma ./prisma
 COPY src ./src
 
-# Génère Prisma Client
-RUN npx prisma generate
-
 COPY run.sh /run.sh
 RUN chmod +x /run.sh
 
