@@ -53,8 +53,8 @@ let targetScreenY = 0;
 let pushDirection = ""; // "LEFT", "RIGHT", "TOP", "BOTTOM"
 
 // Paramètres de comportement Desktop Goose
-const SPEED_BASE = 0.7;           // Vitesse de déplacement normal
-const SPEED_RUN = 2.0;            // Vitesse de course (pour pousser!)
+const SPEED_BASE = 0.8;           // Vitesse de déplacement normal
+const SPEED_RUN = 3.0;            // Vitesse de course (pour pousser!)
 const SHORT_IDLE_MIN = 0.3;       // Pause courte minimale
 const SHORT_IDLE_MAX = 1.0;       // Pause courte maximale
 const LONG_IDLE_MIN = 1.5;        // Pause longue minimale
@@ -522,14 +522,17 @@ function pushElementOffScreen(element: HTMLElement) {
 // --- Gestion des animations ---
 
 function stopAllAnimations() {
-  // Arrêter TOUTES les animations du modèle pour éviter le blending
-  if (scene) {
-    scene.animationGroups.forEach(anim => {
+  // On arrête juste les anims en cours sans reset global du squelette
+  if (!scene) return;
+
+  scene.animationGroups.forEach((anim) => {
+    if (anim.isPlaying) {
       anim.stop();
-      anim.reset();
-    });
-  }
+      // ⚠️ pas de anim.reset() ici
+    }
+  });
 }
+
 
 function playIdleAnimation() {
   stopAllAnimations();
@@ -683,12 +686,21 @@ function updateGoose() {
             targetScreenY = rect.top - 50;
             pushDirection = "BOTTOM";
           }
-          
+
+          // 🔧 Sécuriser la cible dans la zone visible pour éviter que l'oie ne bloque sur les bords
+          const marginPx = 40;
+          const maxX = window.innerWidth - marginPx;
+          const maxY = window.innerHeight - marginPx;
+
+          targetScreenX = Math.min(maxX, Math.max(marginPx, targetScreenX));
+          targetScreenY = Math.min(maxY, Math.max(marginPx, targetScreenY));
+
           console.log(`🦢 Position cible ÉCRAN: x=${targetScreenX.toFixed(0)}px, y=${targetScreenY.toFixed(0)}px`);
           console.log(`🦢 Direction de poussée: ${pushDirection}`);
-          
+
           // Position cible dans le monde 3D
           const worldPos = screenToWorld(targetScreenX, targetScreenY);
+
           console.log(`🦢 Position CIBLE (monde): x=${worldPos.x.toFixed(2)}, z=${worldPos.z.toFixed(2)}`);
           
           startPos.copyFrom(goose.position);
