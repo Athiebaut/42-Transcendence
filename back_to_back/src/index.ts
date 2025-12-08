@@ -6,6 +6,7 @@ import { PrismaClient } from '@prisma/client';
 import userRoutes from './routes/user.routes.js';
 import authRoutes from './routes/auth.routes.js';
 import profileRoutes from './routes/profile.routes.js';
+import historyRoutes from './routes/history.routes.js'
 
 const prisma = new PrismaClient();
 const app = fastify({ logger: true });
@@ -22,6 +23,7 @@ await app.register(formbody);
 app.register(authRoutes, { prefix: "/auth" });
 app.register(userRoutes, { prefix: "/auth" });
 app.register(profileRoutes, {prefix: "/update" });
+app.register(historyRoutes, {prefix: "/"});
 app.get("/test", async () => ({message: "API OK"}));
 
 app.get("/", async () => {
