@@ -34,7 +34,7 @@ export default function renderPong(): string {
 
       <!-- CONTENU PRINCIPAL -->
       <main class="relative z-10 flex-1 flex flex-col px-4 sm:px-6 pb-6 pt-4">
-        <div class="max-w-6xl mx-auto flex-1 flex flex-col gap-4 lg:flex-row">
+        <div class="max-w-6xl mx-auto flex-1 flex flex-col gap-4 lg:flex-row" id="pong-container">
           <!-- Colonne gauche : Joueur 1 -->
           <aside
             id="player1-info"
