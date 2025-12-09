@@ -31,12 +31,13 @@ model User {
 
 model GameHistory {
   id         Int      @id @default(autoincrement())
-  user       User     @relation(fields: [userId], references: [id])
   opponentId Int
   durationMs Int
   playerId   Int
   score      String
-  date       CreateAt @default(now())
+  date       DateTime @default(now())
+  User       User?    @relation(fields: [userId], references: [id])
+  userId     Int?
 }
 
 model Friend {

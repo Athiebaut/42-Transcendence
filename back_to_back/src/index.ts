@@ -6,7 +6,12 @@ import { PrismaClient } from '@prisma/client';
 import userRoutes from './routes/user.routes.js';
 import authRoutes from './routes/auth.routes.js';
 import profileRoutes from './routes/profile.routes.js';
-import historyRoutes from './routes/history.routes.js'
+import historyRoutes from './routes/history.routes.js';
+import authGoogleRoutes from "./routes/./auth-google.routes.js";
+
+function frontOrigin() {
+	return process.env.FRONT_ORIGIN ?? 'https://front.localhost:8443'
+}
 
 const prisma = new PrismaClient();
 const app = fastify({ logger: true });
@@ -16,9 +21,11 @@ await app.register(import('@fastify/multipart'));
 await app.register(cors, {
 	origin: true,
 	methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+	allowedHeaders: ['content-type', 'authorization']
 });
 
 await app.register(formbody);
+await app.register(authGoogleRoutes);
 
 app.register(authRoutes, { prefix: "/auth" });
 app.register(userRoutes, { prefix: "/auth" });
