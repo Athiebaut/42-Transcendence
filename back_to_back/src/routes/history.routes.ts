@@ -24,7 +24,7 @@ interface GameHistoryBody {
 	score: string;
 }
 export default async function history(app: FastifyInstance) {
-	app.post("history", { schema: gameHistoryShema },
+	app.post("history", { schema: gameHistorySchema },
 		async (request: FastifyRequest<{ Body: GameHistoryBody}>, reply)=> {
 			const { playerId, durationMs, opponentId, score } = request.body;
 
@@ -54,41 +54,44 @@ export default async function history(app: FastifyInstance) {
 		playerId: number;
 	}
 
-	app.get<{ Params: PlayerParams }>('/history/:playerId' async (request, reply) => {
-		const playerId = request.params.playerId;
+	app.get<{ Params: PlayerParams }>('/history/:playerId', async (request, reply) => { // <-- Retrait de l'accolade fermante juste avant 'async'
+    const playerId = request.params.playerId;
 
-		if (isNaN(playerId)) {
-			reply.code(400).send({ message: "L'ID du joueur doit etre un nombre" });
-			return ;
-		}
+    // Assurez-vous que PlayerParams garantit que playerId est une string avant la conversion
+    if (isNaN(Number(playerId))) { // Le problème initial utilisait isNaN(playerId) sur une string, Number() est plus sûr ici.
+        reply.code(400).send({ message: "L'ID du joueur doit être un nombre" });
+        return;
+    }
 
-		try {
-			const history = await prisma.gameHistory.findMany({
-				where: {
-					playerId: Number(playerId),
-				},
-				oderBy: {
-					createAt: 'desc',
-				},
-				select: {
-					durationMs: true,
-					opponentId: true,
-					score: true,
-					createAt: true
-				}
-			});
-			if (history.length === 0) {
-				reply.code(404).send({ message: "Aucune partie trouve pour ce joueur." });
-				return ;
-			}
+    try {
+        const history = await prisma.gameHistory.findMany({
+            where: {
+                playerId: Number(playerId),
+            },
+            // CORRECTION: 'oderBy' doit être 'orderBy'
+            orderBy: {
+                createAt: 'desc',
+            },
+            select: {
+                durationMs: true,
+                opponentId: true,
+                score: true,
+                createAt: true
+            }
+        });
+        if (history.length === 0) {
+            reply.code(404).send({ message: "Aucune partie trouvée pour ce joueur." });
+            return;
+        }
 
-			reply.code(200).send({
-				player: playerId,
-				history: history
-			});
-		} catch (error) {
-			request.log.error(error);
-			reply.code(500).send({ message: "Erreur lors de la recupe de l'historique" });
-		}
-	});
+        reply.code(200).send({
+            player: playerId,
+            history: history
+        });
+    } catch (error) {
+        request.log.error(error);
+        reply.code(500).send({ message: "Erreur lors de la récup de l'historique" });
+    }
+}); // <-- L'accolade de fin est maintenant ici pour fermer la fonction de gestion de la route.
+// Il peut y avoir d'autres accolades fermantes nécessaires APRES cette ligne, selon le contexte englobant.
 }

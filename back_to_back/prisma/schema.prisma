@@ -24,19 +24,17 @@ model User {
   receivedFriendRequests Friend[] @relation("ReceivedFriendRequests")
 
   accounts OAuthAccount[]
-  history  GameHistory[]
 
   @@index([createdAt])
 }
 
 model GameHistory {
   id         Int      @id @default(autoincrement())
-  user       User     @relation(fields: [userId], references: [id])
-  opponentId Int
   durationMs Int
-  playerId   Int
+  opponentId Int
   score      String
-  date       CreateAt @default(now())
+  date       DateTime @default(now())
+  playerId   Int
 }
 
 model Friend {

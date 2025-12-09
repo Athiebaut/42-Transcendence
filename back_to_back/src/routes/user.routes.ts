@@ -3,7 +3,6 @@ import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import * as repl from "node:repl";
-import { AuthService } from "../2FA-JWT/src/auth/auth.service.js";
 
 const prisma = new PrismaClient();
 
