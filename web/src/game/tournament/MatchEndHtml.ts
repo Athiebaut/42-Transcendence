@@ -7,7 +7,7 @@ export function renderFirstMatchHTML(
     firstMatch: Match
 ): string {
     return `
-        <div id="tournament-match-end" class="absolute inset-0 z-50 flex items-center justify-center bg-slate-950/90 backdrop-blur-sm overflow-y-auto py-8">
+        <div id="tournament-match-end" class="absolute inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm overflow-y-auto py-8">
             <div class="text-center space-y-6 p-8 max-w-4xl my-auto">
                 
                 <div class="space-y-2">

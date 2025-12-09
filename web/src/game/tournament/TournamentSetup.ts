@@ -4,7 +4,7 @@ import { showFirstMatchScreen } from './MatchEnd';
 
 export function renderTournamentSetup(): string {
   return `
-    <div id="tournament-setup" class="absolute inset-0 z-50 flex items-center justify-center">
+    <div id="tournament-setup" class="absolute inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm">
       <div class="max-w-lg w-full mx-4 space-y-6 my-auto">
         
         <div class="text-center space-y-2">
