@@ -56,21 +56,21 @@ services:
     volumes:
       - prometheus_data:/prometheus #persistent data for prometheus
     restart: always
-  grafana:
-    container_name: grafana
-    depends_on: #needs prometheus to be running first
-      - prometheus
-    ports:
-      - "3000:3000"
-    build:
-      context: ./monitoring/grafana
-      dockerfile: Dockerfile
-    # extra_hosts:
-    #   - "host.docker.internal:host-gateway"
-    volumes:
-      - grafana_data:/var/lib/grafana #persistent data for grafana
-      - grafana_data:/grafana/data #persistent data for grafana
-    restart: always
+  # grafana:
+  #   container_name: grafana
+  #   depends_on: #needs prometheus to be running first
+  #     - prometheus
+  #   ports:
+  #     - "3000:3000"
+  #   build:
+  #     context: ./monitoring/grafana
+  #     dockerfile: Dockerfile
+  #   # extra_hosts:
+  #   #   - "host.docker.internal:host-gateway"
+  #   volumes:
+  #     - grafana_data:/var/lib/grafana #persistent data for grafana
+  #     - grafana_data:/grafana/data #persistent data for grafana
+  #   restart: always
 
   cadvisor: #monitor docker containers
     image: gcr.io/cadvisor/cadvisor:latest #use latest cadvisor image (no dockerfile, maybe add one later)

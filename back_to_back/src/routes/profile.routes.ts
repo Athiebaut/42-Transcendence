@@ -14,16 +14,17 @@ const prisma = new PrismaClient();
 export default async function profileRoutes(app: FastifyInstance) {
 	app.addHook("preHandler", async (request, reply) => {
 		const auth = request.headers.authorization;
-		console.log("AUTH HEADER =", request.headers.authorization);
 		if (!auth || !auth.startsWith("Bearer "))
 			return reply.status(401).send({ error: "Missing token" });
-
 		try {
 			const token = auth.split(" ")[1];
-			const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: number };
+			const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: number, isSecondFactorAuthenticated: boolean };
+			if (decoded.isSecondFactorAuthenticated === false) {
+				 return reply.status(401).send({ error: "2FA validation required" });
+			}
 			request.user = decoded;
 		} catch (e) {
-			return reply.status(401).send({ error: "Invalid token"});
+			return reply.status(401).send({ error: "Invalid token" });
 		}
 	});
 

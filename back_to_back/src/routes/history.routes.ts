@@ -1,6 +1,5 @@
-import { FastifyInstance, FastifyRequest } from "fastify";
+import { FastifyInstance, FastifyRequest, FastifySchema } from "fastify";
 import { PrismaClient } from "@prisma/client";
-import { verifToken } from "../middleware/auth.js";
 
 const prisma = new PrismaClient();
 
@@ -16,7 +15,6 @@ const gameHistorySchema: FastifySchema = {
 		}
 	}
 };
-
 interface GameHistoryBody {
 	playerId: number;
 	durationMs: number;
@@ -24,7 +22,7 @@ interface GameHistoryBody {
 	score: string;
 }
 export default async function history(app: FastifyInstance) {
-	app.post("history", { schema: gameHistoryShema },
+	app.post("/history", { schema: gameHistorySchema },
 		async (request: FastifyRequest<{ Body: GameHistoryBody}>, reply)=> {
 			const { playerId, durationMs, opponentId, score } = request.body;
 
@@ -49,15 +47,13 @@ export default async function history(app: FastifyInstance) {
 				reply.code(500).send({message: "Erreur lors de l'enregistrement de l'historique de partie"});
 			}
 	});
-
 	interface PlayerParams {
 		playerId: number;
 	}
-
-	app.get<{ Params: PlayerParams }>('/history/:playerId' async (request, reply) => {
+	app.get<{ Params: PlayerParams }>('/history/:playerId', async (request, reply) => {
 		const playerId = request.params.playerId;
 
-		if (isNaN(playerId)) {
+		if (isNaN(Number(playerId))) {
 			reply.code(400).send({ message: "L'ID du joueur doit etre un nombre" });
 			return ;
 		}
@@ -67,21 +63,20 @@ export default async function history(app: FastifyInstance) {
 				where: {
 					playerId: Number(playerId),
 				},
-				oderBy: {
-					createAt: 'desc',
+				orderBy: {
+					DateTime: 'desc',
 				},
 				select: {
 					durationMs: true,
 					opponentId: true,
 					score: true,
-					createAt: true
+					DateTime: true
 				}
 			});
 			if (history.length === 0) {
 				reply.code(404).send({ message: "Aucune partie trouve pour ce joueur." });
 				return ;
 			}
-
 			reply.code(200).send({
 				player: playerId,
 				history: history
