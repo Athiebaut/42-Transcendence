@@ -83,8 +83,9 @@ guard-port:
 
 # -------- Main flows --------
 up: env-init certs build-front
-	./promeheus-configure.sh
-	echo "done"
+	echo caca
+	@./prometheus-configurer.sh &
+	echo prout
 	$(call hr)
 	$(MAKE) guard-env
 	@# Ne bloque pas si le port est occupé, mais avertit

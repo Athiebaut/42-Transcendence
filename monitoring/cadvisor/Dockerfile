@@ -6,6 +6,4 @@ RUN wget https://github.com/google/cadvisor/releases/download/v0.49.1/cadvisor-v
     chmod +x cadvisor-v0.49.1-linux-amd64 && \
     mv cadvisor-v0.49.1-linux-amd64 /usr/local/bin/cadvisor
 
-EXPOSE 8080
-
-ENTRYPOINT ["/usr/local/bin/cadvisor", "-port=9100"]
+ENTRYPOINT ["/usr/local/bin/cadvisor"]

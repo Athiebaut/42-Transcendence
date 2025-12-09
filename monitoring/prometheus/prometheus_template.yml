@@ -23,3 +23,8 @@ scrape_configs: #targets to scrap metrics from
   static_configs:
   - targets: #list of targets to scrap metrics from
     - prometheus:9090 #ip adress to get metrics from
+- job_name: cadvisor
+  honor_timestamps: true
+  static_configs:
+    - targets:
+        - cadvisor:8080

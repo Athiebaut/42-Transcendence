@@ -20,6 +20,5 @@ COPY grafana.ini /grafana.ini
 COPY run.sh /run.sh
 RUN chmod +x /run.sh
 
-
-ENTRYPOINT ["./run.sh"]
+ENTRYPOINT ["/grafana/bin/grafana", "server", "--homepath", "/grafana", "--config", "/grafana.ini"]
 
