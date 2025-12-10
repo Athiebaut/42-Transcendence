@@ -4,11 +4,9 @@ DOCKER_COMPOSE_FILE="./docker-compose.yml"
 PROMETHEUS_TEMPLATE="monitoring/prometheus/prometheus_template.yml"
 PROMETHEUS_CONFIG="monitoring/prometheus/prometheus.yml"
 
-sed -i '/^DOCKER_SOCK=/d' api/.env
-echo "DOCKER_SOCK=${XDG_RUNTIME_DIR}/docker.sock" >> api/.env
-
-sed -i '/^DOCKER_GID=/d' api/.env
-echo "DOCKER_GID=$(stat -c '%g' /run/user/$(id -u)/docker.sock)" >> api/.env
+mkdir -p .env
+sed -i '/^USER_ID_MONITORING=/d' .env
+echo "USER_ID_MONITORING=$(id -u)" >> .env
 
 if [[ ! -f "$DOCKER_COMPOSE_FILE" ]]; then
     echo "Erreur: Le fichier $DOCKER_COMPOSE_FILE n'existe pas."
