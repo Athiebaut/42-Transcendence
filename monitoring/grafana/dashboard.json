@@ -18,13 +18,13 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 0,
+  "id": 2,
   "links": [],
   "panels": [
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "df1tsyts13y0wd"
+        "uid": "ef6ozduwngtfkd"
       },
       "fieldConfig": {
         "defaults": {
@@ -76,7 +76,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "count(container_start_time_seconds{name!=\"\"}) or vector(0)",
+          "expr": "count(up) or vector(0)",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -88,7 +88,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "df1tsyts13y0wd"
+        "uid": "ef6ozduwngtfkd"
       },
       "fieldConfig": {
         "defaults": {
@@ -140,7 +140,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "count(container_start_time_seconds{name!=\"\"}) or vector(0)",
+          "expr": "count(up) - count(container_start_time_seconds{name!=\"\"}) or vector(0)",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -152,7 +152,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "df1tsyts13y0wd"
+        "uid": "ef6ozduwngtfkd"
       },
       "fieldConfig": {
         "defaults": {
@@ -216,7 +216,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "df1tsyts13y0wd"
+        "uid": "ef6ozduwngtfkd"
       },
       "fieldConfig": {
         "defaults": {
@@ -361,5 +361,5 @@
   "timezone": "browser",
   "title": "Dashboard Pong",
   "uid": "ad2mbcm",
-  "version": 3
+  "version": 1
 }
