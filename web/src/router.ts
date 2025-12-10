@@ -2,24 +2,28 @@
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";
-import Register from "./pages/Register";
+import Register, { initRegisterPage } from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Pong from "./pages/Pong";
-import { setGoose3DActive } from "./goose3d";
 import Play from "./pages/Play";
+import { setGoose3DActive } from "./goose3d";
 import type { GameMode } from "./game/config/gameModeConfig";
 
-
 type RouteHandler = () => string;
+type RouteInit = () => void | Promise<void>;
 
 const routes: Record<string, RouteHandler> = {
   "/": Home,
-  "/home": Home,
   "/login": Login,
   "/register": Register,
   "/dashboard": Dashboard,
-  "/pong": Pong,
   "/play": Play,
+  "/pong": Pong,
+};
+
+const routeInits: Partial<Record<string, RouteInit>> = {
+  "/register": initRegisterPage,
+  // tu pourras ajouter ici initLoginPage, initDashboardPage, etc. plus tard
 };
 
 export async function renderRoute(path: string) {
@@ -40,18 +44,23 @@ export async function renderRoute(path: string) {
     await disposePongGame();
   }
 
+  // Injection du HTML de la page
   app.innerHTML = handler();
 
-  // Initialiser le jeu Pong si on arrive sur la page Pong
+  // Initialisation spécifique à la page (listeners, etc.)
+  const init = routeInits[cleanPath];
+  if (init) {
+    await init();
+  }
+
+  // Cas particulier : initialiser le jeu Pong
   if (cleanPath === "/pong") {
     const { initPongGame } = await import("./pages/Pong");
-    
-    // Extraire le paramètre mode de l'URL
     const urlParams = new URLSearchParams(window.location.search);
-    const mode = urlParams.get('mode') || 'pvp1v1';
-    
+    const mode = urlParams.get("mode") || "pvp1v1";
     await initPongGame(mode as GameMode);
   }
+
 }
 
 function NotFound(): string {

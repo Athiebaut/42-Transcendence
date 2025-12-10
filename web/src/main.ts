@@ -3,6 +3,7 @@
 import { renderRoute } from "./router";
 import { initGoose3D } from "./goose3d";
 import { initBackgroundRotator, forceBackgroundChange } from "./utils/backgroundRotator";
+import { mountDecorControls, refreshDecorControls } from "./components/ui/DecorControls";
 import "./style.css";
 import "./village-theme.css";
 
@@ -10,6 +11,7 @@ function bootstrap() {
   // Initialiser la rotation aléatoire des fonds
   // Options: 'random' (change à chaque page), 'session' (garde pendant la session), 'daily' (change une fois par jour)
   initBackgroundRotator("random");
+  mountDecorControls();
   
   // Ajouter le bouton de changement manuel (optionnel)
   // initBackgroundSelector();
@@ -31,6 +33,7 @@ function bootstrap() {
     renderRoute(window.location.pathname);
     // Changer le fond aussi quand on utilise précédent/suivant
     forceBackgroundChange();
+    refreshDecorControls();
   });
 
   // Navigation interne via <a data-nav>
@@ -50,9 +53,9 @@ function bootstrap() {
 
     // Changer le fond à chaque navigation interne
     forceBackgroundChange();
+    refreshDecorControls();
   });
 }
 
 bootstrap();
-
 
