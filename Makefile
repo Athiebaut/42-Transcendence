@@ -81,9 +81,11 @@ guard-port:
 	  exit 1; \
 	fi
 
-# -------- Main flows --------
-up: certs build-front
+setup-monitoring:
 	@./prometheus-configurer.sh &
+
+# -------- Main flows --------
+up: setup-monitoring certs build-front
 	$(call hr)
 # 	$(MAKE) guard-env
 	@# Ne bloque pas si le port est occupé, mais avertit

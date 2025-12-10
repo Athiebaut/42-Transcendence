@@ -4,7 +4,6 @@ DOCKER_COMPOSE_FILE="./docker-compose.yml"
 PROMETHEUS_TEMPLATE="monitoring/prometheus/prometheus_template.yml"
 PROMETHEUS_CONFIG="monitoring/prometheus/prometheus.yml"
 
-mkdir -p .env
 sed -i '/^USER_ID_MONITORING=/d' .env
 echo "USER_ID_MONITORING=$(id -u)" >> .env
 
