@@ -82,9 +82,9 @@ guard-port:
 	fi
 
 # -------- Main flows --------
-up: env-init certs build-front
+up: certs build-front
 	$(call hr)
-	$(MAKE) guard-env
+# 	$(MAKE) guard-env
 	@# Ne bloque pas si le port est occupé, mais avertit
 	@if ss -ltn | grep -q ":$(PORT) "; then $(call warn,Le port $(PORT) semble occupé, le démarrage de nginx peut échouer.); fi
 	$(COMPOSE) up --build
