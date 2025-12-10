@@ -1,5 +1,6 @@
 services:
   back_to_back:
+    container_name: back_to_back
     build:
       context: ./back_to_back
       dockerfile: Dockerfile.backend
