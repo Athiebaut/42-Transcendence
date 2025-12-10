@@ -5,8 +5,9 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Pong from "./pages/Pong";
-import { setGoose3DActive } from "./goose3d";
 import Play from "./pages/Play";
+import ProfileSettings from "./pages/ProfileSettings";
+import { setGoose3DActive } from "./goose3d";
 import type { GameMode } from "./game/config/gameModeConfig";
 import { setupRegister } from "./pages/Register";
 import { setupLogin } from "./pages/Login";
@@ -21,6 +22,7 @@ const routes: Record<string, RouteHandler> = {
   "/dashboard": Dashboard,
   "/pong": Pong,
   "/play": Play,
+  "/profile-settings": ProfileSettings,
 };
 
 export async function renderRoute(path: string) {

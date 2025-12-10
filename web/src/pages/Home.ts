@@ -40,6 +40,13 @@ export default function Home(): string {
             >
               ✨ S'inscrire
             </a>
+            <a
+              href="/dashboard"
+              data-nav
+              class="px-4 py-2 rounded-full border border-emerald-400/40 text-xs font-medium text-emerald-200 hover:bg-emerald-400/10 transition-colors"
+            >
+              Profil
+            </a>
           </div>
         </nav>
       </header>
@@ -153,6 +160,7 @@ export default function Home(): string {
               </button>
             </div>
           </div>
+   
         </section>
 
         <!-- SECTION ACCÈS RAPIDE -->
