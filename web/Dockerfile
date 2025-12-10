@@ -16,9 +16,6 @@ COPY . .
 # Exposer le port Vite
 EXPOSE 5173
 
-COPY run.sh /run.sh
-RUN chmod +x /run.sh
 
-
-ENTRYPOINT ["./run.sh"]
+ENTRYPOINT ["npm", "run", "dev", "--", "--host"]
 

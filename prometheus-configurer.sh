@@ -51,7 +51,7 @@ ELAPSED=0
 
 while [ "$(docker inspect -f '{{.State.Running}}' $container 2>/dev/null)" != "true" ]; do
     if [ $ELAPSED -ge $TIMEOUT ]; then
-        exit 1
+		break
     fi
     sleep 5
     ELAPSED=$((ELAPSED + 5))

@@ -9,6 +9,10 @@ alerting: #alertmanager allows to group alerts. Not used here
     scheme: http
     timeout: 10s
     api_version: v2
+
+rule_files: # alert rules location. allow to create alert rules to monitor systems through web UI
+  - "/alert_rules.yml"
+
 scrape_configs: #targets to scrap metrics from
 - job_name: prometheus #custom job name for personnal vizualisation
   honor_timestamps: true #use timestamp from metrics 
@@ -19,27 +23,8 @@ scrape_configs: #targets to scrap metrics from
   static_configs:
   - targets: #list of targets to scrap metrics from
     - prometheus:9090 #ip adress to get metrics from
-- job_name: grafana
+- job_name: cadvisor
   honor_timestamps: true
-  scrape_interval: 15s
-  scrape_timeout: 10s
-  metrics_path: /metrics
-  scheme: http
   static_configs:
-  - targets:
-    - grafana:9100
-- job_name: vps
-  honor_timestamps: true
-  scrape_interval: 15s
-  scrape_timeout: 10s
-  metrics_path: /metrics
-  scheme: http
-  static_configs:
-  - targets:
-    - 172.17.0.1:9091
-- job_name: 'cadvisor'
-  static_configs:
-    - targets: ['cadvisor:8080']
-
-rule_files: # alert rules location. allow to create alert rules to monitor systems through web UI
-  - "/alert_rules.yml"
+    - targets:
+        - cadvisor:8080
