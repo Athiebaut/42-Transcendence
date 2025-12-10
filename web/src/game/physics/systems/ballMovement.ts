@@ -1,5 +1,5 @@
 import { Scene, Vector3, Mesh } from "@babylonjs/core";
-import { PHYSICS_CONFIG } from "../../config/gameConfig";
+import { GAME_RULES, PHYSICS_CONFIG } from "../../config/gameConfig";
 
 /**
  * Interface pour le système de mouvement de la balle
@@ -45,7 +45,13 @@ export function createBallMovement(scene: Scene): BallMovementSystem {
             console.error("Ball mesh not found in scene");
             return;
         }
-        resetPosition();
+        ball.metadata = ball.metadata ?? {};
+        
+        ball.position = new Vector3(0, 0, 0);
+        ballVelocity = new Vector3(0, 0, 0);
+        ball.metadata.physicsVelocity = ballVelocity.clone();
+        
+        resetWithDelay(GAME_RULES.START_DELAY_MS);
     }
     
     /**
@@ -54,8 +60,12 @@ export function createBallMovement(scene: Scene): BallMovementSystem {
     function update(deltaTime: number): void {
         if (!ball || isWaitingToReset) return;
         
+        ball.metadata = ball.metadata ?? {};
+        
         ball.position.x += ballVelocity.x * deltaTime;
         ball.position.z += ballVelocity.z * deltaTime;
+
+        ball.metadata.physicsVelocity = ballVelocity.clone();
     }
     
     /**
@@ -64,6 +74,8 @@ export function createBallMovement(scene: Scene): BallMovementSystem {
      */
     function resetPosition(direction?: "left" | "right"): void {
         if (!ball) return;
+        
+        ball.metadata = ball.metadata ?? {};
         
         // Position initiale
         ball.position = new Vector3(0, 0, 0);
@@ -87,6 +99,7 @@ export function createBallMovement(scene: Scene): BallMovementSystem {
             angle * ballSpeed
         );
         
+        ball.metadata.physicsVelocity = ballVelocity.clone();
         isWaitingToReset = false;
     }
     
@@ -98,10 +111,14 @@ export function createBallMovement(scene: Scene): BallMovementSystem {
     function resetWithDelay(delayMs = PHYSICS_CONFIG.RESET_DELAY_MS, direction?: "left" | "right"): void {  
         if (!ball) return;
         
+        ball.metadata = ball.metadata ?? {};
+        
         // Arrêt immédiat
         ballVelocity = new Vector3(0, 0, 0);
         isWaitingToReset = true;
         ball.position = new Vector3(0, 0, 0);
+
+        ball.metadata.physicsVelocity = ballVelocity.clone();
         
         // Redémarrage différé avec direction
         setTimeout(() => {
@@ -118,12 +135,8 @@ export function createBallMovement(scene: Scene): BallMovementSystem {
         update,
         
         // Position
-        resetPosition(direction?: "left" | "right") {
-            resetPosition(direction);
-        },
-        resetWithDelay(delayMs?: number, direction?: "left" | "right") {
-            resetWithDelay(delayMs, direction);
-        },
+        resetPosition,
+        resetWithDelay,
         setPosition(position: Vector3) { 
             if (ball) ball.position = position; 
         },

@@ -1,14 +1,16 @@
 import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import { Engine, Scene } from "@babylonjs/core";
-import { setupScene } from "./scene/sceneSetup";
+import { resetPaddles, setupScene } from "./scene/sceneSetup";
 import { setupControls } from "./controls/gameControls";
 import { createBallPhysics, type ComposedPhysicsSystem } from "./physics/BallPhysicsComposed";
+import type { GameMode } from "./config/gameModeConfig";
+import { showVictoryScreen } from './ui/Victory';
+import { showTournamentMatchEnd } from './tournament/MatchEnd';
+import { clearTournament } from "./tournament/TournamentLogic";
+import { updatePlayerNames } from "./ui/displayPlayerNames";
 
-/**
- * État global du jeu Pong
- * Utilise des variables de module pour éviter les fuites mémoire
- */
+
 let engine: Engine | null = null;
 let scene: Scene | null = null;
 let ballPhysics: ComposedPhysicsSystem | null = null;
@@ -33,7 +35,7 @@ function updateScoreDisplay(player1Score: number, player2Score: number): void {
  * Initialise le jeu Pong avec Babylon.js
  * @returns Promise<boolean> - true si l'initialisation réussit
  */
-export async function initPongGame(): Promise<boolean> {
+export async function initPongGame(mode: GameMode = 'pvp1v1'): Promise<boolean> {
     const canvas = document.getElementById("gameCanvas") as HTMLCanvasElement;
     
     if (!canvas) {
@@ -43,20 +45,43 @@ export async function initPongGame(): Promise<boolean> {
 
     // Nettoyage préventif de l'état précédent
     disposePongGame();
+    
+    if (mode === 'tournament') {
+        window.addEventListener('beforeunload', clearTournament);
+    }
 
     try {
+        console.log(`🎮 Initializing Pong - Mode: ${mode}`);
         // Initialisation du moteur 3D
         engine = new Engine(canvas, true);
         scene = new Scene(engine);
 
         // Configuration de la scène de jeu
-        setupScene(scene);
-        setupControls(scene, engine);
+        setupScene(scene, mode);
+        setupControls(scene, engine, mode);
+
+        updatePlayerNames(mode);
         
         // Initialisation du système de physique
-        ballPhysics = createBallPhysics(scene);
+        ballPhysics = createBallPhysics(scene, mode);
         ballPhysics.onScoreUpdate = updateScoreDisplay;
         
+        ballPhysics.onGameOver = (winner: number) => {
+            if (!ballPhysics) return;
+            
+            const score = ballPhysics.score;
+            if (mode === 'tournament') {
+                showTournamentMatchEnd(winner, score, () => {
+                    if (scene) resetPaddles(scene, mode);
+                    ballPhysics?.resetGame();
+                });
+            } else {
+                showVictoryScreen(winner, score, mode, () => {
+                    if (scene) resetPaddles(scene, mode);
+                    ballPhysics?.resetGame();
+                });
+            }
+        };
         // Démarrage de la boucle de rendu
         engine.runRenderLoop(() => {
             if (scene) {
@@ -97,4 +122,3 @@ export function disposePongGame(): void {
         console.error("Error disposing game:", error);
     }
 }
-
