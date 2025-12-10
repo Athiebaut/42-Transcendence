@@ -8,6 +8,8 @@ import Pong from "./pages/Pong";
 import { setGoose3DActive } from "./goose3d";
 import Play from "./pages/Play";
 import type { GameMode } from "./game/config/gameModeConfig";
+import { setupRegister } from "./pages/Register";
+import { setupLogin } from "./pages/Login";
 
 
 type RouteHandler = () => string;
@@ -51,6 +53,14 @@ export async function renderRoute(path: string) {
     const mode = urlParams.get('mode') || 'pvp1v1';
     
     await initPongGame(mode as GameMode);
+  }
+
+  if (cleanPath === "/register") {
+    setupRegister();
+  }
+
+  if (cleanPath === "/login") {
+    setupLogin();
   }
 }
 

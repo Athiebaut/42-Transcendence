@@ -1,3 +1,5 @@
+import { api } from "../services/api";
+
 export default function Register(): string {
   return `
     <div class="min-h-screen flex flex-col relative overflow-hidden">
@@ -202,42 +204,6 @@ export default function Register(): string {
                     <span>🦢</span>
                   </button>
                 </form>
-                <!-- script vers backend   -->
-                <script type="module">
-                    document.getElementById('registrationForm').addEventListener('submit', async function(event) { // ID du form corrigé
-                        event.preventDefault();
-                        console.log('%cMon message important est en rouge et gras !', 'color: red; font-weight: bold; font-size: 14px;');
-                        const formElement = event.target;
-						const formData = new FormData(formElement);
-						const dataToSend = {
-							username: formData.get('username'), 
-							email: formData.get('email'),
-                            password: formData.get('password'), 
-                        };
-                        console.log('Données prêtes :', dataToSend);
-                        try {
-                            const response = await fetch('http://localhost:3042/auth/register', {
-                                method: 'POST',
-                                headers: {
-                                 'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify(dataToSend) 
-                            });
-						
-                            const result = await response.json();
-                            if (response.ok) {
-                                console.log('Inscription réussie !', result);
-                                alert('Inscription réussie !');
-                            } else {
-                                console.error('Erreur du serv:', result.message);
-						        alert('Erreur lors de l\\'inscription: ' + result.message);
-                            }
-                        } catch (error) {
-                            console.error('Erreur réseau ou du client', error);
-							alert('Erreur de connexion au serveur.'); // Ajout d'une alerte en cas d'erreur réseau
-                        }
-				    });
-                </script>
 
                 <!-- Séparateur -->
                 <div class="flex items-center gap-3 text-[0.7rem] text-slate-500">
@@ -278,4 +244,32 @@ export default function Register(): string {
       </main>
     </div>
   `;
+}
+
+export function setupRegister() {
+  const form = document.getElementById('registrationForm') as HTMLFormElement;
+  if (!form) return;
+
+  form.addEventListener('submit', async function(event) {
+      event.preventDefault();
+      
+      const formData = new FormData(form);
+      const dataToSend = {
+          username: formData.get('username'), 
+          email: formData.get('email'),
+          password: formData.get('password'), 
+      };
+
+      try {
+          // APPEL SIMPLIFIÉ
+          const result = await api.post('/register', dataToSend);
+          
+          console.log('Inscription réussie !', result);
+          alert('Inscription réussie !');
+          window.location.href = '/login';
+      } catch (error: any) {
+          // L'erreur est déjà formatée par notre ApiClient
+          alert('Erreur : ' + error.message);
+      }
+  });
 }

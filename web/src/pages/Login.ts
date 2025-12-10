@@ -1,3 +1,5 @@
+import { api } from "../services/api";
+
 export default function Login(): string {
   return `
     <div class="min-h-screen flex flex-col relative overflow-hidden">
@@ -108,7 +110,7 @@ export default function Login(): string {
                 </div>
 
                 <!-- Formulaire -->
-                <form class="space-y-4">
+                <form class="space-y-4" id="loginForm">
                   <div class="space-y-1">
                     <label
                       for="email"
@@ -228,4 +230,31 @@ export default function Login(): string {
       </main>
     </div>
   `;
+}
+
+export function setupLogin() {
+  const form = document.getElementById('loginForm') as HTMLFormElement;
+  if (!form) return;
+
+  form.addEventListener('submit', async function(event) {
+      event.preventDefault();
+      const formData = new FormData(form);
+      
+      try {
+          const result: any = await api.post('/login', {
+              email: formData.get('email'),
+              password: formData.get('password'), 
+          });
+
+          console.log('Connexion réussie !', result);
+          if (result.token) {
+              localStorage.setItem('token', result.token);
+          }
+          alert('Connexion réussie !');
+          window.location.href = '/dashboard'; 
+
+      } catch (error: any) {
+          alert('Erreur : ' + error.message);
+      }
+  });
 }
