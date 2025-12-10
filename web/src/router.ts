@@ -11,7 +11,6 @@ import type { GameMode } from "./game/config/gameModeConfig";
 import { setupRegister } from "./pages/Register";
 import { setupLogin } from "./pages/Login";
 
-
 type RouteHandler = () => string;
 
 const routes: Record<string, RouteHandler> = {
@@ -62,6 +61,7 @@ export async function renderRoute(path: string) {
   if (cleanPath === "/login") {
     setupLogin();
   }
+  
 }
 
 function NotFound(): string {

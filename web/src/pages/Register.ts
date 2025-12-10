@@ -3,25 +3,19 @@ import { api } from "../services/api";
 export default function Register(): string {
   return `
     <div class="min-h-screen flex flex-col relative overflow-hidden">
-      <!-- Fond ambiance village / halos de lumière -->
       <div class="absolute inset-0 pointer-events-none">
         <div class="absolute -top-32 -left-24 w-72 h-72 bg-amber-500/15 rounded-full blur-3xl"></div>
         <div class="absolute -bottom-40 -right-40 w-80 h-80 bg-sky-500/20 rounded-full blur-3xl"></div>
       </div>
 
-      <!-- HEADER -->
-      <header
-        class="relative z-10 px-4 sm:px-6 py-4 flex items-center justify-between border-b border-slate-800/80 bg-slate-950/70 backdrop-blur"
-      >
+      <header class="relative z-10 px-4 sm:px-6 py-4 flex items-center justify-between border-b border-slate-800/80 bg-slate-950/70 backdrop-blur">
         <a
           href="/"
           data-nav
-          class="flex items-center gap-2 group"
+          class="inline-flex items-center gap-2 text-slate-200 hover:text-white transition-colors text-sm"
         >
-          <span class="text-2xl transition-transform group-hover:scale-110">🦢</span>
-          <span class="font-semibold tracking-tight text-slate-100">
-            Honk Village
-          </span>
+          <span class="text-lg">🦢</span>
+          <span class="font-semibold tracking-tight">Retour au village</span>
         </a>
 
         <nav class="flex items-center gap-3 text-xs sm:text-sm">
@@ -35,12 +29,8 @@ export default function Register(): string {
         </nav>
       </header>
 
-      <!-- CONTENU -->
-      <main class="relative z-10 flex-1 px-4 sm:px-6 lg:px-8 py-8">
-        <div
-          class="max-w-6xl mx-auto grid gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] items-center"
-        >
-          <!-- Colonne gauche : texte -->
+      <main class="relative z-10 flex-1 px-4 sm:px-6 lg:px-8 py-8 flex items-center">
+        <div class="w-full max-w-6xl mx-auto grid gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] items-center">
           <div class="space-y-6">
             <div class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs sm:text-sm font-medium bg-black/40 border border-white/10 backdrop-blur">
               <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -50,54 +40,41 @@ export default function Register(): string {
             </div>
 
             <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">
+              Prépare ton honk,
               <span class="block text-glow mt-1">
-              Crée ton oie,
-              et viens semer le chaos avec élégance.
+                et laisse ton oie faire sa grande entrée.
               </span>
             </h1>
 
-            <p class="text-base sm:text-lg text-slate-200/80 max-w-xl">
-              En créant un compte, tu pourras suivre ta progression, débloquer des cosmétiques
-              pour ton oie, et affronter les autres villageois dans des matchs de Pong glorieux.
+            <p class="text-sm sm:text-base text-slate-200/80 max-w-xl">
+              Crée un compte pour débloquer la personnalisation, suivre ta progression,
+              défier les autres villageois et établir ton héritage d'oie.
             </p>
 
-            <div class="grid sm:grid-cols-3 gap-4 text-sm sm:text-base">
-              <div class="space-y-1">
-                <p class="font-semibold text-slate-100 flex items-center gap-2">
-                  <span class="text-lg">🥇</span>
-                  <span>Progression</span>
-                </p>
-                <p class="text-slate-200/90 text-sm sm:text-base">
-                  Ton classement, ton historique de matchs et tes stats d'oie sont sauvegardés.
-                </p>
-              </div>
-              <div class="space-y-1">
-                <p class="font-semibold text-slate-100 flex items-center gap-2">
-                  <span class="text-lg">🎭</span>
-                  <span>Personnalisation</span>
-                </p>
-                <p class="text-slate-200/80">
-                  Des cosmétiques à débloquer au fil des parties gagnées.
-                </p>
-              </div>
-              <div class="space-y-1">
-                <p class="font-semibold text-slate-100 flex items-center gap-2">
-                  <span class="text-lg">🧑‍🤝‍🧑</span>
-                  <span>Social</span>
-                </p>
-                <p class="text-slate-200/80">
-                  Rejoins tes amis, crée des salons privés, et honk ensemble.
-                </p>
-              </div>
+            <div class="grid gap-3 sm:grid-cols-3">
+              <p class="flex items-start gap-2 text-sm sm:text-base text-slate-100">
+                <span class="mt-0.5">🥇</span>
+                <span>
+                  Classement et historique de matchs conservés à chaque honk.
+                </span>
+              </p>
+              <p class="flex items-start gap-2 text-sm sm:text-base text-slate-100">
+                <span class="mt-0.5">🎭</span>
+                <span>
+                  Cosmétiques exclusifs à débloquer pour ton oie.
+                </span>
+              </p>
+              <p class="flex items-start gap-2 text-sm sm:text-base text-slate-100">
+                <span class="mt-0.5">🧑‍🤝‍🧑</span>
+                <span>
+                  Rejoins tes amis et crée des salons privés.
+                </span>
+              </p>
             </div>
           </div>
 
-          <!-- Colonne droite : card d'inscription -->
           <div class="relative">
-            <div
-              class="relative glass-panel card-shadow rounded-2xl overflow-hidden"
-            >
-              <!-- Liserés lumineux -->
+            <div class="relative glass-panel card-shadow rounded-2xl overflow-hidden">
               <div class="pointer-events-none absolute inset-0">
                 <div class="absolute -top-10 -right-10 w-32 h-32 bg-emerald-500/15 blur-3xl"></div>
                 <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-sky-500/15 blur-3xl"></div>
@@ -106,15 +83,14 @@ export default function Register(): string {
               <div class="relative p-6 sm:p-8 space-y-6">
                 <div class="space-y-2 text-center sm:text-left">
                   <h2 class="text-xl sm:text-2xl font-semibold tracking-tight">
-                    Inscription
+                    Créer mon oie
                   </h2>
                   <p class="text-xs sm:text-sm text-slate-300">
-                    Quelques infos, et ton oie est prête à rejoindre le village.
+                    Quelques infos suffisent pour rejoindre le village.
                   </p>
                 </div>
 
-                <!-- Formulaire -->
-                <form class="space-y-4" id="registrationForm">
+                <form class="space-y-4" id="registrationForm" novalidate method="post" action="/register">
                   <div class="space-y-1">
                     <label
                       for="username"
@@ -127,7 +103,17 @@ export default function Register(): string {
                       type="text"
                       name="username"
                       autocomplete="username"
-                      class="w-full rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/70 focus:border-emerald-400/80"
+                      class="
+                        w-full rounded-lg
+                        border border-[#d4c4a0]/90
+                        bg-[#3a5548]/90
+                        px-3 py-2
+                        text-sm text-slate-100
+                        placeholder:text-slate-300
+                        focus:outline-none
+                        focus:ring-2 focus:ring-emerald-400/70
+                        focus:border-emerald-300/80
+                      "
                       placeholder="OieLégendaire"
                     />
                   </div>
@@ -144,7 +130,17 @@ export default function Register(): string {
                       type="email"
                       name="email"
                       autocomplete="email"
-                      class="w-full rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/70 focus:border-emerald-400/80"
+                      class="
+                        w-full rounded-lg
+                        border border-[#d4c4a0]/90
+                        bg-[#3a5548]/90
+                        px-3 py-2
+                        text-sm text-slate-100
+                        placeholder:text-slate-300
+                        focus:outline-none
+                        focus:ring-2 focus:ring-emerald-400/70
+                        focus:border-emerald-300/80
+                      "
                       placeholder="toi@honk-village.gg"
                     />
                   </div>
@@ -161,7 +157,17 @@ export default function Register(): string {
                       type="password"
                       name="password"
                       autocomplete="new-password"
-                      class="w-full rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/70 focus:border-emerald-400/80"
+                      class="
+                        w-full rounded-lg
+                        border border-[#d4c4a0]/90
+                        bg-[#3a5548]/90
+                        px-3 py-2
+                        text-sm text-slate-100
+                        placeholder:text-slate-300
+                        focus:outline-none
+                        focus:ring-2 focus:ring-emerald-400/70
+                        focus:border-emerald-300/80
+                      "
                       placeholder="••••••••"
                     />
                   </div>
@@ -178,7 +184,17 @@ export default function Register(): string {
                       type="password"
                       name="password_confirm"
                       autocomplete="new-password"
-                      class="w-full rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/70 focus:border-emerald-400/80"
+                      class="
+                        w-full rounded-lg
+                        border border-[#d4c4a0]/90
+                        bg-[#3a5548]/90
+                        px-3 py-2
+                        text-sm text-slate-100
+                        placeholder:text-slate-300
+                        focus:outline-none
+                        focus:ring-2 focus:ring-emerald-400/70
+                        focus:border-emerald-300/80
+                      "
                       placeholder="••••••••"
                     />
                   </div>
@@ -190,9 +206,7 @@ export default function Register(): string {
                       class="mt-0.5 h-3 w-3 rounded border-slate-700 bg-slate-900 text-emerald-500 focus:ring-emerald-500/60"
                     />
                     <label for="terms" class="text-slate-200/90">
-                      Je confirme que je suis prêt·e à accepter les bêtises
-                      régulières de mon oie dans l'interface,
-                      et j'accepte les conditions d'utilisation.
+                      J'accepte que mon oie puisse faire des bêtises et les conditions d'utilisation.
                     </label>
                   </div>
 
@@ -212,7 +226,6 @@ export default function Register(): string {
                   <div class="h-px flex-1 bg-slate-800"></div>
                 </div>
 
-                <!-- Bouton Google -->
                 <button
                   type="button"
                   class="w-full inline-flex items-center justify-center gap-2 rounded-lg border border-slate-700/80 bg-slate-900/80 text-xs sm:text-sm text-slate-100 py-2.5 hover:bg-slate-800 transition-colors"
@@ -233,8 +246,7 @@ export default function Register(): string {
                     </a>
                   </p>
                   <p class="mt-1 text-[0.7rem] text-slate-500">
-                    Ton honk pourra toujours être entendu, même si tu te fais
-                    battre au Pong.
+                    Ton honk pourra toujours être entendu, même si tu perds un match de Pong.
                   </p>
                 </div>
               </div>

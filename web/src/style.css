@@ -206,6 +206,106 @@ body {
     inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
+/* Contrôles de décor flottants */
+.decor-controls {
+  position: fixed;
+  bottom: 1.75rem;
+  right: 1.75rem;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(11, 15, 12, 0.65);
+  backdrop-filter: blur(12px);
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.decor-controls__action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: none;
+  border-radius: 999px;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.9), rgba(56, 189, 248, 0.85));
+  color: #04140f;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.decor-controls__action:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(16, 185, 129, 0.4);
+}
+
+.decor-controls__icon {
+  font-size: 1rem;
+}
+
+.decor-controls__info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.decor-controls__label {
+  text-transform: uppercase;
+  font-size: 0.55rem;
+  letter-spacing: 0.16em;
+  color: rgba(226, 232, 240, 0.65);
+}
+
+.decor-controls__value {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #f0fdf4;
+}
+
+.decor-controls--pulse {
+  animation: decorPulse 0.6s ease;
+}
+
+@keyframes decorPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 640px) {
+  .decor-controls {
+    width: calc(100% - 1.5rem);
+    left: 0.75rem;
+    right: 0.75rem;
+    border-radius: 16px;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .decor-controls__action {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .decor-controls__info {
+    width: 100%;
+    text-align: center;
+  }
+}
+
 /* Bouton danger / accent terracotta */
 .btn-accent {
   border-radius: 999px;
