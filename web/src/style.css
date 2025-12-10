@@ -13,7 +13,7 @@
   --color-border-subtle: #6B8A7A; /* Vert/gris des pierres et ombres */
   
   /* Textes */
-  --color-text: #b82192;        /* Beige clair des murs et pavés */
+  --color-text: #cf7805;        /* Beige clair des murs et pavés */
   --color-text-muted: #C4B5A0;  /* Beige sable des chemins */
 
   /* Accents ciel/eau (gris bleuté tiré des fonds) */
@@ -25,21 +25,6 @@
   --color-terracotta: #D4764C;  /* Orange des toits et briques chaudes */
   --color-grass: #6B9A5C;       /* Vert de l'herbe et des massifs */
 }
-/*
-html,
-body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-}
-
-body {
-  min-height: 100vh;
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
-    sans-serif;
-  background-color: var(--color-bg);
-  color: var(--color-text);
-}*/
 
 /* Fond global : ton village sans l’oie */
 body {
@@ -53,10 +38,6 @@ body {
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
-  /*background-attachment: fixed;*/
-
-  /* Animation lente du fond si tu veux la garder */
-  animation: none;
 }
 
 

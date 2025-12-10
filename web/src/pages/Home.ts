@@ -7,11 +7,17 @@ export default function Home(): string {
         <div class="absolute -bottom-40 -right-40 w-80 h-80 bg-sky-500/20 rounded-full blur-3xl"></div>
       </div>
 
-      <!-- HEADER : logo + navigation (équivalent barre du haut Wolfy) -->
-      <header class="z-20 px-6 py-4 flex items-center justify-between">
-        <a href="/" data-nav class="flex items-center gap-2">
-          <span class="text-2xl">🦢</span>
-          <span class="font-semibold tracking-tight">Honk Village</span>
+      <!-- HEADER -->
+      <header
+        class="relative z-10 px-4 sm:px-6 py-4 flex items-center justify-between border-b border-slate-800/80 bg-slate-950/70 backdrop-blur"
+      >
+        <a
+          href="/"
+          data-nav
+          class="inline-flex items-center gap-2 text-slate-200 hover:text-white transition-colors text-sm"
+        >
+          <span class="text-lg">🦢</span>
+          <span class="font-semibold tracking-tight">Honk village</span>
         </a>
 
         <nav class="flex items-center gap-4 text-sm">
@@ -55,9 +61,9 @@ export default function Home(): string {
             </p>
 
             <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
-              ft_nique_ta_mere,
+              ft_transcendence,
               <span class="block text-glow mt-1">
-                LE Pong social au milieu d'un village d'oies
+                LE pong social au milieu d'un village d'oies
               </span>
             </h1>
 
@@ -81,7 +87,7 @@ export default function Home(): string {
             <dl class="grid grid-cols-3 gap-4 text-[0.7rem] sm:text-xs text-slate-300/80">
               <div>
                 <dt class="font-semibold text-white">8 rôles</dt>
-                <dd class="text-slate-400">duo, solo, chaos</dd>
+                <dd class="text-slate-400">duo, solo, tournois</dd>
               </div>
               <div>
                 <dt class="font-semibold text-white">Parties rapides</dt>
@@ -89,7 +95,7 @@ export default function Home(): string {
               </div>
               <div>
                 <dt class="font-semibold text-white">Village vivant</dt>
-                <dd class="text-slate-400">chat & emotes oies</dd>
+                <dd class="text-slate-400">emotes oies</dd>
               </div>
             </dl>
           </div>
@@ -154,7 +160,7 @@ export default function Home(): string {
           <div class="flex items-center justify-between gap-4 mb-6">
             <div>
               <h2 class="text-2xl sm:text-3xl font-bold">
-                Joue un des rôles du village
+                Joue un des rôles du village (in progress)
               </h2>
               <p class="text-slate-300/80 text-sm sm:text-base">
                 Chaque partie te donne un rôle différent pour perturber le Pong
@@ -263,7 +269,7 @@ export default function Home(): string {
           <div class="flex items-center justify-between gap-4 mb-6">
             <div>
               <h2 class="text-2xl sm:text-3xl font-bold">
-                Progresse dans le classement
+                Progresse dans le classement (in progress)
               </h2>
               <p class="text-slate-300/80 text-sm sm:text-base">
                 Montre que tu es l'oie la plus bruyante du village avant la
@@ -379,7 +385,7 @@ export default function Home(): string {
         >
           <div class="space-y-4">
             <h2 class="text-2xl sm:text-3xl font-bold">
-              Personnalise ton oie au fil des parties
+              Personnalise ton oie au fil des parties (in progress)
             </h2>
             <p class="text-slate-300/80 text-sm sm:text-base">
               Gagne des plumes, des chapeaux ridicules et des effets de

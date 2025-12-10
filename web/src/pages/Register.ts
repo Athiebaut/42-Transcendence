@@ -14,77 +14,86 @@ export default function Register(): string {
         <a
           href="/"
           data-nav
-          class="inline-flex items-center gap-2 text-slate-200 hover:text-white transition-colors text-sm"
+          class="flex items-center gap-2 group"
         >
-          <span class="text-lg">🦢</span>
-          <span class="font-semibold tracking-tight">Retour au village</span>
+          <span class="text-2xl transition-transform group-hover:scale-110">🦢</span>
+          <span class="font-semibold tracking-tight text-slate-100">
+            Honk Village
+          </span>
         </a>
 
-        <div class="hidden sm:flex flex-col items-end text-xs">
-          <span class="uppercase tracking-[0.25em] text-slate-500">
-            Choix du mode
-          </span>
-          <span class="text-slate-400">
-            Sélectionne comment tu veux honker tes adversaires
-          </span>
-        </div>
+        <nav class="flex items-center gap-3 text-xs sm:text-sm">
+          <a
+            href="/login"
+            data-nav
+            class="px-4 py-2 rounded-full border border-white/20 bg-black/30 text-xs font-medium hover:bg-white/10 transition-colors"
+          >
+            J'ai déjà un compte
+          </a>
+        </nav>
       </header>
 
-      <div class="relative z-10 w-full max-w-5xl mx-auto px-4 py-10">
-        <div class="grid gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] items-center">
-          
-          <!-- Colonne gauche : texte d'intro -->
+      <!-- CONTENU -->
+      <main class="relative z-10 flex-1 px-4 sm:px-6 lg:px-8 py-8">
+        <div
+          class="max-w-6xl mx-auto grid gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] items-center"
+        >
+          <!-- Colonne gauche : texte -->
           <div class="space-y-6">
-            <p
-              class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs sm:text-[0.7rem] font-medium bg-black/40 border border-white/10 backdrop-blur"
-            >
-              <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/20 border border-emerald-400/60">
-                <span class="text-[0.7rem]">✨</span>
-              </span>
+            <div class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs sm:text-sm font-medium bg-black/40 border border-white/10 backdrop-blur">
+              <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
               <span class="text-slate-100">
-                Rejoins le village d'oies en ligne.
+                Une nouvelle oie rejoint le village.
               </span>
-            </p>
+            </div>
 
             <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">
-              Crée ton compte
               <span class="block text-glow mt-1">
-                et viens honker sur le Pong du village
+              Crée ton oie,
+              et viens semer le chaos avec élégance.
               </span>
             </h1>
 
-            <p class="text-sm sm:text-base text-slate-200/80 max-w-xl">
-              Un seul compte pour tout : parties classées, classement, cosmétiques,
-              et bien sûr les bêtises de l'oie qui vole ton curseur quand tu t'y attends le moins.
+            <p class="text-base sm:text-lg text-slate-200/80 max-w-xl">
+              En créant un compte, tu pourras suivre ta progression, débloquer des cosmétiques
+              pour ton oie, et affronter les autres villageois dans des matchs de Pong glorieux.
             </p>
 
-            <div class="space-y-3 text-sm">
-              <p class="font-semibold text-slate-100 flex items-center gap-2">
-                <span class="text-lg">🎮</span>
-                <span>Ce que tu débloques en rejoignant le village :</span>
-              </p>
-
-              <ul class="space-y-2 text-sm text-slate-200/80">
-                <li class="flex items-start gap-2">
-                  <span class="mt-0.5">🏅</span>
-                  <span>Un profil d'oie unique avec ton pseudo et ton apparence.</span>
-                </li>
-                <li class="flex items-start gap-2">
-                  <span class="mt-0.5">🏆</span>
-                  <span>Un classement global pour montrer qui honk le plus fort.</span>
-                </li>
-                <li class="flex items-start gap-2">
-                  <span class="mt-0.5">🎨</span>
-                  <span>Des cosmétiques à débloquer au fil des parties gagnées.</span>
-                </li>
-              </ul>
+            <div class="grid sm:grid-cols-3 gap-4 text-sm sm:text-base">
+              <div class="space-y-1">
+                <p class="font-semibold text-slate-100 flex items-center gap-2">
+                  <span class="text-lg">🥇</span>
+                  <span>Progression</span>
+                </p>
+                <p class="text-slate-200/90 text-sm sm:text-base">
+                  Ton classement, ton historique de matchs et tes stats d'oie sont sauvegardés.
+                </p>
+              </div>
+              <div class="space-y-1">
+                <p class="font-semibold text-slate-100 flex items-center gap-2">
+                  <span class="text-lg">🎭</span>
+                  <span>Personnalisation</span>
+                </p>
+                <p class="text-slate-200/80">
+                  Des cosmétiques à débloquer au fil des parties gagnées.
+                </p>
+              </div>
+              <div class="space-y-1">
+                <p class="font-semibold text-slate-100 flex items-center gap-2">
+                  <span class="text-lg">🧑‍🤝‍🧑</span>
+                  <span>Social</span>
+                </p>
+                <p class="text-slate-200/80">
+                  Rejoins tes amis, crée des salons privés, et honk ensemble.
+                </p>
+              </div>
             </div>
           </div>
 
           <!-- Colonne droite : card d'inscription -->
           <div class="relative">
             <div
-              class="relative bg-slate-950/85 border border-slate-800/80 rounded-2xl shadow-2xl overflow-hidden"
+              class="relative glass-panel card-shadow rounded-2xl overflow-hidden"
             >
               <!-- Liserés lumineux -->
               <div class="pointer-events-none absolute inset-0">
@@ -95,10 +104,10 @@ export default function Register(): string {
               <div class="relative p-6 sm:p-8 space-y-6">
                 <div class="space-y-2 text-center sm:text-left">
                   <h2 class="text-xl sm:text-2xl font-semibold tracking-tight">
-                    Inscription au village
+                    Inscription
                   </h2>
                   <p class="text-xs sm:text-sm text-slate-300">
-                    Crée ton compte pour rejoindre les oies en ligne.
+                    Quelques infos, et ton oie est prête à rejoindre le village.
                   </p>
                 </div>
 
@@ -106,19 +115,18 @@ export default function Register(): string {
                 <form class="space-y-4">
                   <div class="space-y-1">
                     <label
-                      for="pseudo"
+                      for="username"
                       class="block text-xs font-medium text-slate-200/90 tracking-wide"
                     >
-                      Pseudo d'oie
+                      Nom d'oie
                     </label>
                     <input
-                      id="pseudo"
+                      id="username"
                       type="text"
-                      name="pseudo"
-                      autocomplete="nickname"
+                      name="username"
+                      autocomplete="username"
                       class="w-full rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/70 focus:border-emerald-400/80"
-                      placeholder="HonkMaster3000"
-                      required
+                      placeholder="OieLégendaire"
                     />
                   </div>
 
@@ -135,8 +143,7 @@ export default function Register(): string {
                       name="email"
                       autocomplete="email"
                       class="w-full rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/70 focus:border-emerald-400/80"
-                      placeholder="toi@village-honk.gg"
-                      required
+                      placeholder="toi@honk-village.gg"
                     />
                   </div>
 
@@ -153,8 +160,7 @@ export default function Register(): string {
                       name="password"
                       autocomplete="new-password"
                       class="w-full rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/70 focus:border-emerald-400/80"
-                      placeholder="Un mot de passe bien solide"
-                      required
+                      placeholder="••••••••"
                     />
                   </div>
 
@@ -171,28 +177,28 @@ export default function Register(): string {
                       name="password_confirm"
                       autocomplete="new-password"
                       class="w-full rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/70 focus:border-emerald-400/80"
-                      placeholder="Répète ton mot de passe"
-                      required
+                      placeholder="••••••••"
                     />
                   </div>
 
-                  <div class="flex items-start gap-2 text-[0.7rem] text-slate-400">
+                  <div class="flex items-start gap-2 text-xs sm:text-sm">
                     <input
-                      id="tos"
+                      id="terms"
                       type="checkbox"
                       class="mt-0.5 h-3 w-3 rounded border-slate-700 bg-slate-900 text-emerald-500 focus:ring-emerald-500/60"
-                      required
                     />
-                    <label for="tos" class="cursor-pointer select-none">
-                      J'accepte que mon oie apparaisse en public dans le village, et que son honk soit entendu de tous.
+                    <label for="terms" class="text-slate-200/90">
+                      Je confirme que je suis prêt·e à accepter les bêtises
+                      régulières de mon oie dans l'interface,
+                      et j'accepte les conditions d'utilisation.
                     </label>
                   </div>
 
                   <button
                     type="submit"
-                    class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-500 text-slate-950 text-sm font-semibold py-2.5 mt-2 hover:bg-emerald-400 transition-colors shadow-lg shadow-emerald-500/25"
+                    class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-500/90 text-slate-950 text-sm sm:text-base font-semibold py-2.5 hover:bg-emerald-400 transition-colors shadow-lg shadow-emerald-500/25"
                   >
-                    <span>Créer mon compte</span>
+                    <span>Créer mon oie</span>
                     <span>🦢</span>
                   </button>
                 </form>
@@ -207,36 +213,33 @@ export default function Register(): string {
                 <!-- Bouton Google -->
                 <button
                   type="button"
-                  class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-slate-900/70 border border-slate-700/80 text-xs sm:text-sm text-slate-100 py-2.5 hover:bg-slate-800 transition-colors"
+                  class="w-full inline-flex items-center justify-center gap-2 rounded-lg border border-slate-700/80 bg-slate-900/80 text-xs sm:text-sm text-slate-100 py-2.5 hover:bg-slate-800 transition-colors"
                 >
                   <span class="text-lg">🪙</span>
                   <span>Continuer avec Google</span>
                 </button>
 
-                <!-- Lien vers login -->
-                <div class="text-center text-[0.75rem] text-slate-400">
-                  <span>Tu as déjà une oie enregistrée ?</span>
-                  <a
-                    href="/login"
-                    data-nav
-                    class="font-medium text-emerald-300 hover:text-emerald-200 underline-offset-2 hover:underline ml-1"
-                  >
-                    Connecte-toi
-                  </a>
-                </div>
-
-                <!-- Petit message fun -->
-                <div class="text-center">
-                  <p class="text-[0.7rem] text-slate-500 italic">
-                    🦢 L'oie vérifie que tu n'es pas un renard déguisé.
+                <div class="text-center text-xs sm:text-sm text-slate-300">
+                  <p>
+                    Tu as déjà une oie ?
+                    <a
+                      href="/login"
+                      data-nav
+                      class="text-emerald-300 hover:text-emerald-200 underline-offset-2 hover:underline"
+                    >
+                      Se connecter
+                    </a>
+                  </p>
+                  <p class="mt-1 text-[0.7rem] text-slate-500">
+                    Ton honk pourra toujours être entendu, même si tu te fais
+                    battre au Pong.
                   </p>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   `;
 }
-

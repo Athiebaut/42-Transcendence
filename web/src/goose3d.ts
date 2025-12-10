@@ -105,7 +105,7 @@ export function initGoose3D() {
   engine = new Engine(canvas, true, {
     preserveDrawingBuffer: false,  // Désactiver pour de meilleures performances
     stencil: false,                // Pas nécessaire ici
-    antialias: false,               // Désactiver l'antialiasing pour éviter les ralentissements
+    antialias: false,              // Désactiver l'antialiasing pour éviter les ralentissements
   });
 
   // Rendu optimisé - limiter le DPR pour éviter la surcharge
@@ -317,6 +317,19 @@ function hasVisibleBorder(el: HTMLElement): boolean {
   return hasBorder || hasOutline || hasBoxShadow || (hasBackground && borderRadius > 0);
 }
 
+// Vérifier si un élément est visible
+function isElementVisible(el: HTMLElement): boolean {
+  const rect = el.getBoundingClientRect();
+  const style = window.getComputedStyle(el);
+  
+  return rect.width > 20 && rect.height > 20 && // Taille minimale raisonnable
+         rect.top < window.innerHeight && rect.bottom > 0 &&
+         rect.left < window.innerWidth && rect.right > 0 &&
+         style.display !== 'none' &&
+         style.visibility !== 'hidden' &&
+         style.opacity !== '0';
+}
+
 // Fonction pour obtenir toutes les balises avec encadrement de la page
 function getInteractiveElements(): HTMLElement[] {
   const selectors = [
@@ -340,7 +353,7 @@ function getInteractiveElements(): HTMLElement[] {
         if (el instanceof HTMLElement && 
             !checkedElements.has(el) && 
             isElementVisible(el) &&
-            hasVisibleBorder(el) &&  // NOUVEAU: vérifier qu'il a un encadrement
+            hasVisibleBorder(el) &&  // vérifier qu'il a un encadrement
             el.id !== 'goose3d-canvas') { // Ne pas cibler le canvas de l'oie!
           elements.push(el);
           checkedElements.add(el);
@@ -355,17 +368,41 @@ function getInteractiveElements(): HTMLElement[] {
   return elements;
 }
 
-// Vérifier si un élément est visible
-function isElementVisible(el: HTMLElement): boolean {
+// 🆕 Vérifier si une "fenêtre" est au milieu de l'écran
+function isElementInScreenCenter(el: HTMLElement): boolean {
   const rect = el.getBoundingClientRect();
-  const style = window.getComputedStyle(el);
-  
-  return rect.width > 20 && rect.height > 20 && // Taille minimale raisonnable
-         rect.top < window.innerHeight && rect.bottom > 0 &&
-         rect.left < window.innerWidth && rect.right > 0 &&
-         style.display !== 'none' &&
-         style.visibility !== 'hidden' &&
-         style.opacity !== '0';
+  if (rect.width < 40 || rect.height < 40) return false; // éviter les petits trucs
+
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+
+  const screenCenterX = viewportWidth / 2;
+  const screenCenterY = viewportHeight / 2;
+
+  // Bande centrale : 50% de la largeur/hauteur autour du centre
+  const horizontalHalfBand = viewportWidth * 0.25;
+  const verticalHalfBand = viewportHeight * 0.25;
+
+  const inHorizontalCenter = Math.abs(centerX - screenCenterX) <= horizontalHalfBand;
+  const inVerticalCenter = Math.abs(centerY - screenCenterY) <= verticalHalfBand;
+
+  return inHorizontalCenter && inVerticalCenter;
+}
+
+// 🆕 Récupérer uniquement les éléments situés dans la zone centrale de l'écran
+function getCenterScreenElements(): HTMLElement[] {
+  const all = getInteractiveElements();
+  const central = all.filter(isElementInScreenCenter);
+  console.log(`🦢 Fenêtres au centre de l'écran: ${central.length}/${all.length}`);
+
+  // Si on n'a rien en plein centre, on retombe sur tous pour éviter que l'oie ne fasse rien
+  if (central.length > 0) {
+    return central;
+  }
+  return all;
 }
 
 // Convertir une position d'écran en coordonnées du monde 3D
@@ -631,9 +668,9 @@ function updateGoose() {
       console.log(`🦢 Devrait pousser? ${shouldPush} (chance: ${PUSH_CHANCE * 100}%)`);
       
       if (shouldPush) {
-        // Essayer de pousser une balise
-        const elements = getInteractiveElements();
-        console.log(`🦢 Éléments trouvés: ${elements.length}`);
+        // 🆕 Essayer de pousser une balise, mais uniquement parmi celles au MILIEU de l'écran
+        const elements = getCenterScreenElements();
+        console.log(`🦢 Éléments centraux trouvés: ${elements.length}`);
         
         if (elements.length > 0) {
           // Choisir un élément aléatoire parmi ceux qui sont assez grands
@@ -872,14 +909,17 @@ function updateGoose() {
     const screenDistX = targetScreenX - gooseScreenPos.x;
     const screenDistY = targetScreenY - gooseScreenPos.y;
     const screenDist = Math.sqrt(screenDistX * screenDistX + screenDistY * screenDistY);
+
+    // 🆕 Distance en monde 3D entre l'oie et sa cible
+    const worldDistToTarget = Vector3.Distance(goose.position, targetPos);
     
-    // Si l'oie n'est pas encore arrivée (distance > 50px à l'écran)
-    if (pushStartTime === 0 && screenDist > 50) {
+    // Si l'oie n'est pas encore arrivée (distance suffisante)
+    // On se base à la fois sur la distance écran ET la distance monde
+    if (pushStartTime === 0 && screenDist > 40 && worldDistToTarget > 0.2) {
       // Continuer à se déplacer vers la cible
       const newTargetWorld = screenToWorld(targetScreenX, targetScreenY);
       targetPos.copyFrom(newTargetWorld);
       
-      // Déplacer l'oie vers la cible avec accélération progressive
       const dirToTarget = targetPos.subtract(goose.position);
       const distToTarget = dirToTarget.length();
       
@@ -911,6 +951,7 @@ function updateGoose() {
       
     } else if (pushStartTime === 0) {
       // L'oie est arrivée à côté de l'élément! Commencer la poussée
+      console.log(`🦢 📍 Arrivée détectée. screenDist=${screenDist.toFixed(1)}, worldDist=${worldDistToTarget.toFixed(2)}`);
       pushStartTime = moveTime;
       
       console.log(`🦢 📍 Oie arrivée! Position écran: (${gooseScreenPos.x.toFixed(0)}, ${gooseScreenPos.y.toFixed(0)})`);
