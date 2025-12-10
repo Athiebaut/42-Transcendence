@@ -92,3 +92,5 @@ tmp/
 *.7z
 *.tar
 *.tgz
+
+*prometheus.yml
