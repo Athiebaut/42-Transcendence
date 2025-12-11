@@ -1,0 +1,74 @@
+services:
+
+  app:
+    build: ./app
+    image: cybertran-app
+    container_name: cybertran-app
+    #user: root
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    depends_on:
+      vault:
+        condition: service_healthy
+    environment:
+      VAULT_SECRET_PATH: secret/data/my-secret
+      VAULT_ADDR: "http://vault:8200"
+      NODE_ENV: production
+    command: sh -c "chmod +x /wait_for_vault.sh && /wait_for_vault.sh node server.js"
+    volumes:
+      - ./app:/app
+      - /app/node_modules
+      - ./wait_for_vault.sh:/wait_for_vault.sh
+      - ./config_shared:/app/config_input
+    entrypoint: ["/wait_for_vault.sh", "node", "server.js"]
+
+  vault:
+    image: hashicorp/vault:1.13.3
+    container_name: vault
+    ports:
+      - "8200:8200"
+    restart: unless-stopped
+    environment:
+      VAULT_ADDR: "http://vault:8200"
+    healthcheck:
+      test: ["CMD", "sh", "-c", "curl -fsS http://vault:8200/v1/sys/health | grep '\"sealed\":false'"]
+      interval: 5s
+      timeout: 10s
+      retries: 20
+      start_period: 20s
+    command: >
+      sh -c "
+        /vault/init-vault.sh &
+        vault server -config=/vault/config.hcl
+      "
+    volumes:
+      - ./vault/config.hcl:/vault/config.hcl:ro
+      - ./vault/init-vault.sh:/vault/init-vault.sh:ro
+      - vault_data:/vault/data
+      - ./config_shared:/vault/config_output
+
+  waf:
+    image: owasp/modsecurity-crs:nginx
+    container_name: cybertran-waf
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+      - "443:443"
+    command: >
+      sh -c "
+        cp /etc/nginx/custom/nginx.conf.template /etc/nginx/custom/nginx.conf &&
+        nginx -g 'daemon off;' -c /etc/nginx/custom/nginx.conf
+      "
+    restart: unless-stopped
+    volumes:
+      - ./waf/modsecurity:/etc/nginx/modsecurity
+      - ./waf/conf.d:/etc/nginx/conf.d
+      - ./waf/custom_nginx:/etc/nginx/custom
+      - ./waf/custom_nginx/crs:/etc/nginx/crs
+      - ./waf/custom_nginx/crs/crs-setup.conf:/etc/nginx/crs/crs-setup.conf
+
+volumes:
+  vault_data:
+  vault_shared_config:
