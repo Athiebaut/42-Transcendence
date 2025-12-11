@@ -1,4 +1,5 @@
 import { api } from "../services/api";
+import { t } from "../i18n";
 
 export default function Register(): string {
   return `
@@ -15,7 +16,7 @@ export default function Register(): string {
           class="inline-flex items-center gap-2 text-slate-200 hover:text-white transition-colors text-sm"
         >
           <span class="text-lg">🦢</span>
-          <span class="font-semibold tracking-tight">Retour au village</span>
+          <span class="font-semibold tracking-tight">${t("settings.backVillage")}</span>
         </a>
 
         <nav class="flex items-center gap-3 text-xs sm:text-sm">
@@ -24,7 +25,7 @@ export default function Register(): string {
             data-nav
             class="px-4 py-2 rounded-full border border-white/20 bg-black/30 text-xs font-medium hover:bg-white/10 transition-colors"
           >
-            J'ai déjà un compte
+            ${t("login.button")}
           </a>
         </nav>
       </header>
@@ -35,39 +36,38 @@ export default function Register(): string {
             <div class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs sm:text-sm font-medium bg-black/40 border border-white/10 backdrop-blur">
               <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
               <span class="text-slate-100">
-                Une nouvelle oie rejoint le village.
+                ${t("register.subtitle")}
               </span>
             </div>
 
             <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">
-              Prépare ton honk,
+              ${t("register.title")}
               <span class="block text-glow mt-1">
-                et laisse ton oie faire sa grande entrée.
+                ${t("register.subtitle")}
               </span>
             </h1>
 
             <p class="text-sm sm:text-base text-slate-200/80 max-w-xl">
-              Crée un compte pour débloquer la personnalisation, suivre ta progression,
-              défier les autres villageois et établir ton héritage d'oie.
+              ${t("register.description")}
             </p>
 
             <div class="grid gap-3 sm:grid-cols-3">
               <p class="flex items-start gap-2 text-sm sm:text-base text-slate-100">
                 <span class="mt-0.5">🥇</span>
                 <span>
-                  Classement et historique de matchs conservés à chaque honk.
+                  ${t("register.benefits.rank")}
                 </span>
               </p>
               <p class="flex items-start gap-2 text-sm sm:text-base text-slate-100">
                 <span class="mt-0.5">🎭</span>
                 <span>
-                  Cosmétiques exclusifs à débloquer pour ton oie.
+                  ${t("register.benefits.cosmetics")}
                 </span>
               </p>
               <p class="flex items-start gap-2 text-sm sm:text-base text-slate-100">
                 <span class="mt-0.5">🧑‍🤝‍🧑</span>
                 <span>
-                  Rejoins tes amis et crée des salons privés.
+                  ${t("register.benefits.friends")}
                 </span>
               </p>
             </div>
@@ -83,10 +83,10 @@ export default function Register(): string {
               <div class="relative p-6 sm:p-8 space-y-6">
                 <div class="space-y-2 text-center sm:text-left">
                   <h2 class="text-xl sm:text-2xl font-semibold tracking-tight">
-                    Créer mon oie
+                    ${t("register.title")}
                   </h2>
                   <p class="text-xs sm:text-sm text-slate-300">
-                    Quelques infos suffisent pour rejoindre le village.
+                    ${t("register.subtitle")}
                   </p>
                 </div>
 
@@ -96,7 +96,7 @@ export default function Register(): string {
                       for="username"
                       class="block text-xs font-medium text-slate-200/90 tracking-wide"
                     >
-                      Nom d'oie
+                      ${t("form.username")}
                     </label>
                     <input
                       id="username"
@@ -114,7 +114,7 @@ export default function Register(): string {
                         focus:ring-2 focus:ring-emerald-400/70
                         focus:border-emerald-300/80
                       "
-                      placeholder="OieLégendaire"
+                      placeholder="${t("form.placeholder.username")}"
                     />
                   </div>
 
@@ -123,7 +123,7 @@ export default function Register(): string {
                       for="email"
                       class="block text-xs font-medium text-slate-200/90 tracking-wide"
                     >
-                      Adresse e-mail
+                      ${t("form.email")}
                     </label>
                     <input
                       id="email"
@@ -141,7 +141,7 @@ export default function Register(): string {
                         focus:ring-2 focus:ring-emerald-400/70
                         focus:border-emerald-300/80
                       "
-                      placeholder="toi@honk-village.gg"
+                      placeholder="${t("form.placeholder.email")}"
                     />
                   </div>
 
@@ -150,7 +150,7 @@ export default function Register(): string {
                       for="password"
                       class="block text-xs font-medium text-slate-200/90 tracking-wide"
                     >
-                      Mot de passe
+                      ${t("form.password")}
                     </label>
                     <input
                       id="password"
@@ -177,7 +177,7 @@ export default function Register(): string {
                       for="password_confirm"
                       class="block text-xs font-medium text-slate-200/90 tracking-wide"
                     >
-                      Confirmation du mot de passe
+                      ${t("form.password.confirm")}
                     </label>
                     <input
                       id="password_confirm"
@@ -206,7 +206,7 @@ export default function Register(): string {
                       class="mt-0.5 h-3 w-3 rounded border-slate-700 bg-slate-900 text-emerald-500 focus:ring-emerald-500/60"
                     />
                     <label for="terms" class="text-slate-200/90">
-                      J'accepte que mon oie puisse faire des bêtises et les conditions d'utilisation.
+                      ${t("register.terms")}
                     </label>
                   </div>
 
@@ -214,7 +214,7 @@ export default function Register(): string {
                     type="submit"
                     class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-500/90 text-slate-950 text-sm sm:text-base font-semibold py-2.5 hover:bg-emerald-400 transition-colors shadow-lg shadow-emerald-500/25"
                   >
-                    <span>Créer mon oie</span>
+                    <span>${t("register.button")}</span>
                     <span>🦢</span>
                   </button>
                 </form>
@@ -222,7 +222,7 @@ export default function Register(): string {
                 <!-- Séparateur -->
                 <div class="flex items-center gap-3 text-[0.7rem] text-slate-500">
                   <div class="h-px flex-1 bg-slate-800"></div>
-                  <span>ou</span>
+                  <span>${t("shared.or")}</span>
                   <div class="h-px flex-1 bg-slate-800"></div>
                 </div>
 
@@ -231,22 +231,22 @@ export default function Register(): string {
                   class="w-full inline-flex items-center justify-center gap-2 rounded-lg border border-slate-700/80 bg-slate-900/80 text-xs sm:text-sm text-slate-100 py-2.5 hover:bg-slate-800 transition-colors"
                 >
                   <span class="text-lg">🪙</span>
-                  <span>Continuer avec Google</span>
+                  <span>${t("register.social.google")}</span>
                 </button>
 
                 <div class="text-center text-xs sm:text-sm text-slate-300">
                   <p>
-                    Tu as déjà une oie ?
+                    ${t("register.haveAccount")}
                     <a
                       href="/login"
                       data-nav
                       class="text-emerald-300 hover:text-emerald-200 underline-offset-2 hover:underline"
                     >
-                      Se connecter
+                      ${t("register.haveAccountLink")}
                     </a>
                   </p>
                   <p class="mt-1 text-[0.7rem] text-slate-500">
-                    Ton honk pourra toujours être entendu, même si tu perds un match de Pong.
+                    ${t("register.helper")}
                   </p>
                 </div>
               </div>
@@ -276,12 +276,11 @@ export function setupRegister() {
           // APPEL SIMPLIFIÉ
           const result = await api.post('/register', dataToSend);
           
-          console.log('Inscription réussie !', result);
-          alert('Inscription réussie !');
+          console.log(t("register.alert.success"), result);
+          alert(t("register.alert.success"));
           window.location.href = '/login';
       } catch (error: any) {
-          // L'erreur est déjà formatée par notre ApiClient
-          alert('Erreur : ' + error.message);
+          alert(t("register.alert.error", { message: error?.message ?? "?" }));
       }
   });
 }

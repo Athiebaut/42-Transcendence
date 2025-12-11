@@ -7,6 +7,7 @@ import Dashboard from "./pages/Dashboard";
 import Pong from "./pages/Pong";
 import Play from "./pages/Play";
 import ProfileSettings from "./pages/ProfileSettings";
+import Profile from "./pages/Profile";
 import { setGoose3DActive } from "./goose3d";
 import type { GameMode } from "./game/config/gameModeConfig";
 import { setupRegister } from "./pages/Register";
@@ -15,6 +16,7 @@ import { isAuthenticated } from "./utils/auth";
 import { setupProfileSettings } from "./pages/ProfileSettings";
 import { setupDashboard } from "./pages/Dashboard";
 import { setupHome } from "./pages/Home";
+import { setupProfile } from "./pages/Profile";
 
 type RouteHandler = () => string;
 
@@ -27,6 +29,7 @@ const routes: Record<string, RouteHandler> = {
   "/pong": Pong,
   "/play": Play,
   "/profile-settings": ProfileSettings,
+  "/profile": Profile
 };
 const protectedRoutes = new Set(["/dashboard", "/profile-settings"]);
 
@@ -90,7 +93,9 @@ export async function renderRoute(path: string) {
     setupHome();
   }
 
-  
+  if (targetPath === "/profile") {
+    setupProfile();
+  }
 }
 
 function NotFound(): string {

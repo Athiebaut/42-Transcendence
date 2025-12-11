@@ -11,7 +11,6 @@ COMPOSE ?= docker compose
 
 API_SERVICE     := api
 NGINX_SERVICE   := nginx
-WEB_BUILD_SVC   := web-build
 
 PORT            := 8443
 CERT_DIR        := certs

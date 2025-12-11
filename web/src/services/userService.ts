@@ -1,8 +1,11 @@
-interface User {
+// AJOUT : export devant l'interface
+export interface User {
   id: number;
   username: string;
   email: string;
   avatarUrl?: string;
+  // AJOUT : Champ manquant pour la 2FA
+  isTwoFactorAuthenticationEnabled?: boolean;
 }
 
 const USER_KEY = "user";

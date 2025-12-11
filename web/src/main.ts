@@ -1,25 +1,34 @@
 // web/src/main.ts
 
 import { renderRoute } from "./router";
-import { initGoose3D } from "./goose3d";
 import { initBackgroundRotator, forceBackgroundChange } from "./utils/backgroundRotator";
 import { mountDecorControls, refreshDecorControls } from "./components/ui/DecorControls";
 import { mountAuthDebugToggle } from "./components/ui/AuthDebugToggle";
+import { initI18n } from "./i18n";
+import { mountLanguageSwitcher } from "./components/ui/LanguageSwitcher";
 import "./style.css";
 import "./village-theme.css";
 
-function refreshCurrentRoute() {
+type RefreshOptions = {
+  preserveBackground?: boolean;
+};
+
+function refreshCurrentRoute(options: RefreshOptions = {}) {
   renderRoute(window.location.pathname);
-  forceBackgroundChange();
+  if (!options.preserveBackground) {
+    forceBackgroundChange();
+  }
   refreshDecorControls();
 }
 
-function bootstrap() {
+async function bootstrap() {
+  initI18n();
   // Initialiser la rotation aléatoire des fonds
   // Options: 'random' (change à chaque page), 'session' (garde pendant la session), 'daily' (change une fois par jour)
   initBackgroundRotator("random");
   mountDecorControls();
   mountAuthDebugToggle();
+  mountLanguageSwitcher();
   
   // Ajouter le bouton de changement manuel (optionnel)
   // initBackgroundSelector();
@@ -30,11 +39,12 @@ function bootstrap() {
     return;
   }
 
-  // Lancer l’oie une fois au démarrage
+  // Lancer l’oie une fois au démarrage (lazy import pour limiter le bundle initial)
+  const { initGoose3D } = await import("./goose3d");
   initGoose3D();
 
   // Première route
-  renderRoute(window.location.pathname);
+  refreshCurrentRoute({ preserveBackground: true });
 
   // Gestion des boutons back/forward
   window.addEventListener("popstate", () => {
@@ -54,9 +64,11 @@ function bootstrap() {
 
     event.preventDefault();
     window.history.pushState({}, "", href);
-    renderRoute(href);
-    forceBackgroundChange();
-    refreshDecorControls();
+    refreshCurrentRoute();
+  });
+
+  window.addEventListener("languagechange", () => {
+    refreshCurrentRoute({ preserveBackground: true });
   });
 }
 

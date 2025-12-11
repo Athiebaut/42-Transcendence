@@ -12,15 +12,15 @@ export function isAuthenticated(): boolean {
   }
 }
 
-export function clearAuthToken(): void {
-  if (typeof window === "undefined") return;
-  try {
-    window.localStorage.removeItem(TOKEN_KEY);
-    userService.clearUser(); // Nettoyer aussi l'utilisateur
-  } catch {
-    // ignore
-  }
-}
+// export function clearAuthToken(): void {
+//   if (typeof window === "undefined") return;
+//   try {
+//     window.localStorage.removeItem(TOKEN_KEY);
+//     userService.clearUser(); // Nettoyer aussi l'utilisateur
+//   } catch {
+//     // ignore
+//   }
+// }
 
 /**
  * Récupère le nom de l'utilisateur connecté
@@ -45,7 +45,8 @@ export async function logout(): Promise<void> {
   
   try {
     // 1. Appeler l'endpoint backend pour nettoyer le cookie
-    await api.post("/auth/logout", {});
+    // CORRECTION : La route backend est définie sur '/logout' et non '/auth/logout'
+    await api.post("/logout", {});
   } catch (error) {
     console.error("Erreur lors de l'appel au logout backend", error);
     // On continue quand même pour nettoyer le front

@@ -1,3 +1,83 @@
+import { t } from "../i18n";
+
+type PlayCard = {
+  href: string;
+  icon: string;
+  circleGradient: string;
+  borderClass: string;
+  badgeColor: string;
+  badgeKey: string;
+  titleKey: string;
+  subtitleKey: string;
+  descriptionKey: string;
+  rulesKey: string;
+  ctaKey: string;
+  ctaColor: string;
+};
+
+const playCards: PlayCard[] = [
+  {
+    href: "/pong?mode=pvp1v1",
+    icon: "⚡",
+    circleGradient: "bg-gradient-to-br from-emerald-400 to-amber-300",
+    borderClass:
+      "border border-emerald-500/30 hover:border-emerald-300/70 hover:bg-emerald-500/5",
+    badgeColor: "text-emerald-300",
+    badgeKey: "play.cards.quick.badge",
+    titleKey: "play.cards.quick.title",
+    subtitleKey: "play.cards.quick.subtitle",
+    descriptionKey: "play.cards.quick.description",
+    rulesKey: "play.cards.quick.rules",
+    ctaKey: "play.cards.quick.cta",
+    ctaColor: "text-emerald-300",
+  },
+  {
+    href: "/pong?mode=pvp2v2",
+    icon: "🏅",
+    circleGradient: "bg-gradient-to-br from-amber-300 to-rose-400",
+    borderClass:
+      "border border-amber-500/30 hover:border-amber-300/70 hover:bg-amber-500/5",
+    badgeColor: "text-amber-300",
+    badgeKey: "play.cards.rank.badge",
+    titleKey: "play.cards.rank.title",
+    subtitleKey: "play.cards.rank.subtitle",
+    descriptionKey: "play.cards.rank.description",
+    rulesKey: "play.cards.rank.rules",
+    ctaKey: "play.cards.rank.cta",
+    ctaColor: "text-amber-300",
+  },
+  {
+    href: "/pong?mode=vsai",
+    icon: "🤝",
+    circleGradient: "bg-gradient-to-br from-sky-400 to-violet-300",
+    borderClass:
+      "border border-sky-500/30 hover:border-sky-300/70 hover:bg-sky-500/5",
+    badgeColor: "text-sky-300",
+    badgeKey: "play.cards.coop.badge",
+    titleKey: "play.cards.coop.title",
+    subtitleKey: "play.cards.coop.subtitle",
+    descriptionKey: "play.cards.coop.description",
+    rulesKey: "play.cards.coop.rules",
+    ctaKey: "play.cards.coop.cta",
+    ctaColor: "text-sky-300",
+  },
+  {
+    href: "/pong?mode=tournament",
+    icon: "🌀",
+    circleGradient: "bg-gradient-to-br from-rose-400 to-fuchsia-400",
+    borderClass:
+      "border border-rose-500/30 hover:border-rose-300/70 hover:bg-rose-500/5",
+    badgeColor: "text-rose-300",
+    badgeKey: "play.cards.chaos.badge",
+    titleKey: "play.cards.chaos.title",
+    subtitleKey: "play.cards.chaos.subtitle",
+    descriptionKey: "play.cards.chaos.description",
+    rulesKey: "play.cards.chaos.rules",
+    ctaKey: "play.cards.chaos.cta",
+    ctaColor: "text-rose-300",
+  },
+];
+
 export default function Play(): string {
   return `
     <div class="min-h-screen flex flex-col relative overflow-hidden text-slate-100">
@@ -17,15 +97,15 @@ export default function Play(): string {
           class="inline-flex items-center gap-2 text-slate-200 hover:text-white transition-colors text-sm"
         >
           <span class="text-lg">🦢</span>
-          <span class="font-semibold tracking-tight">Retour au village</span>
+          <span class="font-semibold tracking-tight">${t("settings.backVillage")}</span>
         </a>
 
         <div class="hidden sm:flex flex-col items-end text-xs">
           <span class="uppercase tracking-[0.25em] text-slate-500">
-            Choix du mode
+            ${t("shared.modeChoice.label")}
           </span>
           <span class="text-slate-400">
-            Sélectionne comment tu veux honker tes adversaires
+            ${t("shared.modeChoice.helper")}
           </span>
         </div>
       </header>
@@ -35,188 +115,64 @@ export default function Play(): string {
         <div class="max-w-5xl mx-auto space-y-8">
           <section class="text-center space-y-3">
             <h1 class="text-2xl sm:text-3xl font-bold">
-              Choisis ton mode de jeu
+              ${t("play.title")}
             </h1>
             <p class="text-sm sm:text-base text-slate-300 max-w-xl mx-auto">
-              Que tu veuilles une partie chill entre oies ou grimper le classement
-              jusqu'à la pleine lune, commence par choisir l'ambiance de ton terrain.
+              ${t("play.description")}
             </p>
           </section>
 
           <!-- Cartes de modes -->
           <section class="grid gap-5 sm:grid-cols-2">
-            <!-- Mode rapide -->
-            <a
-              href="/pong?mode=pvp1v1"
-              data-nav
-              class="glass-panel card-shadow group relative flex flex-col gap-3 p-5 sm:p-6 border border-emerald-500/30 hover:border-emerald-300/70 hover:bg-emerald-500/5 transition-colors"
-            >
-              <div class="flex items-center justify-between gap-3">
-                <div class="flex items-center gap-3">
-                  <div
-                    class="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-amber-300 flex items-center justify-center shadow-lg"
+            ${playCards
+              .map(
+                (card) => `
+                  <a
+                    href="${card.href}"
+                    data-nav
+                    class="glass-panel card-shadow group relative flex flex-col gap-3 p-5 sm:p-6 ${card.borderClass} transition-colors"
                   >
-                    <span class="text-xl">⚡</span>
-                  </div>
-                  <div class="text-left">
-                    <h2 class="font-semibold text-lg">Partie 1v1</h2>
-                    <p class="text-xs text-slate-400">
-                      Lancer et jouer en quelques secondes.
+                    <div class="flex items-center justify-between gap-3">
+                      <div class="flex items-center gap-3">
+                        <div
+                          class="w-10 h-10 rounded-full ${card.circleGradient} flex items-center justify-center shadow-lg"
+                        >
+                          <span class="text-xl">${card.icon}</span>
+                        </div>
+                        <div class="text-left">
+                          <h2 class="font-semibold text-lg">${t(card.titleKey)}</h2>
+                          <p class="text-xs text-slate-400">
+                            ${t(card.subtitleKey)}
+                          </p>
+                        </div>
+                      </div>
+                      <span class="text-[0.65rem] uppercase tracking-[0.2em] ${card.badgeColor}">
+                        ${t(card.badgeKey)}
+                      </span>
+                    </div>
+
+                    <p class="text-sm text-slate-200 mt-1">
+                      ${t(card.descriptionKey)}
                     </p>
-                  </div>
-                </div>
-                <span class="text-[0.65rem] uppercase tracking-[0.2em] text-emerald-300">
-                  Recommandé
-                </span>
-              </div>
 
-              <p class="text-sm text-slate-200 mt-1">
-                Un duel classique entre deux oies, sans pression. Idéal pour
-                s'échauffer le bec et les réflexes.
-              </p>
-
-              <p class="mt-2 text-[0.7rem] text-slate-400">
-                Règles : premier à 10 points • terrain normal • pas de bonus.
-              </p>
-
-              <span
-                class="mt-3 inline-flex items-center gap-1 text-[0.75rem] text-emerald-300 group-hover:translate-x-0.5 transition-transform"
-              >
-                Lancer ce mode
-                <span>→</span>
-              </span>
-            </a>
-
-            <!-- Mode classé -->
-            <a
-              href="/pong?mode=pvp2v2"
-              data-nav
-              class="glass-panel card-shadow group relative flex flex-col gap-3 p-5 sm:p-6 border border-amber-500/30 hover:border-amber-300/70 hover:bg-amber-500/5 transition-colors"
-            >
-              <div class="flex items-center justify-between gap-3">
-                <div class="flex items-center gap-3">
-                  <div
-                    class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-300 to-rose-400 flex items-center justify-center shadow-lg"
-                  >
-                    <span class="text-xl">🏅</span>
-                  </div>
-                  <div class="text-left">
-                    <h2 class="font-semibold text-lg">Partie 2v2</h2>
-                    <p class="text-xs text-slate-400">
-                      Chaque honk compte pour ton rang.
+                    <p class="mt-2 text-[0.7rem] text-slate-400">
+                      ${t(card.rulesKey)}
                     </p>
-                  </div>
-                </div>
-                <span class="text-[0.65rem] uppercase tracking-[0.2em] text-amber-300">
-                  Compétitif
-                </span>
-              </div>
 
-              <p class="text-sm text-slate-200 mt-1">
-                Mode sérieux : ta performance impacte ton classement dans le
-                village. Viens prouver que tu es l'oie la plus bruyante.
-              </p>
-
-              <p class="mt-2 text-[0.7rem] text-slate-400">
-                Règles : matchmaking par niveau • impact sur le ladder • stats détaillées.
-              </p>
-
-              <span
-                class="mt-3 inline-flex items-center gap-1 text-[0.75rem] text-amber-300 group-hover:translate-x-0.5 transition-transform"
-              >
-                Lancer ce mode
-                <span>→</span>
-              </span>
-            </a>
-
-            <!-- Mode privé -->
-            <a
-              href="/pong?mode=vsai"
-              data-nav
-              class="glass-panel card-shadow group relative flex flex-col gap-3 p-5 sm:p-6 border border-sky-500/30 hover:border-sky-300/70 hover:bg-sky-500/5 transition-colors"
-            >
-              <div class="flex items-center justify-between gap-3">
-                <div class="flex items-center gap-3">
-                  <div
-                    class="w-10 h-10 rounded-full bg-gradient-to-br from-sky-400 to-violet-300 flex items-center justify-center shadow-lg"
-                  >
-                    <span class="text-xl">🤝</span>
-                  </div>
-                  <div class="text-left">
-                    <h2 class="font-semibold text-lg">Partie vs IA</h2>
-                    <p class="text-xs text-slate-400">
-                      Invites tes amis dans ton étang.
-                    </p>
-                  </div>
-                </div>
-                <span class="text-[0.65rem] uppercase tracking-[0.2em] text-sky-300">
-                  Social
-                </span>
-              </div>
-
-              <p class="text-sm text-slate-200 mt-1">
-                Crée un lobby et partage un code de village pour honker seulement
-                avec les gens que tu connais.
-              </p>
-
-              <p class="mt-2 text-[0.7rem] text-slate-400">
-                Règles : pas d'impact sur le classement • parfait pour les soirées LAN.
-              </p>
-
-              <span
-                class="mt-3 inline-flex items-center gap-1 text-[0.75rem] text-sky-300 group-hover:translate-x-0.5 transition-transform"
-              >
-                Créer / rejoindre un lobby
-                <span>→</span>
-              </span>
-            </a>
-
-            <!-- Mode chaos -->
-            <a
-              href="/pong?mode=tournament"
-              data-nav
-              class="glass-panel card-shadow group relative flex flex-col gap-3 p-5 sm:p-6 border border-rose-500/30 hover:border-rose-300/70 hover:bg-rose-500/5 transition-colors"
-            >
-              <div class="flex items-center justify-between gap-3">
-                <div class="flex items-center gap-3">
-                  <div
-                    class="w-10 h-10 rounded-full bg-gradient-to-br from-rose-400 to-fuchsia-400 flex items-center justify-center shadow-lg"
-                  >
-                    <span class="text-xl">🌀</span>
-                  </div>
-                  <div class="text-left">
-                    <h2 class="font-semibold text-lg">Mode tournois</h2>
-                    <p class="text-xs text-slate-400">
-                      L'oie a trouvé les réglages avancés.
-                    </p>
-                  </div>
-                </div>
-                <span class="text-[0.65rem] uppercase tracking-[0.2em] text-rose-300">
-                  Fun
-                </span>
-              </div>
-
-              <p class="text-sm text-slate-200 mt-1">
-                Bonus aléatoires, balles qui accélèrent, raquettes qui tremblent :
-                ce mode est fait pour les oies qui n'ont peur de rien.
-              </p>
-
-              <p class="mt-2 text-[0.7rem] text-slate-400">
-                Règles : paramètres expérimentaux • fou rire garanti.
-              </p>
-
-              <span
-                class="mt-3 inline-flex items-center gap-1 text-[0.75rem] text-rose-300 group-hover:translate-x-0.5 transition-transform"
-              >
-                Lancer ce mode
-                <span>→</span>
-              </span>
-            </a>
+                    <span
+                      class="mt-3 inline-flex items-center gap-1 text-[0.75rem] ${card.ctaColor} group-hover:translate-x-0.5 transition-transform"
+                    >
+                      ${t(card.ctaKey)}
+                      <span>→</span>
+                    </span>
+                  </a>
+                `
+              )
+              .join("")}
           </section>
 
           <p class="text-[0.7rem] text-slate-500 text-center mt-2">
-            Certains modes peuvent encore être en cours de construction dans la grange du village.
-            Si rien ne se passe, c'est que l'oie n'a pas encore fini de câbler les fils.
+            ${t("play.notice")}
           </p>
         </div>
       </main>

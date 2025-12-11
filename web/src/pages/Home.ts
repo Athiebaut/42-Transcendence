@@ -1,4 +1,5 @@
-import { isAuthenticated, logout } from "../utils/auth";
+import { isAuthenticated } from "../utils/auth";
+import { t } from "../i18n";
 
 export default function Home(): string {
   const loggedIn = isAuthenticated();
@@ -24,9 +25,9 @@ export default function Home(): string {
         </a>
 
         <nav class="flex items-center gap-4 text-sm">
-          <a href="#roles" class="hover:text-white/80 transition-colors">Rôles</a>
-          <a href="#ladder" class="hover:text-white/80 transition-colors">Classement</a>
-          <a href="#customize" class="hover:text-white/80 transition-colors">Personnalisation</a>
+          <a href="#roles" class="hover:text-white/80 transition-colors">${t("nav.roles")}</a>
+          <a href="#ladder" class="hover:text-white/80 transition-colors">${t("nav.ladder")}</a>
+          <a href="#customize" class="hover:text-white/80 transition-colors">${t("nav.customize")}</a>
 
           <div class="hidden sm:flex items-center gap-2 ml-4">
             ${!loggedIn ? `
@@ -35,23 +36,23 @@ export default function Home(): string {
                 data-nav
                 class="px-4 py-2 rounded-full border border-white/20 bg-black/30 text-xs font-medium hover:bg-white/10 transition-colors"
               >
-                Se connecter
+                ${t("cta.login")}
               </a>
               <a
                 href="/register"
                 data-nav
                 class="wood-sign-btn text-sm px-5 py-2"
               >
-                ✨ S'inscrire
+                ${t("cta.register")}
               </a>
             ` : ""}
             ${loggedIn ? `
               <a
-                href="/dashboard"
+                href="/profile"
                 data-nav
                 class="px-4 py-2 rounded-full border border-emerald-400/40 text-xs font-medium text-emerald-200 hover:bg-emerald-400/10 transition-colors"
               >
-                Profil
+                ${t("cta.profile")}
               </a>
             ` : ""}
           </div>
@@ -71,20 +72,17 @@ export default function Home(): string {
               class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-[0.65rem] sm:text-xs font-medium bg-black/40 border border-white/10 backdrop-blur"
             >
               <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              Etang toujours éveillé
+              ${t("home.heroBadge")}
             </p>
 
             <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
-              ft_transcendence,
               <span class="block text-glow mt-1">
-                LE pong social au milieu d'un village d'oies
+                ${t("home.heroTitle")}
               </span>
             </h1>
 
             <p class="text-base sm:text-lg text-slate-200/80">
-              Défends ton terrain, honke sur tes adversaires et grimpe le
-              classement sans jamais quitter le village. Chaque partie est
-              l'occasion de faire honker quelqu'un de nouveau.
+              ${t("home.heroDescription")}
             </p>
 
             <div class="flex flex-wrap gap-3">
@@ -93,23 +91,23 @@ export default function Home(): string {
                 data-nav
                 class="wood-sign-btn px-6 py-3 text-base font-semibold"
               >
-                🎮 Jouer maintenant
+                ${t("home.playNow")}
               </a>
             </div>
 
             <!-- Mini stats comme sur Wolfy : rôles / joueurs / parties -->
             <dl class="grid grid-cols-3 gap-4 text-[0.7rem] sm:text-xs text-slate-300/80">
               <div>
-                <dt class="font-semibold text-white">8 rôles</dt>
-                <dd class="text-slate-400">duo, solo, tournois</dd>
+                <dt class="font-semibold text-white" data-i18n="home.hero.stats.roles.title">8 rôles</dt>
+                <dd class="text-slate-400" data-i18n="home.hero.stats.roles.desc">duo, solo, tournois</dd>
               </div>
               <div>
-                <dt class="font-semibold text-white">Parties rapides</dt>
-                <dd class="text-slate-400">moins de 5 min</dd>
+                <dt class="font-semibold text-white" data-i18n="home.hero.stats.fast.title">Parties rapides</dt>
+                <dd class="text-slate-400" data-i18n="home.hero.stats.fast.desc">moins de 5 min</dd>
               </div>
               <div>
-                <dt class="font-semibold text-white">Village vivant</dt>
-                <dd class="text-slate-400">emotes oies</dd>
+                <dt class="font-semibold text-white" data-i18n="home.hero.stats.village.title">Village vivant</dt>
+                <dd class="text-slate-400" data-i18n="home.hero.stats.village.desc">customize ton oie</dd>
               </div>
             </dl>
           </div>
@@ -120,17 +118,20 @@ export default function Home(): string {
               class="glass-panel card-shadow absolute inset-0 flex flex-col justify-between p-5"
             >
               <div class="flex items-center justify-between text-xs text-slate-300">
-                <span class="inline-flex items-center gap-1">
+                <span class="inline-flex items-center gap-1" data-i18n="home.hero.matchType">
                   <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
                   Partie classée
                 </span>
-                <span class="text-slate-400">Village #248</span>
+                <span class="text-slate-400" data-i18n="home.hero.village" data-i18n-vars='{"id":"248"}'>Village #248</span>
               </div>
 
               <ul class="mt-4 space-y-3 text-sm">
                 <li class="flex items-start gap-2">
                   <span class="mt-0.5">🦢</span>
-                  <p>
+                  <p
+                    data-i18n-html="home.hero.event1"
+                    data-i18n-vars='{"player":"<span class=&quot;font-medium&quot;>HonkMaster</span>","target":"<span class=&quot;text-amber-300&quot;>@Noob42</span>"}'
+                  >
                     <span class="font-medium">HonkMaster</span>
                     a volé le curseur de
                     <span class="text-amber-300">@Noob42</span>.
@@ -138,7 +139,10 @@ export default function Home(): string {
                 </li>
                 <li class="flex items-start gap-2">
                   <span class="mt-0.5">🎯</span>
-                  <p>
+                  <p
+                    data-i18n-html="home.hero.event2"
+                    data-i18n-vars='{"player":"<span class=&quot;font-medium&quot;>GooseBot</span>","highlight":"<span class=&quot;text-emerald-300 font-semibold&quot;>but parfait</span>"}'
+                  >
                     <span class="font-medium">GooseBot</span>
                     vient de marquer un
                     <span class="text-emerald-300 font-semibold">but parfait</span>.
@@ -146,14 +150,20 @@ export default function Home(): string {
                 </li>
                 <li class="flex items-start gap-2">
                   <span class="mt-0.5">💬</span>
-                  <p>
+                  <p
+                    data-i18n-html="home.hero.event3"
+                    data-i18n-vars='{"player":"<span class=&quot;font-medium&quot;>Villageoise_42</span>"}'
+                  >
                     <span class="font-medium">Villageoise_42</span>
                     : “Je jure que c'est l'oie qui a bougé ma raquette !”
                   </p>
                 </li>
                 <li class="flex items-start gap-2">
                   <span class="mt-0.5">❌</span>
-                  <p>
+                  <p
+                    data-i18n-html="home.hero.event4"
+                    data-i18n-vars='{"player":"<span class=&quot;font-medium text-rose-300&quot;>Noob42</span>"}'
+                  >
                     <span class="font-medium text-rose-300">Noob42</span>
                     s'est fait expulser du terrain…
                   </p>
@@ -162,6 +172,7 @@ export default function Home(): string {
 
               <button
                 class="mt-5 self-end px-4 py-2 rounded-full bg-emerald-500/90 text-slate-950 font-semibold text-xs sm:text-sm hover:bg-emerald-400 transition-colors"
+                data-i18n="home.hero.playAgain"
               >
                 Rejouer une partie
               </button>
@@ -181,9 +192,9 @@ export default function Home(): string {
               <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/15 to-teal-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
               <div class="relative flex items-center justify-between">
                 <div>
-                  <p class="text-xs uppercase tracking-[0.3em] text-emerald-300/80">Direct</p>
-                  <h3 class="text-xl font-semibold text-white mt-1">Rejoindre une partie</h3>
-                  <p class="text-slate-300/80 text-sm mt-2 max-w-[15rem]">
+                  <p class="text-xs uppercase tracking-[0.3em] text-emerald-300/80" data-i18n="home.quick.direct.badge">Direct</p>
+                  <h3 class="text-xl font-semibold text-white mt-1" data-i18n="home.quick.play.title">Rejoindre une partie</h3>
+                  <p class="text-slate-300/80 text-sm mt-2 max-w-[15rem]" data-i18n="home.quick.play.desc">
                     Modes rapides, parties personnalisées et tournois du week-end.
                   </p>
                 </div>
@@ -199,10 +210,10 @@ export default function Home(): string {
               <div class="absolute inset-0 bg-gradient-to-br from-amber-500/15 to-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
               <div class="relative flex items-center justify-between">
                 <div>
-                  <p class="text-xs uppercase tracking-[0.3em] text-amber-200/80">Progression</p>
-                  <h3 class="text-xl font-semibold text-white mt-1">Consulter le classement</h3>
+                  <p class="text-xs uppercase tracking-[0.3em] text-amber-200/80" data-i18n="home.quick.progress.badge">Progression</p>
+                  <h3 class="text-xl font-semibold text-white mt-1">${t("home.quickAccess")}</h3>
                   <p class="text-slate-300/80 text-sm mt-2 max-w-[15rem]">
-                    Historique des matches, ligues et défis communautaires.
+                    ${t("home.quickAccessDesc")}
                   </p>
                 </div>
                 <span class="text-3xl">📊</span>
@@ -217,10 +228,10 @@ export default function Home(): string {
               <div class="absolute inset-0 bg-gradient-to-br from-sky-500/15 to-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
               <div class="relative flex items-center justify-between">
                 <div>
-                  <p class="text-xs uppercase tracking-[0.3em] text-sky-200/80">Nouveaux honks</p>
-                  <h3 class="text-xl font-semibold text-white mt-1">Créer ton profil</h3>
+                  <p class="text-xs uppercase tracking-[0.3em] text-sky-200/80" data-i18n="home.quick.new.badge">Nouveaux honks</p>
+                  <h3 class="text-xl font-semibold text-white mt-1">${t("home.createProfile")}</h3>
                   <p class="text-slate-300/80 text-sm mt-2 max-w-[15rem]">
-                    Sauvegarde ton oie, débloque des cosmétiques et des emotes.
+                    ${t("home.createProfileDesc")}
                   </p>
                 </div>
                 <span class="text-3xl">✨</span>
@@ -233,10 +244,10 @@ export default function Home(): string {
         <section id="roles" class="max-w-5xl mx-auto">
           <div class="flex items-center justify-between gap-4 mb-6">
             <div>
-              <h2 class="text-2xl sm:text-3xl font-bold">
+              <h2 class="text-2xl sm:text-3xl font-bold" data-i18n="home.roles.title">
                 Joue un des rôles du village (in progress)
               </h2>
-              <p class="text-slate-300/80 text-sm sm:text-base">
+              <p class="text-slate-300/80 text-sm sm:text-base" data-i18n="home.roles.description">
                 Chaque partie te donne un rôle différent pour perturber le Pong
                 classique : protège ton camp, trahis tes amis ou fais honker
                 tout le serveur.
@@ -244,6 +255,7 @@ export default function Home(): string {
             </div>
             <span
               class="text-[0.6rem] sm:text-xs uppercase tracking-[0.25em] text-slate-500 hidden sm:inline"
+              data-i18n="home.roles.label"
             >
               RÔLES
             </span>
@@ -253,13 +265,13 @@ export default function Home(): string {
             <article class="glass-panel border border-white/5 p-4 flex flex-col gap-2">
               <div class="flex items-center gap-2">
                 <span class="text-xl">🛡️</span>
-                <h3 class="font-semibold text-lg">Gardienne de l'Étang</h3>
+                <h3 class="font-semibold text-lg" data-i18n="home.roles.guardian.title">Gardienne de l'Étang</h3>
               </div>
-              <p class="text-sm text-slate-300/90">
+              <p class="text-sm text-slate-300/90" data-i18n="home.roles.guardian.desc">
                 Défends ton côté de la rivière. Plus tu bloques de balles,
                 plus ton équipe gagne de “plumes d'honneur”.
               </p>
-              <p class="text-xs text-emerald-300/90 mt-auto">
+              <p class="text-xs text-emerald-300/90 mt-auto" data-i18n="home.roles.guardian.tag">
                 Rôle défensif • idéal débutant
               </p>
             </article>
@@ -267,14 +279,14 @@ export default function Home(): string {
             <article class="glass-panel border border-white/5 p-4 flex flex-col gap-2">
               <div class="flex items-center gap-2">
                 <span class="text-xl">🎯</span>
-                <h3 class="font-semibold text-lg">Sniper des Joncs</h3>
+                <h3 class="font-semibold text-lg" data-i18n="home.roles.sniper.title">Sniper des Joncs</h3>
               </div>
-              <p class="text-sm text-slate-300/90">
+              <p class="text-sm text-slate-300/90" data-i18n="home.roles.sniper.desc">
                 Charge un tir précis qui accélère la balle de façon
                 imprévisible. À utiliser au bon moment pour faire paniquer
                 le village.
               </p>
-              <p class="text-xs text-amber-300/90 mt-auto">
+              <p class="text-xs text-amber-300/90 mt-auto" data-i18n="home.roles.sniper.tag">
                 Rôle offensif • coups décisifs
               </p>
             </article>
@@ -282,14 +294,14 @@ export default function Home(): string {
             <article class="glass-panel border border-white/5 p-4 flex flex-col gap-2">
               <div class="flex items-center gap-2">
                 <span class="text-xl">🌀</span>
-                <h3 class="font-semibold text-lg">Oie Chaotique</h3>
+                <h3 class="font-semibold text-lg" data-i18n="home.roles.chaotic.title">Oie Chaotique</h3>
               </div>
-              <p class="text-sm text-slate-300/90">
+              <p class="text-sm text-slate-300/90" data-i18n="home.roles.chaotic.desc">
                 Inverse les contrôles, fait trembler les raquettes et sème
                 le doute dans les esprits. Personne ne sait vraiment pour qui
                 tu joues.
               </p>
-              <p class="text-xs text-rose-300/90 mt-auto">
+              <p class="text-xs text-rose-300/90 mt-auto" data-i18n="home.roles.chaotic.tag">
                 Rôle chaos • idéal trolls bienveillants
               </p>
             </article>
@@ -297,13 +309,13 @@ export default function Home(): string {
             <article class="glass-panel border border-white/5 p-4 flex flex-col gap-2">
               <div class="flex items-center gap-2">
                 <span class="text-xl">📡</span>
-                <h3 class="font-semibold text-lg">Observatrice de la Mare</h3>
+                <h3 class="font-semibold text-lg" data-i18n="home.roles.observer.title">Observatrice de la Mare</h3>
               </div>
-              <p class="text-sm text-slate-300/90">
+              <p class="text-sm text-slate-300/90" data-i18n="home.roles.observer.desc">
                 Vois les statistiques de tout le monde : précision, vitesse,
                 temps de réaction. Utilise-les pour dénoncer les imposteurs.
               </p>
-              <p class="text-xs text-sky-300/90 mt-auto">
+              <p class="text-xs text-sky-300/90 mt-auto" data-i18n="home.roles.observer.tag">
                 Rôle information • méta-joueuse
               </p>
             </article>
@@ -311,13 +323,13 @@ export default function Home(): string {
             <article class="glass-panel border border-white/5 p-4 flex flex-col gap-2">
               <div class="flex items-center gap-2">
                 <span class="text-xl">💣</span>
-                <h3 class="font-semibold text-lg">Poseuse d'Oeufs Piégés</h3>
+                <h3 class="font-semibold text-lg" data-i18n="home.roles.eggs.title">Poseuse d'Oeufs Piégés</h3>
               </div>
-              <p class="text-sm text-slate-300/90">
+              <p class="text-sm text-slate-300/90" data-i18n="home.roles.eggs.desc">
                 Fais apparaître des “oeufs” sur le terrain : certains
                 ralentissent, d'autres explosent la vitesse de la balle.
               </p>
-              <p class="text-xs text-violet-300/90 mt-auto">
+              <p class="text-xs text-violet-300/90 mt-auto" data-i18n="home.roles.eggs.tag">
                 Rôle contrôle de zone
               </p>
             </article>
@@ -325,13 +337,13 @@ export default function Home(): string {
             <article class="glass-panel border border-white/5 p-4 flex flex-col gap-2">
               <div class="flex items-center gap-2">
                 <span class="text-xl">👑</span>
-                <h3 class="font-semibold text-lg">Reine du Ponton</h3>
+                <h3 class="font-semibold text-lg" data-i18n="home.roles.queen.title">Reine du Ponton</h3>
               </div>
-              <p class="text-sm text-slate-300/90">
+              <p class="text-sm text-slate-300/90" data-i18n="home.roles.queen.desc">
                 Si tu quittes la partie en tête, tout ton groupe gagne un
                 bonus de classement. La pression est sur toi.
               </p>
-              <p class="text-xs text-fuchsia-300/90 mt-auto">
+              <p class="text-xs text-fuchsia-300/90 mt-auto" data-i18n="home.roles.queen.tag">
                 Rôle leader • haute pression
               </p>
             </article>
@@ -342,10 +354,10 @@ export default function Home(): string {
         <section id="ladder" class="max-w-5xl mx-auto">
           <div class="flex items-center justify-between gap-4 mb-6">
             <div>
-              <h2 class="text-2xl sm:text-3xl font-bold">
+              <h2 class="text-2xl sm:text-3xl font-bold" data-i18n="home.ladder.title">
                 Progresse dans le classement (in progress)
               </h2>
-              <p class="text-slate-300/80 text-sm sm:text-base">
+              <p class="text-slate-300/80 text-sm sm:text-base" data-i18n="home.ladder.description">
                 Montre que tu es l'oie la plus bruyante du village avant la
                 prochaine pleine lune. Gagne des plumes, grimpe de ligue et
                 débloque des cosmétiques.
@@ -360,9 +372,9 @@ export default function Home(): string {
                   class="text-slate-400 uppercase text-[0.65rem] tracking-wide bg-white/5"
                 >
                   <tr>
-                    <th class="px-4 py-3 text-left">Rang</th>
-                    <th class="px-4 py-3 text-left">Joueuse</th>
-                    <th class="px-4 py-3 text-right">Plumes</th>
+                    <th class="px-4 py-3 text-left" data-i18n="home.ladder.table.rank">Rang</th>
+                    <th class="px-4 py-3 text-left" data-i18n="home.ladder.table.player">Joueuse</th>
+                    <th class="px-4 py-3 text-right" data-i18n="home.ladder.table.points">Plumes</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5 text-slate-200">
@@ -458,10 +470,10 @@ export default function Home(): string {
           class="max-w-5xl mx-auto grid gap-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.9fr)] items-center"
         >
           <div class="space-y-4">
-            <h2 class="text-2xl sm:text-3xl font-bold">
+            <h2 class="text-2xl sm:text-3xl font-bold" data-i18n="home.customize.title">
               Personnalise ton oie au fil des parties (in progress)
             </h2>
-            <p class="text-slate-300/80 text-sm sm:text-base">
+            <p class="text-slate-300/80 text-sm sm:text-base" data-i18n="home.customize.description">
               Gagne des plumes, des chapeaux ridicules et des effets de
               traînée pour ta raquette. Plus tu joues, plus ton oie devient
               reconnaissable au premier honk.
@@ -470,19 +482,19 @@ export default function Home(): string {
             <ul class="space-y-2 text-sm text-slate-300/90">
               <li class="flex items-start gap-2">
                 <span class="mt-0.5">🎩</span>
-                <span>Skins d'oies : chapeaux, lunettes, bouées et plus encore.</span>
+                <span data-i18n="home.customize.feature1">Skins d'oies : chapeaux, lunettes, bouées et plus encore.</span>
               </li>
               <li class="flex items-start gap-2">
                 <span class="mt-0.5">🌈</span>
-                <span>Effets de balle : traînées colorées, fumée, éclats de plumes.</span>
+                <span data-i18n="home.customize.feature2">Effets de balle : traînées colorées, fumée, éclats de plumes.</span>
               </li>
               <li class="flex items-start gap-2">
                 <span class="mt-0.5">📜</span>
-                <span>Bannières de profil : affiche ton meilleur score ou ton mood du jour.</span>
+                <span data-i18n="home.customize.feature3">Bannières de profil : affiche ton meilleur score ou ton mood du jour.</span>
               </li>
             </ul>
 
-            <p class="text-xs text-slate-400">
+            <p class="text-xs text-slate-400" data-i18n="home.customize.note">
               Tout est cosmétique : le skill ne s'achète pas, il se gagne sur le ponton.
             </p>
           </div>
@@ -492,8 +504,8 @@ export default function Home(): string {
               class="glass-panel card-shadow absolute inset-0 p-4 flex flex-col gap-3"
             >
               <div class="flex items-center justify-between text-xs text-slate-300">
-                <span>Vestiaire du village</span>
-                <span class="text-slate-500">Profil de HonkMaster</span>
+                <span data-i18n="home.customize.wardrobeTitle">Vestiaire du village</span>
+                <span class="text-slate-500" data-i18n="home.customize.profileLabel" data-i18n-vars='{"player":"HonkMaster"}'>Profil de HonkMaster</span>
               </div>
 
               <div class="flex-1 grid grid-cols-[auto,1fr] gap-4 items-center">
@@ -505,12 +517,12 @@ export default function Home(): string {
                 <div class="space-y-2 text-xs">
                   <div class="flex items-center justify-between">
                     <span class="font-semibold">HonkMaster</span>
-                    <span class="text-amber-300 font-semibold">Niveau 24</span>
+                    <span class="text-amber-300 font-semibold" data-i18n="home.customize.level" data-i18n-vars='{"level":"24"}'>Niveau 24</span>
                   </div>
                   <div class="bg-white/5 rounded-full h-2 overflow-hidden">
                     <div class="h-full bg-emerald-400/90 w-3/4"></div>
                   </div>
-                  <p class="text-slate-300/80">
+                  <p class="text-slate-300/80" data-i18n="home.customize.quote" data-i18n-vars='{"cursors":"12","balls":"248"}'>
                     “A déjà volé 12 curseurs et 248 balles.”
                   </p>
                 </div>
@@ -519,22 +531,22 @@ export default function Home(): string {
               <div class="grid grid-cols-4 gap-2 text-[0.6rem] sm:text-xs">
                 <div class="glass-panel border border-white/10 p-2 text-center">
                   <div class="text-lg mb-1">🎩</div>
-                  <p>Chapeaux</p>
+                  <p data-i18n="home.customize.stats.hats">Chapeaux</p>
                   <p class="text-amber-200 mt-0.5">8/20</p>
                 </div>
                 <div class="glass-panel border border-white/10 p-2 text-center">
                   <div class="text-lg mb-1">🕶️</div>
-                  <p>Accessoires</p>
+                  <p data-i18n="home.customize.stats.accessories">Accessoires</p>
                   <p class="text-amber-200 mt-0.5">5/15</p>
                 </div>
                 <div class="glass-panel border border-white/10 p-2 text-center">
                   <div class="text-lg mb-1">🌈</div>
-                  <p>Effets</p>
+                  <p data-i18n="home.customize.stats.effects">Effets</p>
                   <p class="text-amber-200 mt-0.5">6/18</p>
                 </div>
                 <div class="glass-panel border border-white/10 p-2 text-center">
                   <div class="text-lg mb-1">📜</div>
-                  <p>Bannières</p>
+                  <p data-i18n="home.customize.stats.banners">Bannières</p>
                   <p class="text-amber-200 mt-0.5">3/10</p>
                 </div>
               </div>
@@ -561,11 +573,14 @@ export default function Home(): string {
             <a
               href="/help"
               class="hover:text-slate-200 transition-colors"
+              data-i18n="home.footer.help"
             >
               Centre d'aide
             </a>
             <span class="text-slate-600">•</span>
-            <span>© ${new Date().getFullYear()} — Toutes oies réservées</span>
+            <span data-i18n="home.footer.copy" data-i18n-vars='{"year":"${new Date().getFullYear()}"}'>
+              © ${new Date().getFullYear()} — Toutes oies réservées
+            </span>
           </div>
         </div>
       </footer>
