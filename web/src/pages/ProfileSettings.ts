@@ -223,11 +223,15 @@ function setupIdentityForm() {
       return;
     }
 
+    // AJOUT : Validation de la longueur pour correspondre au backend (min 3 caractères)
+    if (username.length < 3) {
+      alert("Le nom d'utilisateur doit contenir au moins 3 caractères");
+      return;
+    }
+
     try {
-      const result = await api.put<{ message: string; user: User }>("/profile", {
-        username,
-        email,
-      });
+      // On utilise api.put avec FormData directement
+      const result = await api.put<{ message: string; user: User }>("/profile", formData);
 
       // Mettre à jour le localStorage
       if (result.user) {

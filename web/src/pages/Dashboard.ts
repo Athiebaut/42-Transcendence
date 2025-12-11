@@ -29,7 +29,7 @@ export default function Dashboard(): string {
           <a href="/dashboard" data-nav class="hidden sm:inline text-emerald-300 font-semibold">
             Dashboard
           </a>
-          <a href="/login" data-nav class="hidden sm:inline text-slate-300 hover:text-white transition-colors">
+          <a href="#" id="header-logout-btn" class="hidden sm:inline text-slate-300 hover:text-white transition-colors">
             Se déconnecter
           </a>
         </nav>
@@ -305,13 +305,14 @@ export default function Dashboard(): string {
 }
 
 export function setupDashboard() {
-  const logoutBtn = document.getElementById("logout-btn");
+  // Gestion de la déconnexion via le header
+  const headerLogoutBtn = document.getElementById("header-logout-btn");
   
-  logoutBtn?.addEventListener("click", async () => {
-    if (confirm("Voulez-vous vraiment vous déconnecter ?")) {
-      logoutBtn.textContent = "⏳ Déconnexion...";
-      (logoutBtn as HTMLButtonElement).disabled = true;
-      
+  headerLogoutBtn?.addEventListener("click", async (event) => {
+    event.preventDefault(); // Empêche la navigation vers "#"
+    
+    if (confirm("Voulez-vous vraiment quitter le village ?")) {
+      headerLogoutBtn.textContent = "Au revoir...";
       await logout();
     }
   });

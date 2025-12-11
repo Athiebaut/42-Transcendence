@@ -10,11 +10,14 @@ class ApiClient {
   }
 
   private async request<T>(endpoint: string, options: ApiOptions = {}): Promise<T> {
-    // CORRECTION ICI : On force le type Record<string, string> pour pouvoir manipuler les clés
     const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
       ...(options.headers as Record<string, string>),
     };
+
+    // On ajoute Content-Type: application/json SEULEMENT si ce n'est pas du FormData
+    if (!(options.body instanceof FormData) && !headers['Content-Type']) {
+      headers['Content-Type'] = 'application/json';
+    }
 
     const token = this.getToken();
     if (token) {
@@ -50,16 +53,18 @@ class ApiClient {
   }
 
   post<T>(endpoint: string, body: any) {
+    const isFormData = body instanceof FormData;
     return this.request<T>(endpoint, {
       method: 'POST',
-      body: JSON.stringify(body),
+      body: isFormData ? body : JSON.stringify(body),
     });
   }
 
   put<T>(endpoint: string, body: any) {
+    const isFormData = body instanceof FormData;
     return this.request<T>(endpoint, {
       method: 'PUT',
-      body: JSON.stringify(body),
+      body: isFormData ? body : JSON.stringify(body),
     });
   }
 
