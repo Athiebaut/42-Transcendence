@@ -1,5 +1,4 @@
 import { t } from "../utils/i18n";
-import { isAuthenticated } from "../utils/auth";
 
 type PlayCard = {
   href: string;
@@ -80,7 +79,6 @@ const playCards: PlayCard[] = [
 ];
 
 export default function Play(): string {
-  const loggedIn = isAuthenticated();
   return `
     <div class="min-h-screen flex flex-col relative overflow-hidden text-slate-100">
       <!-- Halos de lumière / ambiance -->
@@ -110,12 +108,10 @@ export default function Play(): string {
         </div>
 
         <nav class="flex items-center gap-3 text-xs sm:text-sm text-slate-300 justify-end">
-          <a
-            href="${loggedIn ? "/profil" : "/login"}"
-            data-nav
-            class="hover:text-white transition-colors"
-          >
-            ${loggedIn ? t("nav.profile") : t("nav.login")}
+          <a href="/play" data-nav class="hover:text-white transition-colors">${t("nav.playModes")}</a>
+          <span class="hidden sm:inline text-slate-700">•</span>
+          <a href="/profil" data-nav class="hover:text-white transition-colors">
+            ${t("nav.profile")}
           </a>
         </nav>
       </header>

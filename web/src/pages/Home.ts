@@ -1,8 +1,6 @@
-import { isAuthenticated } from "../utils/auth";
 import { t } from "../utils/i18n";
 
 export default function Home(): string {
-  const loggedIn = isAuthenticated();
   return `
     <div class="min-h-screen flex flex-col relative overflow-hidden">
       <!-- Halo de lumière / ambiance -->
@@ -34,12 +32,8 @@ export default function Home(): string {
         <nav class="flex items-center gap-3 text-xs sm:text-sm text-slate-300 justify-end">
           <a href="/play" data-nav class="hover:text-white transition-colors">${t("nav.playModes")}</a>
           <span class="hidden sm:inline text-slate-700">•</span>
-          <a
-            href="${loggedIn ? "/profil" : "/login"}"
-            data-nav
-            class="hover:text-white transition-colors"
-          >
-            ${loggedIn ? t("nav.profile") : t("nav.login")}
+          <a href="/profil" data-nav class="hover:text-white transition-colors">
+            ${t("nav.profile")}
           </a>
         </nav>
       </header>
@@ -539,37 +533,6 @@ export default function Home(): string {
           </div>
         </section>
       </main>
-
-      <!-- FOOTER (équivalent footer Wolfy) -->
-      <footer
-        class="border-t border-white/10 mt-auto py-6 px-6 text-xs sm:text-sm text-slate-400 bg-black/40"
-      >
-        <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div class="flex items-center gap-2">
-            <span class="text-lg">🦢</span>
-            <span class="font-semibold">Honk Village</span>
-            <span class="text-slate-600 hidden sm:inline">•</span>
-            <span class="text-slate-500 hidden sm:inline">
-              ft_transcendence — Projet 42
-            </span>
-          </div>
-
-          <div class="flex flex-wrap items-center gap-3">
-            <a
-              href="/help"
-              data-nav
-              class="hover:text-slate-200 transition-colors"
-              data-i18n="home.footer.help"
-            >
-              Centre d'aide
-            </a>
-            <span class="text-slate-600">•</span>
-            <span data-i18n="home.footer.copy" data-i18n-vars='{"year":"${new Date().getFullYear()}"}'>
-              © ${new Date().getFullYear()} — Toutes oies réservées
-            </span>
-          </div>
-        </div>
-      </footer>
     </div>
   `;
 }

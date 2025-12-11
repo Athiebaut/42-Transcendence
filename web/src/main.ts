@@ -3,9 +3,9 @@
 import { renderRoute } from "./router";
 import { initBackgroundRotator, forceBackgroundChange } from "./utils/backgroundRotator";
 import { mountDecorControls, refreshDecorControls } from "./components/ui/DecorControls";
-import { mountAuthDebugToggle } from "./components/ui/AuthDebugToggle";
 import { initI18n } from "./utils/i18n";
 import { mountLanguageSwitcher } from "./components/ui/LanguageSwitcher";
+import { mountFooterLinks } from "./components/ui/FooterLinks";
 import "./style.css";
 import "./village-theme.css";
 
@@ -27,8 +27,8 @@ async function bootstrap() {
   // Options: 'random' (change à chaque page), 'session' (garde pendant la session), 'daily' (change une fois par jour)
   initBackgroundRotator("random");
   mountDecorControls();
-  mountAuthDebugToggle(refreshCurrentRoute);
   mountLanguageSwitcher();
+  mountFooterLinks();
   
   // Ajouter le bouton de changement manuel (optionnel)
   // initBackgroundSelector();
