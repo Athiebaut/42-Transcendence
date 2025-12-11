@@ -8,16 +8,23 @@ export default function ProfileSettings(): string {
         <div class="absolute -bottom-40 -right-32 w-80 h-80 bg-sky-500/20 rounded-full blur-3xl"></div>
       </div>
 
-      <header class="relative z-10 px-4 sm:px-6 py-4 flex items-center justify-between border-b border-slate-800/80 bg-slate-950/70 backdrop-blur">
+      <header class="relative z-10 px-4 sm:px-6 py-4 grid grid-cols-[auto_1fr_auto] items-center gap-4 border-b border-slate-800/80 bg-slate-950/70 backdrop-blur">
         <a href="/" data-nav class="inline-flex items-center gap-2 text-slate-200 hover:text-white transition-colors text-sm">
           <span class="text-lg">🦢</span>
           <span class="font-semibold tracking-tight">${t("settings.backVillage")}</span>
         </a>
 
-        <nav class="flex items-center gap-3 text-xs sm:text-sm text-slate-300">
-          <a href="/profil" data-nav class="hover:text-white transition-colors">${t("nav.profile")}</a>
-          <span class="text-slate-600">•</span>
+        <div class="hidden sm:flex flex-col items-center text-xs text-slate-400">
+          <span class="uppercase tracking-[0.25em] text-slate-500">
+            ${t("header.settings.label")}
+          </span>
+          <span>${t("header.settings.helper")}</span>
+        </div>
+
+        <nav class="flex items-center gap-3 text-xs sm:text-sm text-slate-300 justify-end">
           <a href="/play" data-nav class="hover:text-white transition-colors">${t("nav.playModes")}</a>
+          <span class="hidden sm:inline text-slate-700">•</span>
+          <a href="/profil" data-nav class="hover:text-white transition-colors">${t("nav.profile")}</a>
         </nav>
       </header>
 

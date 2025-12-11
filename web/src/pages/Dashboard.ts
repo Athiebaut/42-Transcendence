@@ -1,4 +1,5 @@
 import { t } from "../i18n";
+import { isAuthenticated } from "../utils/auth";
 import {
   activityFeed,
   campfireStats,
@@ -8,6 +9,7 @@ import {
 } from "../data/dashboard";
 
 export default function Dashboard(): string {
+  const loggedIn = isAuthenticated();
   const podiumCards = leaderboard
     .slice(0, 3)
     .map(
@@ -124,15 +126,29 @@ export default function Dashboard(): string {
         <div class="absolute -bottom-40 -right-36 w-80 h-80 bg-emerald-400/20 rounded-full blur-3xl"></div>
       </div>
 
-      <header class="z-20 px-6 py-4 flex items-center justify-between border-b border-slate-800/80 bg-slate-950/70 backdrop-blur">
+      <header class="z-20 px-6 py-4 grid grid-cols-[auto_1fr_auto] items-center gap-4 border-b border-slate-800/80 bg-slate-950/70 backdrop-blur">
         <a href="/" data-nav class="inline-flex items-center gap-2 text-slate-200 hover:text-white transition-colors">
           <span class="text-lg">🦢</span>
-          <span class="font-semibold tracking-tight">Honk village</span>
+          <span class="font-semibold tracking-tight">${t("settings.backVillage")}</span>
         </a>
-        <nav class="flex items-center gap-3 text-xs sm:text-sm text-slate-300">
+
+        <div class="hidden sm:flex flex-col items-center text-xs text-slate-400">
+          <span class="uppercase tracking-[0.25em] text-slate-500">
+            ${t("header.dashboard.label")}
+          </span>
+          <span>${t("header.dashboard.helper")}</span>
+        </div>
+
+        <nav class="flex items-center gap-3 text-xs sm:text-sm text-slate-300 justify-end">
           <a href="/play" data-nav class="hover:text-white transition-colors">${t("nav.playModes")}</a>
           <span class="hidden sm:inline text-slate-700">•</span>
-          <a href="/profil" data-nav class="hover:text-white transition-colors">${t("nav.profile")}</a>
+          <a
+            href="${loggedIn ? "/profil" : "/login"}"
+            data-nav
+            class="hover:text-white transition-colors"
+          >
+            ${loggedIn ? t("nav.profile") : t("nav.login")}
+          </a>
         </nav>
       </header>
 

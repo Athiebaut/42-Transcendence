@@ -13,7 +13,7 @@ export default function Home(): string {
 
       <!-- HEADER -->
       <header
-        class="relative z-10 px-4 sm:px-6 py-4 flex items-center justify-between border-b border-slate-800/80 bg-slate-950/70 backdrop-blur"
+        class="relative z-10 px-4 sm:px-6 py-4 grid grid-cols-[auto_1fr_auto] items-center gap-4 border-b border-slate-800/80 bg-slate-950/70 backdrop-blur"
       >
         <a
           href="/"
@@ -24,38 +24,23 @@ export default function Home(): string {
           <span class="font-semibold tracking-tight">Honk village</span>
         </a>
 
-        <nav class="flex items-center gap-4 text-sm">
-          <a href="#roles" class="hover:text-white/80 transition-colors">${t("nav.roles")}</a>
-          <a href="#ladder" class="hover:text-white/80 transition-colors">${t("nav.ladder")}</a>
-          <a href="#customize" class="hover:text-white/80 transition-colors">${t("nav.customize")}</a>
+        <div class="hidden sm:flex flex-col items-center text-xs text-slate-400">
+          <span class="uppercase tracking-[0.25em] text-slate-500">
+            ${t("header.home.label")}
+          </span>
+          <span>${t("header.home.helper")}</span>
+        </div>
 
-          <div class="hidden sm:flex items-center gap-2 ml-4">
-            ${!loggedIn ? `
-              <a
-                href="/login"
-                data-nav
-                class="px-4 py-2 rounded-full border border-white/20 bg-black/30 text-xs font-medium hover:bg-white/10 transition-colors"
-              >
-                ${t("cta.login")}
-              </a>
-              <a
-                href="/register"
-                data-nav
-                class="wood-sign-btn text-sm px-5 py-2"
-              >
-                ${t("cta.register")}
-              </a>
-            ` : ""}
-            ${loggedIn ? `
-              <a
-                href="/profil"
-                data-nav
-                class="px-4 py-2 rounded-full border border-emerald-400/40 text-xs font-medium text-emerald-200 hover:bg-emerald-400/10 transition-colors"
-              >
-                ${t("cta.profile")}
-              </a>
-            ` : ""}
-          </div>
+        <nav class="flex items-center gap-3 text-xs sm:text-sm text-slate-300 justify-end">
+          <a href="/play" data-nav class="hover:text-white transition-colors">${t("nav.playModes")}</a>
+          <span class="hidden sm:inline text-slate-700">•</span>
+          <a
+            href="${loggedIn ? "/profil" : "/login"}"
+            data-nav
+            class="hover:text-white transition-colors"
+          >
+            ${loggedIn ? t("nav.profile") : t("nav.login")}
+          </a>
         </nav>
       </header>
 
@@ -572,6 +557,7 @@ export default function Home(): string {
           <div class="flex flex-wrap items-center gap-3">
             <a
               href="/help"
+              data-nav
               class="hover:text-slate-200 transition-colors"
               data-i18n="home.footer.help"
             >

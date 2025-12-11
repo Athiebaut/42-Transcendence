@@ -18,7 +18,7 @@ export default function Login(): string {
 
       <!-- HEADER -->
       <header
-        class="relative z-10 px-4 sm:px-6 py-4 flex items-center justify-between border-b border-slate-800/80 bg-slate-950/70 backdrop-blur"
+        class="relative z-10 px-4 sm:px-6 py-4 grid grid-cols-[auto_1fr_auto] items-center gap-4 border-b border-slate-800/80 bg-slate-950/70 backdrop-blur"
       >
         <a
           href="/"
@@ -29,20 +29,23 @@ export default function Login(): string {
           <span class="font-semibold tracking-tight">${t("settings.backVillage")}</span>
         </a>
 
-        <div class="hidden sm:flex flex-col items-end text-xs text-right">
+        <div class="hidden sm:flex flex-col items-center text-xs text-slate-400">
           <span class="uppercase tracking-[0.25em] text-slate-500">
-            ${t("shared.modeChoice.label")}
+            ${t("header.login.label")}
           </span>
-          <span class="text-slate-400">
-            ${t("shared.modeChoice.helper")}
-          </span>
+          <span>${t("header.login.helper")}</span>
         </div>
+
+        <nav class="flex items-center gap-3 text-xs sm:text-sm text-slate-300 justify-end">
+          <a href="/play" data-nav class="hover:text-white transition-colors">${t("nav.playModes")}</a>
+          <span class="hidden sm:inline text-slate-700">•</span>
+          <a href="/register" data-nav class="hover:text-white transition-colors">${t("nav.register")}</a>
+        </nav>
       </header>
 
       <div class="relative z-10 w-full max-w-5xl mx-auto px-4 py-10">
         <div class="grid gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] items-center">
           
-          <!-- Colonne gauche : texte “marketing” façon Wolfy -->
           <div class="space-y-6">
             <p
               class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs sm:text-[0.7rem] font-medium bg-black/40 border border-white/10 backdrop-blur"
@@ -89,13 +92,10 @@ export default function Login(): string {
 
           <!-- Colonne droite : card de login -->
           <div class="relative">
-            <div
-              class="relative bg-slate-950/85 border border-slate-800/80 rounded-2xl shadow-2xl overflow-hidden"
-            >
-              <!-- Liserés lumineux -->
+            <div class="relative village-window text-[var(--color-text)] shadow-2xl overflow-hidden">
               <div class="pointer-events-none absolute inset-0">
-                <div class="absolute -top-10 -right-10 w-32 h-32 bg-emerald-500/15 blur-3xl"></div>
-                <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-sky-500/15 blur-3xl"></div>
+                <div class="absolute -top-16 -right-12 w-32 h-32 bg-emerald-500/15 blur-3xl"></div>
+                <div class="absolute -bottom-16 -left-12 w-32 h-32 bg-amber-500/15 blur-3xl"></div>
               </div>
 
               <div class="relative p-6 sm:p-8 space-y-6">
@@ -103,7 +103,7 @@ export default function Login(): string {
                   <h2 class="text-xl sm:text-2xl font-semibold tracking-tight">
                     ${t("login.title")}
                   </h2>
-                  <p class="text-xs sm:text-sm text-slate-300">
+                  <p class="text-xs sm:text-sm text-[var(--color-text-muted)]">
                     ${t("login.subtitle")}
                   </p>
                 </div>
@@ -113,7 +113,7 @@ export default function Login(): string {
                   <div class="space-y-1">
                     <label
                       for="email"
-                      class="block text-xs font-medium text-slate-200/90 tracking-wide"
+                      class="block text-xs font-semibold text-[var(--color-text)] tracking-wide"
                     >
                       ${t("form.email")}
                     </label>
@@ -122,7 +122,12 @@ export default function Login(): string {
                       type="email"
                       name="email"
                       autocomplete="email"
-                      class="w-full rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/70 focus:border-emerald-400/80"
+                      class="
+                        w-full rounded-lg border border-[#d4c4a0]/70
+                        bg-[#3a5548]/80 px-3 py-2 text-sm text-slate-100
+                        placeholder:text-slate-300 focus:outline-none
+                        focus:ring-2 focus:ring-emerald-400/70 focus:border-emerald-300
+                      "
                       placeholder="${t("login.placeholder.email")}"
                       required
                     />
@@ -131,7 +136,7 @@ export default function Login(): string {
                   <div class="space-y-1">
                     <label
                       for="password"
-                      class="block text-xs font-medium text-slate-200/90 tracking-wide"
+                      class="block text-xs font-semibold text-[var(--color-text)] tracking-wide"
                     >
                       ${t("form.password")}
                     </label>
@@ -140,7 +145,12 @@ export default function Login(): string {
                       type="password"
                       name="password"
                       autocomplete="current-password"
-                      class="w-full rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/70 focus:border-emerald-400/80"
+                      class="
+                        w-full rounded-lg border border-[#d4c4a0]/70
+                        bg-[#3a5548]/80 px-3 py-2 text-sm text-slate-100
+                        placeholder:text-slate-300 focus:outline-none
+                        focus:ring-2 focus:ring-emerald-400/70 focus:border-emerald-300
+                      "
                       placeholder="${t("login.placeholder.password")}"
                       required
                     />

@@ -1,7 +1,9 @@
 import { t } from "../i18n";
+import { isAuthenticated } from "../utils/auth";
 import type { GameMode } from '../game/config/gameModeConfig';
 
 export default function Pong(): string {
+  const loggedIn = isAuthenticated();
   return `
     <div id="pong-container" class="min-h-screen flex flex-col relative overflow-hidden">
       <!-- Fond léger -->
@@ -12,22 +14,31 @@ export default function Pong(): string {
 
       <!-- HEADER -->
       <header
-        class="relative z-10 px-4 sm:px-6 py-4 flex items-center justify-between border-b border-slate-800/80 bg-slate-950/70 backdrop-blur"
+        class="relative z-10 px-4 sm:px-6 py-4 grid grid-cols-[auto_1fr_auto] items-center gap-4 border-b border-slate-800/80 bg-slate-950/70 backdrop-blur"
       >
         <a href="/" data-nav class="flex items-center gap-2 group">
           <span class="text-2xl transition-transform group-hover:scale-110">🦢</span>
           <span class="font-semibold tracking-tight text-slate-100">
-            Honk Village
+            ${t("settings.backVillage")}
           </span>
         </a>
 
-        <nav class="flex items-center gap-3 text-xs sm:text-sm">
+        <div class="hidden sm:flex flex-col items-center text-xs text-slate-400">
+          <span class="uppercase tracking-[0.25em] text-slate-500">
+            ${t("header.pong.label")}
+          </span>
+          <span>${t("header.pong.helper")}</span>
+        </div>
+
+        <nav class="flex items-center gap-3 text-xs sm:text-sm text-slate-300 justify-end">
+          <a href="/play" data-nav class="hover:text-white transition-colors">${t("nav.playModes")}</a>
+          <span class="hidden sm:inline text-slate-700">•</span>
           <a
-            href="/home"
+            href="${loggedIn ? "/profil" : "/login"}"
             data-nav
-            class="px-3 py-1.5 rounded-full border border-slate-700/80 bg-slate-900/70 text-slate-100 hover:bg-slate-800 hover:border-slate-500 transition-colors"
+            class="hover:text-white transition-colors"
           >
-            ${t("settings.backVillage")}
+            ${loggedIn ? t("nav.profile") : t("nav.login")}
           </a>
         </nav>
       </header>
