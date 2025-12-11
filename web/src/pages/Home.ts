@@ -1,4 +1,7 @@
+import { isAuthenticated } from "../utils/auth";
+
 export default function Home(): string {
+  const loggedIn = isAuthenticated();
   return `
     <div class="min-h-screen flex flex-col relative overflow-hidden">
       <!-- Halo de lumière / ambiance -->
@@ -26,27 +29,31 @@ export default function Home(): string {
           <a href="#customize" class="hover:text-white/80 transition-colors">Personnalisation</a>
 
           <div class="hidden sm:flex items-center gap-2 ml-4">
-            <a
-              href="/login"
-              data-nav
-              class="px-4 py-2 rounded-full border border-white/20 bg-black/30 text-xs font-medium hover:bg-white/10 transition-colors"
-            >
-              Se connecter
-            </a>
-            <a
-              href="/register"
-              data-nav
-              class="wood-sign-btn text-sm px-5 py-2"
-            >
-              ✨ S'inscrire
-            </a>
-            <a
-              href="/dashboard"
-              data-nav
-              class="px-4 py-2 rounded-full border border-emerald-400/40 text-xs font-medium text-emerald-200 hover:bg-emerald-400/10 transition-colors"
-            >
-              Profil
-            </a>
+            ${!loggedIn ? `
+              <a
+                href="/login"
+                data-nav
+                class="px-4 py-2 rounded-full border border-white/20 bg-black/30 text-xs font-medium hover:bg-white/10 transition-colors"
+              >
+                Se connecter
+              </a>
+              <a
+                href="/register"
+                data-nav
+                class="wood-sign-btn text-sm px-5 py-2"
+              >
+                ✨ S'inscrire
+              </a>
+            ` : ""}
+            ${loggedIn ? `
+              <a
+                href="/dashboard"
+                data-nav
+                class="px-4 py-2 rounded-full border border-emerald-400/40 text-xs font-medium text-emerald-200 hover:bg-emerald-400/10 transition-colors"
+              >
+                Profil
+              </a>
+            ` : ""}
           </div>
         </nav>
       </header>

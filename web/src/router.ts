@@ -11,6 +11,7 @@ import { setGoose3DActive } from "./goose3d";
 import type { GameMode } from "./game/config/gameModeConfig";
 import { setupRegister } from "./pages/Register";
 import { setupLogin } from "./pages/Login";
+import { isAuthenticated } from "./utils/auth";
 
 type RouteHandler = () => string;
 
@@ -24,21 +25,31 @@ const routes: Record<string, RouteHandler> = {
   "/play": Play,
   "/profile-settings": ProfileSettings,
 };
+const protectedRoutes = new Set(["/dashboard", "/profile-settings"]);
 
 export async function renderRoute(path: string) {
   const app = document.querySelector<HTMLDivElement>("#app");
   if (!app) return;
 
   const cleanPath = path.split("?")[0].split("#")[0];
-  const handler = routes[cleanPath] ?? NotFound;
+  const previousPath = window.location.pathname.split("?")[0].split("#")[0];
+
+  let targetPath = cleanPath;
+  if (protectedRoutes.has(targetPath) && !isAuthenticated()) {
+    if (window.location.pathname !== "/login") {
+      window.history.replaceState({}, "", "/login");
+    }
+    targetPath = "/login";
+  }
+
+  const handler = routes[targetPath] ?? NotFound;
 
   // Oie visible sur toutes les pages SAUF Pong
-  const isPongPage = cleanPath === "/pong";
+  const isPongPage = targetPath === "/pong";
   setGoose3DActive(!isPongPage);
 
   // Nettoyer le jeu Pong précédent si on quitte la page Pong
-  const previousPath = window.location.pathname.split("?")[0].split("#")[0];
-  if (previousPath === "/pong" && cleanPath !== "/pong") {
+  if (previousPath === "/pong" && targetPath !== "/pong") {
     const { disposePongGame } = await import("./pages/Pong");
     await disposePongGame();
   }
@@ -46,7 +57,7 @@ export async function renderRoute(path: string) {
   app.innerHTML = handler();
 
   // Initialiser le jeu Pong si on arrive sur la page Pong
-  if (cleanPath === "/pong") {
+  if (targetPath === "/pong") {
     const { initPongGame } = await import("./pages/Pong");
     
     // Extraire le paramètre mode de l'URL
@@ -56,11 +67,11 @@ export async function renderRoute(path: string) {
     await initPongGame(mode as GameMode);
   }
 
-  if (cleanPath === "/register") {
+  if (targetPath === "/register") {
     setupRegister();
   }
 
-  if (cleanPath === "/login") {
+  if (targetPath === "/login") {
     setupLogin();
   }
   
