@@ -134,17 +134,6 @@ build:
 	$(COMPOSE) build --no-cache
 	$(call ok,Images reconstruites.)
 
-build-front:
-	$(call hr)
-	@echo "→ Build du front (Vite)…"
-	@$(COMPOSE) run --rm $(WEB_BUILD_SVC) || \
-	docker run --rm -v "$$PWD/web":/web -w /web node:20-bookworm sh -lc "npm ci && npm run build"
-	@if [ -f web/dist/index.html ]; then \
-		$(call ok,Front build OK (web/dist)); \
-	else \
-		$(call err,Front build KO (web/dist manquant)); exit 1; \
-	fi
-
 # -------- Certs & env --------
 certs:
 	@mkdir -p "$(CERT_DIR)"

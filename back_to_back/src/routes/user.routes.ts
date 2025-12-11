@@ -1,9 +1,12 @@
 import { FastifyInstance } from 'fastify';
-import { PrismaClient } from '@prisma/client';
+import cookie from '@fastify/cookie'
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { prisma } from '../middleware/prisma.js';
 
-const prisma = new PrismaClient();
+
+const ACCESS_TOKEN_EXPIRES = '1h';
+const REFRESH_TOKEN_EXPIRES_IN_DAYS = 7;
 
 export default async function userRoutes(app: FastifyInstance) {
 	app.post('/login', async (request, reply) => {
@@ -24,12 +27,39 @@ export default async function userRoutes(app: FastifyInstance) {
 				isSecondFactorAuthenticated: isAuthenticated
 			},
 			process.env.JWT_SECRET!,
-			{ expiresIn: '1h' }
+			{ expiresIn: ACCESS_TOKEN_EXPIRES }
 		);
+
+		const refreshTokenPayload = { userId: user.id };
+		const refreshToken = jwt.sign(
+			refreshTokenPayload,
+			process.env.JWT_SECRET!,
+			{ expiresIn: `${REFRESH_TOKEN_EXPIRES_IN_DAYS}d` }
+		);
+
+		const expirationDate = new Date(); // Crée la date actuelle
+		expirationDate.setDate(expirationDate.getDate() + REFRESH_TOKEN_EXPIRES_IN_DAYS); // Ajoute 7 jours
+		await prisma.refreshToken.create({
+			data: {
+				token: refreshToken,
+				userId: user.id,
+				expiresAt: expirationDate,
+			},
+		});
+
+
+		// 4. Envoi du Refresh Token dans un cookie HttpOnly sécurisé
+		reply.setCookie('refreshToken', refreshToken, {
+			path: '/', // Accessible depuis toutes les routes
+			httpOnly: true, // Non accessible par JavaScript client (sécurité)
+			secure: process.env.NODE_ENV === 'production', // Seulement via HTTPS en production
+			expires: expirationDate,
+			sameSite: 'strict', // Protection CSRF
+		});
 
 		return reply.send({
 			message: user.isTwoFactorAuthenticationEnabled ? '2FA required' : 'Login successful',
-			token,
+			token: token,
 			is2faEnabled: user.isTwoFactorAuthenticationEnabled
 		});
 	});
