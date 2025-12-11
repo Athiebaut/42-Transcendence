@@ -76,12 +76,13 @@ export default function Dashboard(): string {
                 >
                   🤝 Créer un lobby privé
                 </button>
-                <button
-                  type="button"
-                  class="px-4 py-2 rounded-full border border-slate-700 bg-black/30 text-xs sm:text-sm hover:bg-white/5 transition-colors"
+                <a
+                  href="/profile-settings"
+                  data-nav
+                  class="px-4 py-2 rounded-full border border-slate-700 bg-black/30 text-xs sm:text-sm hover:bg-white/5 transition-colors inline-flex items-center justify-center"
                 >
                   ⚙️ Paramètres du profil
-                </button>
+                </a>
               </div>
             </article>
 
