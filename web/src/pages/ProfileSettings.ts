@@ -1,4 +1,30 @@
+import { api } from "../services/api";
+
+interface User {
+  id: number;
+  username: string;
+  email: string;
+  avatarUrl?: string;
+  isTwoFactorAuthenticationEnabled?: boolean;
+}
+
+// Fonction pour récupérer l'utilisateur du localStorage
+function getCurrentUser(): User | null {
+  try {
+    const userData = localStorage.getItem("user");
+    return userData ? JSON.parse(userData) : null;
+  } catch {
+    return null;
+  }
+}
+
 export default function ProfileSettings(): string {
+  const user = getCurrentUser();
+  const username = user?.username || "";
+  const email = user?.email || "";
+  const avatarUrl = user?.avatarUrl || "";
+  const is2FAEnabled = user?.isTwoFactorAuthenticationEnabled || false;
+
   return `
     <div class="min-h-screen flex flex-col relative overflow-hidden">
       <div class="absolute inset-0 pointer-events-none">
@@ -33,6 +59,7 @@ export default function ProfileSettings(): string {
           </section>
 
           <div class="grid gap-6 md:grid-cols-2">
+            <!-- Formulaire Identité -->
             <article class="glass-panel card-shadow rounded-2xl p-6 space-y-4">
               <header class="flex items-center justify-between">
                 <div>
@@ -41,19 +68,32 @@ export default function ProfileSettings(): string {
                 </div>
                 <span class="text-2xl">🪶</span>
               </header>
-              <form class="space-y-4">
+              <form id="profile-identity-form" class="space-y-4">
                 <label class="space-y-1 block text-xs font-medium text-slate-200/80">
                   Nom d'utilisateur
-                  <input type="text" name="username" class="w-full rounded-lg border border-[#d4c4a0]/70 bg-[#3a5548]/80 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-400 focus:ring-2 focus:ring-emerald-400/70 focus:border-emerald-300" placeholder="MaîtreHonk" />
+                  <input 
+                    type="text" 
+                    name="username" 
+                    value="${username}"
+                    class="w-full rounded-lg border border-[#d4c4a0]/70 bg-[#3a5548]/80 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-400 focus:ring-2 focus:ring-emerald-400/70 focus:border-emerald-300" 
+                    placeholder="MaîtreHonk" 
+                  />
                 </label>
                 <label class="space-y-1 block text-xs font-medium text-slate-200/80">
                   Adresse e-mail
-                  <input type="email" name="email" class="w-full rounded-lg border border-[#d4c4a0]/70 bg-[#3a5548]/80 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-400 focus:ring-2 focus:ring-emerald-400/70 focus:border-emerald-300" placeholder="toi@honk.fr" />
+                  <input 
+                    type="email" 
+                    name="email" 
+                    value="${email}"
+                    class="w-full rounded-lg border border-[#d4c4a0]/70 bg-[#3a5548]/80 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-400 focus:ring-2 focus:ring-emerald-400/70 focus:border-emerald-300" 
+                    placeholder="toi@honk.fr" 
+                  />
                 </label>
-                <button type="button" class="btn-main w-full justify-center">Enregistrer</button>
+                <button type="submit" class="btn-main w-full justify-center">Enregistrer</button>
               </form>
             </article>
 
+            <!-- Formulaire Mot de passe -->
             <article class="glass-panel card-shadow rounded-2xl p-6 space-y-4">
               <header class="flex items-center justify-between">
                 <div>
@@ -62,23 +102,39 @@ export default function ProfileSettings(): string {
                 </div>
                 <span class="text-2xl">🔒</span>
               </header>
-              <form class="space-y-4">
+              <form id="profile-password-form" class="space-y-4">
                 <label class="space-y-1 block text-xs font-medium text-slate-200/80">
                   Mot de passe actuel
-                  <input type="password" class="w-full rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 focus:ring-2 focus:ring-rose-400/60 focus:border-rose-300" placeholder="••••••••" />
+                  <input 
+                    type="password" 
+                    name="currentPassword"
+                    class="w-full rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 focus:ring-2 focus:ring-rose-400/60 focus:border-rose-300" 
+                    placeholder="••••••••" 
+                  />
                 </label>
                 <label class="space-y-1 block text-xs font-medium text-slate-200/80">
                   Nouveau mot de passe
-                  <input type="password" class="w-full rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 focus:ring-2 focus:ring-rose-400/60 focus:border-rose-300" placeholder="••••••••" />
+                  <input 
+                    type="password" 
+                    name="newPassword"
+                    class="w-full rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 focus:ring-2 focus:ring-rose-400/60 focus:border-rose-300" 
+                    placeholder="••••••••" 
+                  />
                 </label>
                 <label class="space-y-1 block text-xs font-medium text-slate-200/80">
                   Confirmation
-                  <input type="password" class="w-full rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 focus:ring-2 focus:ring-rose-400/60 focus:border-rose-300" placeholder="••••••••" />
+                  <input 
+                    type="password" 
+                    name="confirmPassword"
+                    class="w-full rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 focus:ring-2 focus:ring-rose-400/60 focus:border-rose-300" 
+                    placeholder="••••••••" 
+                  />
                 </label>
-                <button type="button" class="btn-main w-full justify-center bg-amber-400/90 text-slate-950 hover:bg-amber-300">Mettre à jour</button>
+                <button type="submit" class="btn-main w-full justify-center bg-amber-400/90 text-slate-950 hover:bg-amber-300">Mettre à jour</button>
               </form>
             </article>
 
+            <!-- Formulaire Avatar -->
             <article class="glass-panel card-shadow rounded-2xl p-6 space-y-4">
               <header class="flex items-center justify-between">
                 <div>
@@ -88,22 +144,32 @@ export default function ProfileSettings(): string {
                 <span class="text-2xl">🎭</span>
               </header>
               <div class="flex items-center gap-4">
-                <div class="h-20 w-20 rounded-full bg-gradient-to-br from-emerald-400 to-amber-300 flex items-center justify-center text-3xl shadow-lg">🦢</div>
+                <div id="avatar-preview" class="h-20 w-20 rounded-full bg-gradient-to-br from-emerald-400 to-amber-300 flex items-center justify-center text-3xl shadow-lg overflow-hidden">
+                  ${avatarUrl ? `<img src="${avatarUrl}" alt="Avatar" class="w-full h-full object-cover" />` : '🦢'}
+                </div>
                 <div class="text-xs text-slate-300">
                   <p>Affiche ton humeur du jour ou ta dernière victoire.</p>
                   <p class="text-slate-500 mt-1">PNG/JPG, 2 Mo max.</p>
                 </div>
               </div>
-              <label class="block text-xs font-medium text-slate-200/80">
-                Importer un fichier
-                <input type="file" class="mt-1 w-full rounded-lg border border-dashed border-slate-600 bg-black/30 px-3 py-5 text-center text-slate-300 focus:ring-2 focus:ring-emerald-400/70 focus:border-emerald-300" />
-              </label>
-              <div class="flex gap-3">
-                <button type="button" class="btn-main flex-1 justify-center">Téléverser</button>
-                <button type="button" class="btn-secondary flex-1 justify-center text-center">Réinitialiser</button>
-              </div>
+              <form id="profile-avatar-form" class="space-y-4">
+                <label class="block text-xs font-medium text-slate-200/80">
+                  Importer un fichier
+                  <input 
+                    type="file" 
+                    name="avatar"
+                    accept="image/png,image/jpeg,image/jpg"
+                    class="mt-1 w-full rounded-lg border border-dashed border-slate-600 bg-black/30 px-3 py-5 text-center text-slate-300 focus:ring-2 focus:ring-emerald-400/70 focus:border-emerald-300" 
+                  />
+                </label>
+                <div class="flex gap-3">
+                  <button type="submit" class="btn-main flex-1 justify-center">Téléverser</button>
+                  <button type="button" id="reset-avatar-btn" class="btn-secondary flex-1 justify-center text-center">Réinitialiser</button>
+                </div>
+              </form>
             </article>
 
+            <!-- Formulaire 2FA -->
             <article class="glass-panel card-shadow rounded-2xl p-6 space-y-4">
               <header class="flex items-center justify-between">
                 <div>
@@ -117,16 +183,228 @@ export default function ProfileSettings(): string {
               </p>
               <div class="flex items-center justify-between rounded-xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3">
                 <div class="text-xs text-slate-200">
-                  <p class="font-semibold">État actuel : <span class="text-emerald-300">désactivé</span></p>
+                  <p class="font-semibold">État actuel : <span class="${is2FAEnabled ? 'text-emerald-300' : 'text-rose-300'}" id="2fa-status">${is2FAEnabled ? 'activé' : 'désactivé'}</span></p>
                   <p class="text-slate-400 mt-1">Dernier changement : jamais</p>
                 </div>
-                <button type="button" class="btn-main">Activer</button>
+                <button type="button" id="toggle-2fa-btn" class="btn-main">${is2FAEnabled ? 'Désactiver' : 'Activer'}</button>
               </div>
-              <button type="button" class="btn-secondary w-full justify-center">Je préfère rester comme ça</button>
+              <div id="2fa-qr-container" class="hidden">
+                <!-- Le QR code sera inséré ici dynamiquement -->
+              </div>
             </article>
           </div>
         </div>
       </main>
     </div>
   `;
+}
+
+export function setupProfileSettings() {
+  setupIdentityForm();
+  setupPasswordForm();
+  setupAvatarForm();
+  setup2FAToggle();
+}
+
+// Gestion du formulaire d'identité (username + email)
+function setupIdentityForm() {
+  const form = document.getElementById("profile-identity-form") as HTMLFormElement | null;
+  if (!form) return;
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const formData = new FormData(form);
+    const username = formData.get("username")?.toString().trim();
+    const email = formData.get("email")?.toString().trim();
+
+    if (!username || !email) {
+      alert("Tous les champs sont requis");
+      return;
+    }
+
+    try {
+      const result = await api.put<{ message: string; user: User }>("/profile", {
+        username,
+        email,
+      });
+
+      // Mettre à jour le localStorage
+      if (result.user) {
+        localStorage.setItem("user", JSON.stringify(result.user));
+      }
+
+      alert(result.message || "Profil mis à jour avec succès !");
+    } catch (error: any) {
+      alert("Erreur : " + error.message);
+    }
+  });
+}
+
+// Gestion du formulaire de mot de passe
+function setupPasswordForm() {
+  const form = document.getElementById("profile-password-form") as HTMLFormElement | null;
+  if (!form) return;
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const formData = new FormData(form);
+    const currentPassword = formData.get("currentPassword")?.toString();
+    const newPassword = formData.get("newPassword")?.toString();
+    const confirmPassword = formData.get("confirmPassword")?.toString();
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      alert("Tous les champs sont requis");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      alert("Les mots de passe ne correspondent pas");
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      alert("Le mot de passe doit contenir au moins 8 caractères");
+      return;
+    }
+
+    try {
+      const result = await api.put<{ message: string }>("/profile/password", {
+        currentPassword,
+        newPassword,
+      });
+
+      alert(result.message || "Mot de passe mis à jour avec succès !");
+      form.reset();
+    } catch (error: any) {
+      alert("Erreur : " + error.message);
+    }
+  });
+}
+
+// Gestion du formulaire d'avatar
+function setupAvatarForm() {
+  const form = document.getElementById("profile-avatar-form") as HTMLFormElement | null;
+  const resetBtn = document.getElementById("reset-avatar-btn");
+  
+  if (!form) return;
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const formData = new FormData(form);
+    const avatarFile = formData.get("avatar") as File;
+
+    if (!avatarFile || avatarFile.size === 0) {
+      alert("Veuillez sélectionner un fichier");
+      return;
+    }
+
+    if (avatarFile.size > 2 * 1024 * 1024) {
+      alert("Le fichier ne doit pas dépasser 2 Mo");
+      return;
+    }
+
+    try {
+      // Utiliser FormData pour l'upload
+      const uploadFormData = new FormData();
+      uploadFormData.append("avatar", avatarFile);
+
+      const response = await fetch("/back_to_back/profile/avatar", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: uploadFormData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Erreur lors de l'upload");
+      }
+
+      const result = await response.json();
+
+      // Mettre à jour le localStorage et l'aperçu
+      if (result.user) {
+        localStorage.setItem("user", JSON.stringify(result.user));
+        updateAvatarPreview(result.user.avatarUrl);
+      }
+
+      alert(result.message || "Avatar mis à jour avec succès !");
+      form.reset();
+    } catch (error: any) {
+      alert("Erreur : " + error.message);
+    }
+  });
+
+  // Bouton de réinitialisation
+  resetBtn?.addEventListener("click", async () => {
+    if (!confirm("Voulez-vous vraiment réinitialiser votre avatar ?")) return;
+
+    try {
+      const result = await api.delete<{ message: string; user: User }>("/profile/avatar");
+
+      if (result.user) {
+        localStorage.setItem("user", JSON.stringify(result.user));
+        updateAvatarPreview(null);
+      }
+
+      alert(result.message || "Avatar réinitialisé !");
+    } catch (error: any) {
+      alert("Erreur : " + error.message);
+    }
+  });
+}
+
+// Gestion du toggle 2FA
+function setup2FAToggle() {
+  const toggleBtn = document.getElementById("toggle-2fa-btn");
+  const qrContainer = document.getElementById("2fa-qr-container");
+
+  toggleBtn?.addEventListener("click", async () => {
+    const user = getCurrentUser();
+    const is2FAEnabled = user?.isTwoFactorAuthenticationEnabled || false;
+
+    try {
+      if (!is2FAEnabled) {
+        // Activer 2FA - récupérer le QR code
+        const result = await api.get<{ qrCodeUrl: string }>("/auth/2fa/generate");
+
+        if (result.qrCodeUrl && qrContainer) {
+          qrContainer.innerHTML = `
+            <div class="p-4 bg-white rounded-lg">
+              <p class="text-slate-900 text-sm mb-2">Scanne ce QR code avec ton app d'authentification :</p>
+              <img src="${result.qrCodeUrl}" alt="QR Code 2FA" class="mx-auto" />
+            </div>
+          `;
+          qrContainer.classList.remove("hidden");
+        }
+
+        alert("Scanne le QR code et active la 2FA depuis ton app d'authentification");
+      } else {
+        // Désactiver 2FA
+        if (!confirm("Voulez-vous vraiment désactiver la 2FA ?")) return;
+
+        await api.post("/auth/2fa/disable", {});
+        
+        alert("2FA désactivée avec succès !");
+        window.location.reload();
+      }
+    } catch (error: any) {
+      alert("Erreur : " + error.message);
+    }
+  });
+}
+
+// Helper pour mettre à jour l'aperçu de l'avatar
+function updateAvatarPreview(avatarUrl: string | null) {
+  const preview = document.getElementById("avatar-preview");
+  if (!preview) return;
+
+  if (avatarUrl) {
+    preview.innerHTML = `<img src="${avatarUrl}" alt="Avatar" class="w-full h-full object-cover" />`;
+  } else {
+    preview.innerHTML = "🦢";
+  }
 }

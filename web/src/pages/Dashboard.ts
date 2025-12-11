@@ -1,4 +1,12 @@
+import { logout } from "../utils/auth";
+import { userService } from "../services/userService";
+
 export default function Dashboard(): string {
+  const user = userService.getUser();
+  const username = user?.username || "HonkMaster";
+  // const email = user?.email || "";
+  // const avatar = user?.avatarUrl || "";
+
   return `
     <div class="min-h-screen flex flex-col relative overflow-hidden text-slate-100">
       <!-- Halo de lumière / ambiance -->
@@ -41,9 +49,9 @@ export default function Dashboard(): string {
                   </div>
                   <div>
                     <p class="text-xs uppercase tracking-[0.25em] text-slate-400">Profil</p>
-                    <h1 class="text-xl sm:text-2xl font-semibold" id="dashboard-username">
-                      HonkMaster
-                    </h1>
+                      <h1 class="text-xl sm:text-2xl font-semibold" id="dashboard-username">
+                        ${username}
+                      </h1>
                     <p class="text-xs text-slate-400 mt-1">
                       Rang actuel : <span class="text-emerald-300 font-medium" id="dashboard-rank">Oie d'élite</span>
                     </p>
@@ -294,4 +302,17 @@ export default function Dashboard(): string {
       </main>
     </div>
   `;
+}
+
+export function setupDashboard() {
+  const logoutBtn = document.getElementById("logout-btn");
+  
+  logoutBtn?.addEventListener("click", async () => {
+    if (confirm("Voulez-vous vraiment vous déconnecter ?")) {
+      logoutBtn.textContent = "⏳ Déconnexion...";
+      (logoutBtn as HTMLButtonElement).disabled = true;
+      
+      await logout();
+    }
+  });
 }

@@ -12,6 +12,9 @@ import type { GameMode } from "./game/config/gameModeConfig";
 import { setupRegister } from "./pages/Register";
 import { setupLogin } from "./pages/Login";
 import { isAuthenticated } from "./utils/auth";
+import { setupProfileSettings } from "./pages/ProfileSettings";
+import { setupDashboard } from "./pages/Dashboard";
+import { setupHome } from "./pages/Home";
 
 type RouteHandler = () => string;
 
@@ -74,6 +77,19 @@ export async function renderRoute(path: string) {
   if (targetPath === "/login") {
     setupLogin();
   }
+
+  if (targetPath === "/profile-settings") {
+    setupProfileSettings();
+  }
+
+  if (targetPath === "/dashboard") {
+    setupDashboard();
+  }
+  
+  if (targetPath === "/" || targetPath === "/home") {
+    setupHome();
+  }
+
   
 }
 

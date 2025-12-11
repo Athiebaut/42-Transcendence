@@ -19,7 +19,7 @@ function bootstrap() {
   // Options: 'random' (change à chaque page), 'session' (garde pendant la session), 'daily' (change une fois par jour)
   initBackgroundRotator("random");
   mountDecorControls();
-  mountAuthDebugToggle(refreshCurrentRoute);
+  mountAuthDebugToggle();
   
   // Ajouter le bouton de changement manuel (optionnel)
   // initBackgroundSelector();

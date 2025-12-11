@@ -1,5 +1,3 @@
-import { api } from "../services/api";
-
 export default function Login(): string {
   return `
     <div class="min-h-screen flex flex-col relative overflow-hidden">
@@ -210,9 +208,15 @@ export default function Login(): string {
   `;
 }
 
+import { userService } from "../services/userService";
+import { api } from "../services/api";
+
 export function setupLogin() {
-  const form = document.getElementById("loginForm") as HTMLFormElement | null;
-  if (!form) return;
+  const form = document.querySelector("form") as HTMLFormElement | null;
+  if (!form) {
+    console.error("Login form not found");
+    return;
+  }
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -227,11 +231,19 @@ export function setupLogin() {
     }
 
     try {
-      const result = await api.post<{ token?: string }>("/login", { email, password });
+      const result = await api.post<{ token?: string }>("/login", { 
+        LogEmail: email,
+        LogPassword: password
+      });
+      
       if (result?.token) {
         localStorage.setItem("token", result.token);
+        
+        // 🆕 RÉCUPÉRER LES INFOS UTILISATEUR
+        await userService.fetchProfile();
+        
+        window.location.href = "/dashboard";
       }
-      window.location.href = "/dashboard";
     } catch (error: any) {
       alert(error?.message ?? "Impossible de se connecter pour le moment.");
     }

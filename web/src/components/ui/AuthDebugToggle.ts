@@ -1,35 +1,45 @@
-import { isAuthenticated } from "../../utils/auth";
+import { isAuthenticated, logout } from "../../utils/auth";
 
-type RefreshHandler = () => void;
-
+// Plus besoin de RefreshHandler
 let mounted = false;
 
 function createButton(): HTMLButtonElement {
   const button = document.createElement("button");
   button.type = "button";
-  button.className = "debug-auth-toggle";
+  button.className = "auth-toggle-btn";
   return button;
 }
 
-function updateLabel(button: HTMLButtonElement) {
-  button.textContent = isAuthenticated() ? "Debug: Se déconnecter" : "Debug: Se connecter";
+function updateButton(button: HTMLButtonElement) {
+  const authenticated = isAuthenticated();
+  
+  if (authenticated) {
+    button.textContent = "🦢 Se déconnecter";
+    button.classList.add("is-logout");
+  } else {
+    button.textContent = "🔑 Se connecter";
+    button.classList.remove("is-logout");
+  }
 }
 
-export function mountAuthDebugToggle(refresh: RefreshHandler) {
+// 🆕 Retirer le paramètre refresh
+export function mountAuthDebugToggle() {
   if (mounted) return;
   mounted = true;
 
   const button = createButton();
-  updateLabel(button);
+  updateButton(button);
 
-  button.addEventListener("click", () => {
+  button.addEventListener("click", async () => {
     if (isAuthenticated()) {
-      localStorage.removeItem("token");
+      if (confirm("Voulez-vous vraiment vous déconnecter ?")) {
+        button.disabled = true;
+        button.textContent = "⏳ Déconnexion...";
+        await logout();
+      }
     } else {
-      localStorage.setItem("token", "debug-token");
+      window.location.href = "/login";
     }
-    updateLabel(button);
-    refresh();
   });
 
   document.body.appendChild(button);

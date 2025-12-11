@@ -1,4 +1,4 @@
-import { isAuthenticated } from "../utils/auth";
+import { isAuthenticated, logout } from "../utils/auth";
 
 export default function Home(): string {
   const loggedIn = isAuthenticated();
@@ -571,4 +571,19 @@ export default function Home(): string {
       </footer>
     </div>
   `;
+}
+
+
+export function setupHome() {
+  const logoutBtn = document.getElementById("home-logout-btn");
+  
+  logoutBtn?.addEventListener("click", async () => {
+    if (confirm("Voulez-vous vraiment vous déconnecter ?")) {
+      // Désactiver le bouton pendant la déconnexion
+      logoutBtn.textContent = "⏳ Déconnexion...";
+      (logoutBtn as HTMLButtonElement).disabled = true;
+      
+      await logout();
+    }
+  });
 }
