@@ -4,7 +4,7 @@ import { renderRoute } from "./router";
 import { initBackgroundRotator, forceBackgroundChange } from "./utils/backgroundRotator";
 import { mountDecorControls, refreshDecorControls } from "./components/ui/DecorControls";
 import { mountAuthDebugToggle } from "./components/ui/AuthDebugToggle";
-import { initI18n } from "./i18n";
+import { initI18n } from "./utils/i18n";
 import { mountLanguageSwitcher } from "./components/ui/LanguageSwitcher";
 import "./style.css";
 import "./village-theme.css";
@@ -40,7 +40,7 @@ async function bootstrap() {
   }
 
   // Lancer l’oie une fois au démarrage (lazy import pour limiter le bundle initial)
-  const { initGoose3D } = await import("./goose3d");
+  const { initGoose3D } = await import("./utils/goose3d");
   initGoose3D();
 
   // Première route

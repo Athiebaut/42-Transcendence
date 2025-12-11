@@ -1,5 +1,5 @@
 import { isAuthenticated } from "../utils/auth";
-import { t } from "../i18n";
+import { t } from "../utils/i18n";
 
 export default function Home(): string {
   const loggedIn = isAuthenticated();

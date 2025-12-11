@@ -1,5 +1,5 @@
 import { statCards, recentMatches, friendStatus, type FriendActionVariant } from "../data/profile";
-import { t } from "../i18n";
+import { t } from "../utils/i18n";
 
 const resultStyles: Record<string, string> = {
   "profile.match.result.win": "bg-emerald-500/15 text-emerald-300",

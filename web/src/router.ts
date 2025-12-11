@@ -2,7 +2,7 @@
 
 import type { GameMode } from "./game/config/gameModeConfig";
 import { isAuthenticated } from "./utils/auth";
-import { applyTranslations, t } from "./i18n";
+import { applyTranslations, t } from "./utils/i18n";
 
 type RouteHandler = () => string;
 type RouteModule = { default: RouteHandler };
@@ -27,10 +27,10 @@ const setupLoaders: Record<string, () => Promise<() => void>> = {
 
 const protectedRoutes = new Set(["/profil", "/profile-settings"]);
 
-let gooseModulePromise: Promise<typeof import("./goose3d")> | null = null;
+let gooseModulePromise: Promise<typeof import("./utils/goose3d")> | null = null;
 function loadGooseModule() {
   if (!gooseModulePromise) {
-    gooseModulePromise = import("./goose3d");
+    gooseModulePromise = import("./utils/goose3d");
   }
   return gooseModulePromise;
 }

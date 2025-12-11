@@ -4,7 +4,7 @@ import {
   setLanguage,
   t,
   type LanguageCode,
-} from "../../i18n";
+} from "../../utils/i18n";
 
 let initialized = false;
 

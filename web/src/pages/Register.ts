@@ -1,5 +1,5 @@
 import { api } from "../services/api";
-import { t } from "../i18n";
+import { t } from "../utils/i18n";
 
 export default function Register(): string {
   return `
