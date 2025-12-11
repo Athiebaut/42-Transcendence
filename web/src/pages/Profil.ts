@@ -1,88 +1,5 @@
+import { statCards, recentMatches, friendStatus, type FriendActionVariant } from "../data/profile";
 import { t } from "../i18n";
-
-type StatCard = {
-  labelKey: string;
-  value: string;
-  infoKey: string;
-  infoVars?: Record<string, string>;
-};
-
-const statCards: StatCard[] = [
-  {
-    labelKey: "profile.stats.games.label",
-    value: "24",
-    infoKey: "profile.stats.games.info",
-    infoVars: { delta: "+8" },
-  },
-  {
-    labelKey: "profile.stats.winrate.label",
-    value: "63%",
-    infoKey: "profile.stats.winrate.info",
-    infoVars: { streak: "3" },
-  },
-  {
-    labelKey: "profile.stats.goals.label",
-    value: "7.4",
-    infoKey: "profile.stats.goals.info",
-  },
-  {
-    labelKey: "profile.stats.playtime.label",
-    value: "3 h 18",
-    infoKey: "profile.stats.playtime.info",
-  },
-];
-
-const recentMatches = [
-  {
-    opponent: "GooseValkyrie",
-    score: "10 - 7",
-    modeKey: "profile.match.mode.ranked",
-    resultKey: "profile.match.result.win",
-  },
-  {
-    opponent: "LittleGoose",
-    score: "8 - 10",
-    modeKey: "profile.match.mode.friendly",
-    resultKey: "profile.match.result.loss",
-  },
-  {
-    opponent: "OieBourrue",
-    score: "9 - 9",
-    modeKey: "profile.match.mode.chaos",
-    resultKey: "profile.match.result.draw",
-  },
-  {
-    opponent: "NoisyMallard",
-    score: "10 - 4",
-    modeKey: "profile.match.mode.ranked",
-    resultKey: "profile.match.result.win",
-  },
-];
-
-const friendStatus = [
-  {
-    badge: "GV",
-    name: "GooseValkyrie",
-    statusKey: "profile.friends.status.playing",
-    statusVars: { village: "#248" },
-    actionKey: "profile.friends.action.join",
-    actionVariant: "primary",
-  },
-  {
-    badge: "LG",
-    name: "LittleGoose",
-    statusKey: "profile.friends.status.lobby",
-    actionKey: "profile.friends.action.invite",
-    actionVariant: "secondary",
-  },
-  {
-    badge: "OB",
-    name: "OieBourrue",
-    statusKey: "profile.friends.status.offline",
-    actionKey: "profile.friends.action.sleep",
-    actionVariant: "muted",
-  },
-];
 
 const resultStyles: Record<string, string> = {
   "profile.match.result.win": "bg-emerald-500/15 text-emerald-300",
@@ -90,7 +7,7 @@ const resultStyles: Record<string, string> = {
   "profile.match.result.draw": "bg-slate-500/20 text-slate-200",
 };
 
-const friendActionStyles: Record<string, string> = {
+const friendActionStyles: Record<FriendActionVariant, string> = {
   primary: "px-3 py-1.5 rounded-full border border-emerald-500/50 bg-emerald-500/10 text-[0.7rem] sm:text-xs text-emerald-300 hover:bg-emerald-500/20 transition-colors",
   secondary: "px-3 py-1.5 rounded-full border border-slate-600 bg-black/40 text-[0.7rem] sm:text-xs hover:bg-white/5 transition-colors",
   muted: "text-[0.7rem] sm:text-xs text-slate-500",

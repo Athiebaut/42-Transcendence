@@ -1,34 +1,38 @@
 // web/src/router.ts
 
-import Home from "./pages/Home";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Profil from "./pages/Profil";
-import Dashboard from "./pages/Dashboard";
-import Pong from "./pages/Pong";
-import Play from "./pages/Play";
-import ProfileSettings from "./pages/ProfileSettings";
-import { setGoose3DActive } from "./goose3d";
 import type { GameMode } from "./game/config/gameModeConfig";
-import { setupRegister } from "./pages/Register";
-import { setupLogin } from "./pages/Login";
 import { isAuthenticated } from "./utils/auth";
 import { applyTranslations, t } from "./i18n";
 
 type RouteHandler = () => string;
+type RouteModule = { default: RouteHandler };
 
-const routes: Record<string, RouteHandler> = {
-  "/": Home,
-  "/home": Home,
-  "/login": Login,
-  "/register": Register,
-  "/dashboard": Dashboard,
-  "/profil": Profil,
-  "/pong": Pong,
-  "/play": Play,
-  "/profile-settings": ProfileSettings,
+const routeLoaders: Record<string, () => Promise<RouteModule>> = {
+  "/": () => import("./pages/Home"),
+  "/home": () => import("./pages/Home"),
+  "/login": () => import("./pages/Login"),
+  "/register": () => import("./pages/Register"),
+  "/dashboard": () => import("./pages/Dashboard"),
+  "/profil": () => import("./pages/Profil"),
+  "/pong": () => import("./pages/Pong"),
+  "/play": () => import("./pages/Play"),
+  "/profile-settings": () => import("./pages/ProfileSettings"),
 };
+
+const setupLoaders: Record<string, () => Promise<() => void>> = {
+  "/register": async () => (await import("./pages/Register")).setupRegister,
+  "/login": async () => (await import("./pages/Login")).setupLogin,
+};
+
 const protectedRoutes = new Set(["/profil", "/profile-settings"]);
+
+let gooseModulePromise: Promise<typeof import("./goose3d")> | null = null;
+function loadGooseModule() {
+  if (!gooseModulePromise) {
+    gooseModulePromise = import("./goose3d");
+  }
+  return gooseModulePromise;
+}
 
 export async function renderRoute(path: string) {
   const app = document.querySelector<HTMLDivElement>("#app");
@@ -45,11 +49,14 @@ export async function renderRoute(path: string) {
     targetPath = "/login";
   }
 
-  const handler = routes[targetPath] ?? NotFound;
+  const loader = routeLoaders[targetPath] ?? (async () => ({ default: NotFound }));
+  const module = await loader();
+  const handler = module.default ?? NotFound;
 
   // Oie visible sur toutes les pages SAUF Pong
   const isPongPage = targetPath === "/pong";
-  setGoose3DActive(!isPongPage);
+  const goose = await loadGooseModule();
+  goose.setGoose3DActive(!isPongPage);
 
   // Nettoyer le jeu Pong précédent si on quitte la page Pong
   if (previousPath === "/pong" && targetPath !== "/pong") {
@@ -61,24 +68,20 @@ export async function renderRoute(path: string) {
   applyTranslations(app);
 
   // Initialiser le jeu Pong si on arrive sur la page Pong
-  if (targetPath === "/pong") {
+  if (isPongPage) {
     const { initPongGame } = await import("./pages/Pong");
-    
-    // Extraire le paramètre mode de l'URL
+
     const urlParams = new URLSearchParams(window.location.search);
-    const mode = urlParams.get('mode') || 'pvp1v1';
-    
+    const mode = urlParams.get("mode") || "pvp1v1";
+
     await initPongGame(mode as GameMode);
   }
 
-  if (targetPath === "/register") {
-    setupRegister();
+  const setupLoader = setupLoaders[targetPath];
+  if (setupLoader) {
+    const setup = await setupLoader();
+    setup?.();
   }
-
-  if (targetPath === "/login") {
-    setupLogin();
-  }
-  
 }
 
 function NotFound(): string {

@@ -1,7 +1,6 @@
 // web/src/main.ts
 
 import { renderRoute } from "./router";
-import { initGoose3D } from "./goose3d";
 import { initBackgroundRotator, forceBackgroundChange } from "./utils/backgroundRotator";
 import { mountDecorControls, refreshDecorControls } from "./components/ui/DecorControls";
 import { mountAuthDebugToggle } from "./components/ui/AuthDebugToggle";
@@ -22,7 +21,7 @@ function refreshCurrentRoute(options: RefreshOptions = {}) {
   refreshDecorControls();
 }
 
-function bootstrap() {
+async function bootstrap() {
   initI18n();
   // Initialiser la rotation aléatoire des fonds
   // Options: 'random' (change à chaque page), 'session' (garde pendant la session), 'daily' (change une fois par jour)
@@ -40,7 +39,8 @@ function bootstrap() {
     return;
   }
 
-  // Lancer l’oie une fois au démarrage
+  // Lancer l’oie une fois au démarrage (lazy import pour limiter le bundle initial)
+  const { initGoose3D } = await import("./goose3d");
   initGoose3D();
 
   // Première route
