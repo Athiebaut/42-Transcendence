@@ -23,10 +23,22 @@ model User {
   sentFriendRequests     Friend[] @relation("SentFriendRequests")
   receivedFriendRequests Friend[] @relation("ReceivedFriendRequests")
 
-  accounts OAuthAccount[]
-  history  GameHistory[]
+  accounts     OAuthAccount[]
+  history      GameHistory[]
+  RefreshToken RefreshToken[]
 
   @@index([createdAt])
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    Int
+  expiresAt DateTime
+  createAt  DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
 }
 
 model GameHistory {

@@ -2,6 +2,7 @@ import 'dotenv/config';
 import fastify from 'fastify';
 import cors from "@fastify/cors";
 import formbody from "@fastify/formbody";
+import cookie from '@fastify/cookie';
 import multipart from '@fastify/multipart';
 import { PrismaClient } from '@prisma/client';
 
@@ -22,6 +23,9 @@ const start = async () => {
 			methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
 			allowedHeaders: ['content-type', 'authorization']
 		});
+		app.register(cookie, {
+			secret: process.env.JWT_SECRET,
+		})
 		await app.register(formbody);
 		await app.register(authGoogleRoutes);
 		await app.register(authRoutes);

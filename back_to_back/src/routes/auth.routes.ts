@@ -1,10 +1,12 @@
 import { FastifyInstance } from "fastify";
-import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 import jwt from 'jsonwebtoken';
 import { TwoFactorService } from '../services/2fa.service.js';
+import {logoutHandler} from "./auth.controller.js";
+import { prisma } from "../middleware/prisma.js"
 
-const prisma = new PrismaClient();
+const ACCESS_TOKEN_EXPIRES = '1h';
+const REFRESH_TOKEN_EXPIRES_IN_DAYS = 7;
 
 const verifyJwt = (token: string) => {
     return jwt.verify(token, process.env.JWT_SECRET!) as { userId: number, isSecondFactorAuthenticated: boolean };
@@ -50,6 +52,36 @@ export default async function authRoutes(fastify: FastifyInstance) {
 				emailLower: email.toLowerCase(),
 				passwordHash: hashedPassword,
 			},
+		});
+		const token = jwt.sign(
+			{
+				userId: newUser.id,
+			},
+			process.env.JWT_SECRET!,
+			{ expiresIn: ACCESS_TOKEN_EXPIRES }
+		);
+		const refreshTokenPayload = { userId: newUser.id };
+		const refreshToken = jwt.sign(
+			refreshTokenPayload,
+			process.env.JWT_SECRET!,
+			{ expiresIn: `${REFRESH_TOKEN_EXPIRES_IN_DAYS}d` }
+		);
+		const expirationDate = new Date(); // Crée la date actuelle
+		expirationDate.setDate(expirationDate.getDate() + REFRESH_TOKEN_EXPIRES_IN_DAYS); // Ajoute 7 jours
+		await prisma.refreshToken.create({
+			data: {
+				token: refreshToken,
+				userId: newUser.id,
+				expiresAt: expirationDate,
+			},
+		});
+		// 4. Envoi du Refresh Token dans un cookie HttpOnly sécurisé
+		reply.setCookie('refreshToken', refreshToken, {
+			path: '/', // Accessible depuis toutes les routes
+			httpOnly: true, // Non accessible par JavaScript client (sécurité)
+			secure: process.env.NODE_ENV === 'production', // Seulement via HTTPS en production
+			expires: expirationDate,
+			sameSite: 'strict', // Protection CSRF
 		});
 		return reply.send({
 			message: "Inscription réussie",
@@ -119,4 +151,5 @@ export default async function authRoutes(fastify: FastifyInstance) {
             return reply.status(401).send({ error: "Unauthorized or Invalid Token" });
         }
     });
+	fastify.post('/logout', logoutHandler);
 }
