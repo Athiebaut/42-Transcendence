@@ -44,6 +44,7 @@ let targetElement: HTMLElement | null = null;
 let pushStartTime = 0;
 let pushDuration = 2.0; // durée de la poussée (s)
 let timeSinceLastPush = 0;
+let movementTimer = 0;
 const PUSH_COOLDOWN = 8; // temps minimum entre deux poussées (s)
 const PUSH_CHANCE = 0.5; // 50% de chance de pousser après le cooldown
 
@@ -53,7 +54,7 @@ let targetScreenY = 0;
 let pushDirection = ""; // "LEFT", "RIGHT", "TOP", "BOTTOM"
 
 // Paramètres de comportement Desktop Goose
-const SPEED_BASE = 0.8;           // Vitesse de déplacement normal
+const SPEED_BASE = 1.0;           // Vitesse de déplacement normal
 const SPEED_RUN = 3.0;            // Vitesse de course (pour pousser!)
 const SHORT_IDLE_MIN = 0.3;       // Pause courte minimale
 const SHORT_IDLE_MAX = 1.0;       // Pause courte maximale
@@ -65,6 +66,7 @@ const BOBBING_FREQUENCY = 6.0;    // Fréquence du bobbing
 const BOBBING_FREQUENCY_RUN = 12.0; // Fréquence du bobbing en courant
 const MIN_MOVE_DISTANCE = 1.0;    // Distance minimale de déplacement
 const MAX_MOVE_DISTANCE = 4.0;    // Distance maximale de déplacement
+const MAX_MOVE_TIME = 20;         // Durée max avant reset en mouvement
 
 function rand(min: number, max: number): number {
   return min + Math.random() * (max - min);
@@ -271,9 +273,9 @@ function updateCameraOrtho() {
 
 // Fonctions d'easing pour des mouvements plus naturels
 // Easing plus doux pour la marche normale
-function easeInOutSine(t: number): number {
-  return -(Math.cos(Math.PI * t) - 1) / 2;
-}
+// function easeInOutSine(t: number): number {
+//   return -(Math.cos(Math.PI * t) - 1) / 2;
+// }
 
 // Fonction pour lisser la rotation de l'oie
 function lerpAngle(from: number, to: number, t: number): number {
@@ -558,15 +560,17 @@ function pushElementOffScreen(element: HTMLElement) {
 
 // --- Gestion des animations ---
 
-function stopAllAnimations() {
-  // On arrête juste les anims en cours sans reset global du squelette
+function stopAllAnimations(resetPose = true) {
   if (!scene) return;
 
   scene.animationGroups.forEach((anim) => {
     if (anim.isPlaying) {
       anim.stop();
-      // ⚠️ pas de anim.reset() ici
     }
+    if (resetPose) {
+      anim.reset();
+    }
+    anim.setWeightForAllAnimatables(0);
   });
 }
 
@@ -619,6 +623,21 @@ function playPushAnimation() {
   }
 }
 
+function forceRandomWander(reason: string) {
+  console.warn(`🦢 Reset déplacement (${reason}), retour à une marche aléatoire`);
+  targetElement = null;
+  pushStartTime = 0;
+  state = "idle";
+  idleTimer = 0;
+  moveTime = 0;
+  movementTimer = 0;
+  walkPhase = 0;
+  timeSinceLastPush = 0;
+  startPos.copyFrom(goose?.position ?? startPos);
+  targetPos.copyFrom(startPos);
+  playIdleAnimation();
+}
+
 // --- Update principal ---
 
 function clampPositionToCamera(pos: Vector3): Vector3 {
@@ -647,6 +666,20 @@ function updateGoose() {
 
   if (!isActive) {
     return;
+  }
+
+  const isMovingContinuously =
+    state === "moving" || (state === "pushing" && pushStartTime === 0);
+
+  if (isMovingContinuously) {
+    movementTimer += dt;
+    if (movementTimer >= MAX_MOVE_TIME) {
+      movementTimer = 0;
+      forceRandomWander("movement-timeout");
+      return;
+    }
+  } else {
+    movementTimer = 0;
   }
 
   // --- ÉTAT : IDLE ---
@@ -830,43 +863,32 @@ function updateGoose() {
   // --- ÉTAT : MOVING ---
   if (state === "moving") {
     moveTime += dt;
-    const t = Math.min(moveTime / moveDuration, 1);
+    const toTarget = targetPos.subtract(goose.position);
+    const distance = toTarget.length();
+    const arriveThreshold = 0.05;
 
-    // Interpolation lissée avec easing sinusoïdal (plus naturel)
-    const eased = easeInOutSine(t);
-    const newPos = Vector3.Lerp(startPos, targetPos, eased);
-    
-    // IMPORTANT: Contraindre la position pour ne jamais sortir
-    const clampedPos = clampPositionToCamera(newPos);
-    goose.position.x = clampedPos.x;
-    goose.position.z = clampedPos.z;
-
-    // Rotation progressive vers la direction de mouvement
-    const direction = targetPos.subtract(startPos);
-    if (direction.length() > 0.01) {
-      const targetAngle = Math.atan2(-direction.x, -direction.z);
-      goose.rotationQuaternion = null;
-      // Rotation plus fluide au début du mouvement
-      const rotationT = Math.min(t * 3, 1); // Atteint l'angle final à 33% du trajet
-      goose.rotation.y = lerpAngle(goose.rotation.y, targetAngle, rotationT * 0.1 + 0.05);
-    }
-
-    // Bobbing pendant la marche (léger balancement)
-    walkPhase += dt * BOBBING_FREQUENCY;
-    const bobbing = Math.sin(walkPhase) * BOBBING_AMPLITUDE;
-    goose.position.y = bobbing;
-
-    if (t >= 1) {
+    if (distance <= arriveThreshold) {
       const finalPos = clampPositionToCamera(targetPos);
       goose.position.copyFrom(finalPos);
       goose.position.y = 0;
       state = "idle";
-
-      // prochaine pause (parfois longue)
       idleTimer = pickIdleDuration(true);
-
-      // anim idle immobile
       playIdleAnimation();
+    } else {
+      const direction = toTarget.normalize();
+      const speedFactor = Math.min(1, distance / 2);
+      const step = Math.min(distance, SPEED_BASE * (0.6 + speedFactor * 0.6) * dt);
+      goose.position.addInPlace(direction.scale(step));
+      const clampedPos = clampPositionToCamera(goose.position);
+      goose.position.x = clampedPos.x;
+      goose.position.z = clampedPos.z;
+
+      const targetAngle = Math.atan2(-direction.x, -direction.z);
+      goose.rotationQuaternion = null;
+      goose.rotation.y = lerpAngle(goose.rotation.y, targetAngle, 0.2);
+
+      walkPhase += dt * BOBBING_FREQUENCY;
+      goose.position.y = Math.sin(walkPhase) * BOBBING_AMPLITUDE;
     }
   }
 
@@ -877,10 +899,7 @@ function updateGoose() {
     // Vérifier si l'élément cible existe toujours
     if (!targetElement || !document.body.contains(targetElement)) {
       console.log("🦢 ⚠️ Élément cible perdu, retour en idle");
-      state = "idle";
-      idleTimer = pickIdleDuration(false);
-      targetElement = null;
-      playIdleAnimation();
+      forceRandomWander("target-missing");
       return;
     }
     

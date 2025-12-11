@@ -1,3 +1,4 @@
+import { t } from "../i18n";
 import type { GameMode } from '../game/config/gameModeConfig';
 
 export default function Pong(): string {
@@ -26,7 +27,7 @@ export default function Pong(): string {
             data-nav
             class="px-3 py-1.5 rounded-full border border-slate-700/80 bg-slate-900/70 text-slate-100 hover:bg-slate-800 hover:border-slate-500 transition-colors"
           >
-            Retour au village
+            ${t("settings.backVillage")}
           </a>
         </nav>
       </header>
@@ -47,14 +48,14 @@ export default function Pong(): string {
                   🦢
                 </div>
                 <div>
-                  <p class="text-xs uppercase tracking-[0.3em] text-emerald-200/70">Joueur gauche</p>
+                  <p class="text-xs uppercase tracking-[0.3em] text-emerald-200/70">${t("pong.player.left")}</p>
                   <h3 id="pong-player-left-name" class="text-lg font-semibold text-white">Oie Verte</h3>
                 </div>
               </div>
               <div class="space-y-2 text-xs text-slate-200/80">
-                <p>Raquette: <span id="pong-player-left-skin" class="font-semibold text-white">Classique</span></p>
-                <p>Vitesse max: <span id="pong-player-left-speed" class="font-semibold text-white">36 km/h</span></p>
-                <p>Honk power: <span id="pong-player-left-power" class="font-semibold text-white">x1.2</span></p>
+                <p>${t("pong.player.racket")}: <span id="pong-player-left-skin" class="font-semibold text-white">Classique</span></p>
+                <p>${t("pong.player.maxSpeed")}: <span id="pong-player-left-speed" class="font-semibold text-white">36 km/h</span></p>
+                <p>${t("pong.player.honkPower")}: <span id="pong-player-left-power" class="font-semibold text-white">x1.2</span></p>
               </div>
             </article>
 
@@ -72,7 +73,7 @@ export default function Pong(): string {
             <article id="player2-info" class="glass-panel card-shadow rounded-2xl p-4 flex flex-col gap-4">
               <div class="flex items-center gap-3 justify-end">
                 <div class="text-right">
-                  <p class="text-xs uppercase tracking-[0.3em] text-sky-200/70">Joueur droite</p>
+                  <p class="text-xs uppercase tracking-[0.3em] text-sky-200/70">${t("pong.player.right")}</p>
                   <h3 id="pong-player-right-name" class="text-lg font-semibold text-white">Oie Bleue</h3>
                 </div>
                 <div
@@ -82,9 +83,9 @@ export default function Pong(): string {
                 </div>
               </div>
               <div class="space-y-2 text-xs text-slate-200/80 text-right">
-                <p>Raquette: <span id="pong-player-right-skin" class="font-semibold text-white">Arcanique</span></p>
-                <p>Vitesse max: <span id="pong-player-right-speed" class="font-semibold text-white">33 km/h</span></p>
-                <p>Honk power: <span id="pong-player-right-power" class="font-semibold text-white">x1.1</span></p>
+                <p>${t("pong.player.racket")}: <span id="pong-player-right-skin" class="font-semibold text-white">Arcanique</span></p>
+                <p>${t("pong.player.maxSpeed")}: <span id="pong-player-right-speed" class="font-semibold text-white">33 km/h</span></p>
+                <p>${t("pong.player.honkPower")}: <span id="pong-player-right-power" class="font-semibold text-white">x1.1</span></p>
               </div>
             </article>
           </section>
@@ -94,44 +95,44 @@ export default function Pong(): string {
             <div class="glass-panel card-shadow rounded-2xl p-4 space-y-3">
               <h2 class="text-sm sm:text-base font-semibold text-slate-100 flex items-center gap-2">
                 <span>📊</span>
-                <span>Score & manche</span>
+                <span>${t("pong.scoreboard.title")}</span>
               </h2>
               <div class="flex items-center justify-between text-sm sm:text-base text-slate-100">
                 <div class="flex flex-col items-start">
-                  <span class="text-xs text-slate-300">Joueur gauche</span>
+                  <span class="text-xs text-slate-300">${t("pong.player.left")}</span>
                   <span id="player1-score" class="text-2xl font-bold">0</span>
                 </div>
                 <div class="flex flex-col items-end">
-                  <span class="text-xs text-slate-300">Joueur droite</span>
+                  <span class="text-xs text-slate-300">${t("pong.player.right")}</span>
                   <span id="player2-score" class="text-2xl font-bold">0</span>
                 </div>
               </div>
               <div class="flex items-center justify-between text-xs sm:text-sm text-slate-300">
-                <span>Manche : <span id="pong-round">1</span></span>
-                <span>Temps : <span id="pong-timer">00:00</span></span>
+                <span>${t("pong.scoreboard.round")} : <span id="pong-round">1</span></span>
+                <span>${t("pong.scoreboard.time")} : <span id="pong-timer">00:00</span></span>
               </div>
             </div>
 
             <div class="glass-panel card-shadow rounded-2xl p-4 space-y-3">
               <h2 class="text-sm sm:text-base font-semibold text-slate-100 flex items-center gap-2">
                 <span>🎮</span>
-                <span>Contrôles</span>
+                <span>${t("pong.controls.title")}</span>
               </h2>
               <ul class="space-y-1.5 text-[0.75rem] sm:text-xs text-slate-200/90">
-                <li>Joueur gauche : <span class="font-semibold">W / S</span></li>
-                <li>Joueur droite : <span class="font-semibold">↑ / ↓</span></li>
-                <li>P : Pause / reprendre</li>
+                <li>${t("pong.controls.left")} <span class="font-semibold">W / S</span></li>
+                <li>${t("pong.controls.right")} <span class="font-semibold">↑ / ↓</span></li>
+                <li>${t("pong.controls.pause")}</li>
               </ul>
             </div>
 
             <div class="glass-panel card-shadow rounded-2xl p-4 space-y-3">
               <h2 class="text-sm sm:text-base font-semibold text-slate-100 flex items-center gap-2">
                 <span>⚙️</span>
-                <span>Paramètres</span>
+                <span>${t("pong.settings.title")}</span>
               </h2>
               <div class="space-y-1 text-[0.75rem] sm:text-xs text-slate-200/90">
-                <p>Mode : <span id="pong-mode" class="font-semibold text-white">Classique</span></p>
-                <p>Vitesse : <span id="pong-speed" class="font-semibold text-white">Normal</span></p>
+                <p>${t("pong.settings.mode")} : <span id="pong-mode" class="font-semibold text-white">Classique</span></p>
+                <p>${t("pong.settings.speed")} : <span id="pong-speed" class="font-semibold text-white">Normal</span></p>
               </div>
             </div>
           </section>
@@ -187,7 +188,7 @@ async function startGame(mode: GameMode) {
     if (success) {
       text.style.display = 'none';
     } else {
-      text.textContent = 'Error loading game';
+      text.textContent = t("pong.error");
       text.className = 'text-red-500 mt-4 text-sm';
       text.style.display = 'block';
     }

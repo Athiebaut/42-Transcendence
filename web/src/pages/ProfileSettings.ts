@@ -1,3 +1,5 @@
+import { t } from "../i18n";
+
 export default function ProfileSettings(): string {
   return `
     <div class="min-h-screen flex flex-col relative overflow-hidden">
@@ -9,13 +11,13 @@ export default function ProfileSettings(): string {
       <header class="relative z-10 px-4 sm:px-6 py-4 flex items-center justify-between border-b border-slate-800/80 bg-slate-950/70 backdrop-blur">
         <a href="/" data-nav class="inline-flex items-center gap-2 text-slate-200 hover:text-white transition-colors text-sm">
           <span class="text-lg">🦢</span>
-          <span class="font-semibold tracking-tight">Retour au village</span>
+          <span class="font-semibold tracking-tight">${t("settings.backVillage")}</span>
         </a>
 
         <nav class="flex items-center gap-3 text-xs sm:text-sm text-slate-300">
-          <a href="/dashboard" data-nav class="hover:text-white transition-colors">Tableau de bord</a>
+          <a href="/profil" data-nav class="hover:text-white transition-colors">${t("nav.profile")}</a>
           <span class="text-slate-600">•</span>
-          <a href="/play" data-nav class="hover:text-white transition-colors">Modes de jeu</a>
+          <a href="/play" data-nav class="hover:text-white transition-colors">${t("nav.playModes")}</a>
         </nav>
       </header>
 
@@ -24,11 +26,11 @@ export default function ProfileSettings(): string {
           <section class="space-y-3">
             <p class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/40 border border-white/10 text-xs text-slate-200">
               <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span>Paramètres du profil</span>
+              <span>${t("profile.settings")}</span>
             </p>
-            <h1 class="text-3xl sm:text-4xl font-bold text-white">Garde ton oie bien apprêtée</h1>
+            <h1 class="text-3xl sm:text-4xl font-bold text-white">${t("profile.subtitle")}</h1>
             <p class="text-sm sm:text-base text-slate-200/80 max-w-2xl">
-              Mets à jour ton identité dans le village, renforce la sécurité et personnalise l'apparence de ton oie sans quitter l'étang.
+              ${t("profile.settings.heroDesc")}
             </p>
           </section>
 
@@ -36,93 +38,93 @@ export default function ProfileSettings(): string {
             <article class="glass-panel card-shadow rounded-2xl p-6 space-y-4">
               <header class="flex items-center justify-between">
                 <div>
-                  <p class="text-sm text-emerald-200 uppercase tracking-[0.3em]">Identité</p>
-                  <h2 class="text-xl font-semibold text-white">Nom d'oie & e-mail</h2>
+                  <p class="text-sm text-emerald-200 uppercase tracking-[0.3em]">${t("settings.identity")}</p>
+                  <h2 class="text-xl font-semibold text-white">${t("settings.identity")}</h2>
                 </div>
                 <span class="text-2xl">🪶</span>
               </header>
               <form class="space-y-4">
                 <label class="space-y-1 block text-xs font-medium text-slate-200/80">
-                  Nom d'utilisateur
-                  <input type="text" name="username" class="w-full rounded-lg border border-[#d4c4a0]/70 bg-[#3a5548]/80 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-400 focus:ring-2 focus:ring-emerald-400/70 focus:border-emerald-300" placeholder="MaîtreHonk" />
+                  ${t("form.username")}
+                  <input type="text" name="username" class="w-full rounded-lg border border-[#d4c4a0]/70 bg-[#3a5548]/80 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-400 focus:ring-2 focus:ring-emerald-400/70 focus:border-emerald-300" placeholder="${t("profile.settings.placeholder.username")}" />
                 </label>
                 <label class="space-y-1 block text-xs font-medium text-slate-200/80">
-                  Adresse e-mail
-                  <input type="email" name="email" class="w-full rounded-lg border border-[#d4c4a0]/70 bg-[#3a5548]/80 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-400 focus:ring-2 focus:ring-emerald-400/70 focus:border-emerald-300" placeholder="toi@honk.fr" />
+                  ${t("form.email")}
+                  <input type="email" name="email" class="w-full rounded-lg border border-[#d4c4a0]/70 bg-[#3a5548]/80 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-400 focus:ring-2 focus:ring-emerald-400/70 focus:border-emerald-300" placeholder="${t("profile.settings.placeholder.email")}" />
                 </label>
-                <button type="button" class="btn-main w-full justify-center">Enregistrer</button>
+                <button type="button" class="btn-main w-full justify-center">${t("form.save")}</button>
               </form>
             </article>
 
             <article class="glass-panel card-shadow rounded-2xl p-6 space-y-4">
               <header class="flex items-center justify-between">
                 <div>
-                  <p class="text-sm text-amber-200 uppercase tracking-[0.3em]">Secret</p>
-                  <h2 class="text-xl font-semibold text-white">Mot de passe</h2>
+                  <p class="text-sm text-amber-200 uppercase tracking-[0.3em]">${t("settings.password")}</p>
+                  <h2 class="text-xl font-semibold text-white">${t("settings.password")}</h2>
                 </div>
                 <span class="text-2xl">🔒</span>
               </header>
               <form class="space-y-4">
                 <label class="space-y-1 block text-xs font-medium text-slate-200/80">
-                  Mot de passe actuel
+                  ${t("form.password.current")}
                   <input type="password" class="w-full rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 focus:ring-2 focus:ring-rose-400/60 focus:border-rose-300" placeholder="••••••••" />
                 </label>
                 <label class="space-y-1 block text-xs font-medium text-slate-200/80">
-                  Nouveau mot de passe
+                  ${t("form.password.new")}
                   <input type="password" class="w-full rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 focus:ring-2 focus:ring-rose-400/60 focus:border-rose-300" placeholder="••••••••" />
                 </label>
                 <label class="space-y-1 block text-xs font-medium text-slate-200/80">
-                  Confirmation
+                  ${t("form.password.confirm")}
                   <input type="password" class="w-full rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 focus:ring-2 focus:ring-rose-400/60 focus:border-rose-300" placeholder="••••••••" />
                 </label>
-                <button type="button" class="btn-main w-full justify-center bg-amber-400/90 text-slate-950 hover:bg-amber-300">Mettre à jour</button>
+                <button type="button" class="btn-main w-full justify-center bg-amber-400/90 text-slate-950 hover:bg-amber-300">${t("form.update")}</button>
               </form>
             </article>
 
             <article class="glass-panel card-shadow rounded-2xl p-6 space-y-4">
               <header class="flex items-center justify-between">
                 <div>
-                  <p class="text-sm text-sky-200 uppercase tracking-[0.3em]">Apparence</p>
-                  <h2 class="text-xl font-semibold text-white">Avatar</h2>
+                  <p class="text-sm text-sky-200 uppercase tracking-[0.3em]">${t("settings.avatar")}</p>
+                  <h2 class="text-xl font-semibold text-white">${t("settings.avatar")}</h2>
                 </div>
                 <span class="text-2xl">🎭</span>
               </header>
               <div class="flex items-center gap-4">
                 <div class="h-20 w-20 rounded-full bg-gradient-to-br from-emerald-400 to-amber-300 flex items-center justify-center text-3xl shadow-lg">🦢</div>
                 <div class="text-xs text-slate-300">
-                  <p>Affiche ton humeur du jour ou ta dernière victoire.</p>
-                  <p class="text-slate-500 mt-1">PNG/JPG, 2 Mo max.</p>
+                  <p>${t("profile.settings.avatarHint")}</p>
+                  <p class="text-slate-500 mt-1">${t("profile.settings.avatarFormats")}</p>
                 </div>
               </div>
               <label class="block text-xs font-medium text-slate-200/80">
-                Importer un fichier
+                ${t("profile.settings.uploadLabel")}
                 <input type="file" class="mt-1 w-full rounded-lg border border-dashed border-slate-600 bg-black/30 px-3 py-5 text-center text-slate-300 focus:ring-2 focus:ring-emerald-400/70 focus:border-emerald-300" />
               </label>
               <div class="flex gap-3">
-                <button type="button" class="btn-main flex-1 justify-center">Téléverser</button>
-                <button type="button" class="btn-secondary flex-1 justify-center text-center">Réinitialiser</button>
+                <button type="button" class="btn-main flex-1 justify-center">${t("form.upload")}</button>
+                <button type="button" class="btn-secondary flex-1 justify-center text-center">${t("form.reset")}</button>
               </div>
             </article>
 
             <article class="glass-panel card-shadow rounded-2xl p-6 space-y-4">
               <header class="flex items-center justify-between">
                 <div>
-                  <p class="text-sm text-emerald-200 uppercase tracking-[0.3em]">Sécurité</p>
-                  <h2 class="text-xl font-semibold text-white">Double authentification</h2>
+                  <p class="text-sm text-emerald-200 uppercase tracking-[0.3em]">${t("settings.2fa")}</p>
+                  <h2 class="text-xl font-semibold text-white">${t("settings.2fa")}</h2>
                 </div>
                 <span class="text-2xl">🛡️</span>
               </header>
               <p class="text-sm text-slate-300">
-                Active la protection 2FA pour empêcher les autres oies de s'infiltrer sur ton compte. Tu recevras un QR code à scanner dans ton application d'authentification.
+                ${t("profile.settings.2faDescription")}
               </p>
               <div class="flex items-center justify-between rounded-xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3">
                 <div class="text-xs text-slate-200">
-                  <p class="font-semibold">État actuel : <span class="text-emerald-300">désactivé</span></p>
-                  <p class="text-slate-400 mt-1">Dernier changement : jamais</p>
+                  <p class="font-semibold">${t("profile.settings.2faStatus")} <span class="text-emerald-300">${t("profile.settings.2faDisabled")}</span></p>
+                  <p class="text-slate-400 mt-1">${t("profile.settings.2faLastChange")}</p>
                 </div>
-                <button type="button" class="btn-main">Activer</button>
+                <button type="button" class="btn-main">${t("profile.settings.2faEnable")}</button>
               </div>
-              <button type="button" class="btn-secondary w-full justify-center">Je préfère rester comme ça</button>
+              <button type="button" class="btn-secondary w-full justify-center">${t("profile.settings.2faKeep")}</button>
             </article>
           </div>
         </div>

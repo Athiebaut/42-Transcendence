@@ -1,4 +1,11 @@
 import { api } from "../services/api";
+import { t } from "../i18n";
+
+const loginReasons = [
+  { icon: "🏅", textKey: "login.reasons.rank" },
+  { icon: "🧑‍🤝‍🧑", textKey: "login.reasons.friends" },
+  { icon: "🎨", textKey: "login.reasons.cosmetics" },
+];
 
 export default function Login(): string {
   return `
@@ -19,15 +26,15 @@ export default function Login(): string {
           class="inline-flex items-center gap-2 text-slate-200 hover:text-white transition-colors text-sm"
         >
           <span class="text-lg">🦢</span>
-          <span class="font-semibold tracking-tight">Retour au village</span>
+          <span class="font-semibold tracking-tight">${t("settings.backVillage")}</span>
         </a>
 
-        <div class="hidden sm:flex flex-col items-end text-xs">
+        <div class="hidden sm:flex flex-col items-end text-xs text-right">
           <span class="uppercase tracking-[0.25em] text-slate-500">
-            Choix du mode
+            ${t("shared.modeChoice.label")}
           </span>
           <span class="text-slate-400">
-            Sélectionne comment tu veux honker tes adversaires
+            ${t("shared.modeChoice.helper")}
           </span>
         </div>
       </header>
@@ -44,41 +51,38 @@ export default function Login(): string {
                 <span class="text-[0.7rem]">🦢</span>
               </span>
               <span class="text-slate-100">
-                Reprends là où tu t'étais arrêté dans le village d'oies.
+                ${t("login.heroBadge")}
               </span>
             </p>
 
             <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">
-              Bienvenue de retour,
+              ${t("login.title")}
               <span class="block text-glow mt-1">
-                le village n'attend que ton honk.
+                ${t("login.heroHighlight")}
               </span>
             </h1>
 
             <p class="text-sm sm:text-base text-slate-200/80 max-w-xl">
-              Connecte-toi pour retrouver ton oie, ton classement, ton historique de parties,
-              et toutes les bêtises que tu as déjà laissées derrière toi.
+              ${t("login.description")}
             </p>
 
             <div class="space-y-3 text-sm">
               <p class="font-semibold text-slate-100 flex items-center gap-2">
                 <span class="text-lg">📊</span>
-                <span>Pourquoi te connecter ?</span>
+                <span>${t("login.reasons.title")}</span>
               </p>
 
               <ul class="space-y-2 text-sm text-slate-200/80">
-                <li class="flex items-start gap-2">
-                  <span class="mt-0.5">🏅</span>
-                  <span>Retrouve ton classement et ta progression au sein du village.</span>
-                </li>
-                <li class="flex items-start gap-2">
-                  <span class="mt-0.5">🧑‍🤝‍🧑</span>
-                  <span>Rejoins tes amis directement dans leurs parties en cours.</span>
-                </li>
-                <li class="flex items-start gap-2">
-                  <span class="mt-0.5">🎨</span>
-                  <span>Accède à tes cosmétiques d'oie débloqués au fil des matchs.</span>
-                </li>
+                ${loginReasons
+                  .map(
+                    (reason) => `
+                      <li class="flex items-start gap-2">
+                        <span class="mt-0.5">${reason.icon}</span>
+                        <span>${t(reason.textKey)}</span>
+                      </li>
+                    `
+                  )
+                  .join("")}
               </ul>
             </div>
           </div>
@@ -97,21 +101,21 @@ export default function Login(): string {
               <div class="relative p-6 sm:p-8 space-y-6">
                 <div class="space-y-2 text-center sm:text-left">
                   <h2 class="text-xl sm:text-2xl font-semibold tracking-tight">
-                    Connexion au village
+                    ${t("login.title")}
                   </h2>
                   <p class="text-xs sm:text-sm text-slate-300">
-                    Entre tes identifiants pour retrouver ton oie.
+                    ${t("login.subtitle")}
                   </p>
                 </div>
 
                 <!-- Formulaire -->
-                <form class="space-y-4">
+                <form class="space-y-4" id="loginForm">
                   <div class="space-y-1">
                     <label
                       for="email"
                       class="block text-xs font-medium text-slate-200/90 tracking-wide"
                     >
-                      Adresse e-mail
+                      ${t("form.email")}
                     </label>
                     <input
                       id="email"
@@ -119,7 +123,7 @@ export default function Login(): string {
                       name="email"
                       autocomplete="email"
                       class="w-full rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/70 focus:border-emerald-400/80"
-                      placeholder="toi@village-honk.gg"
+                      placeholder="${t("login.placeholder.email")}"
                       required
                     />
                   </div>
@@ -129,7 +133,7 @@ export default function Login(): string {
                       for="password"
                       class="block text-xs font-medium text-slate-200/90 tracking-wide"
                     >
-                      Mot de passe
+                      ${t("form.password")}
                     </label>
                     <input
                       id="password"
@@ -137,7 +141,7 @@ export default function Login(): string {
                       name="password"
                       autocomplete="current-password"
                       class="w-full rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/70 focus:border-emerald-400/80"
-                      placeholder="Ton mot de passe secret"
+                      placeholder="${t("login.placeholder.password")}"
                       required
                     />
                   </div>
@@ -148,13 +152,13 @@ export default function Login(): string {
                         type="checkbox"
                         class="h-3 w-3 rounded border-slate-700 bg-slate-900 text-emerald-500 focus:ring-emerald-500/60"
                       />
-                      <span>Rester connecté·e sur ce village</span>
+                      <span>${t("login.remember")}</span>
                     </label>
                     <button
                       type="button"
                       class="text-emerald-300 hover:text-emerald-200 underline-offset-2 hover:underline"
                     >
-                      Mot de passe oublié ?
+                      ${t("login.forgot")}
                     </button>
                   </div>
 
@@ -162,7 +166,7 @@ export default function Login(): string {
                     type="submit"
                     class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-500 text-slate-950 text-sm font-semibold py-2.5 mt-2 hover:bg-emerald-400 transition-colors shadow-lg shadow-emerald-500/25"
                   >
-                    <span>Se connecter</span>
+                    <span>${t("login.button")}</span>
                     <span>🦢</span>
                   </button>
                 </form>
@@ -170,7 +174,7 @@ export default function Login(): string {
                 <!-- Séparateur -->
                 <div class="flex items-center gap-3 text-[0.7rem] text-slate-500">
                   <div class="h-px flex-1 bg-slate-800"></div>
-                  <span>ou</span>
+                  <span>${t("shared.or")}</span>
                   <div class="h-px flex-1 bg-slate-800"></div>
                 </div>
 
@@ -180,25 +184,25 @@ export default function Login(): string {
                   class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-slate-900/70 border border-slate-700/80 text-xs sm:text-sm text-slate-100 py-2.5 hover:bg-slate-800 transition-colors"
                 >
                   <span class="text-lg">🪙</span>
-                  <span>Continuer avec Google</span>
+                  <span>${t("login.social.google")}</span>
                 </button>
 
                 <!-- Lien vers inscription -->
                 <div class="text-center text-[0.75rem] text-slate-400">
-                  <span>Pas encore d'oie enregistrée ?</span>
+                  <span>${t("register.subtitle")}</span>
                   <a
                     href="/register"
                     data-nav
                     class="font-medium text-emerald-300 hover:text-emerald-200 underline-offset-2 hover:underline ml-1"
                   >
-                    Crée ton compte
+                    ${t("register.button")}
                   </a>
                 </div>
 
                 <!-- Petit message fun -->
                 <div class="text-center">
                   <p class="text-[0.7rem] text-slate-500 italic">
-                    🦢 L'oie surveille les tentatives de connexion suspectes (mais elle se laisse soudoyer avec du pain).
+                    ${t("login.helper")}
                   </p>
                 </div>
               </div>
@@ -222,7 +226,7 @@ export function setupLogin() {
     const password = (formData.get("password") || "").toString();
 
     if (!email || !password) {
-      alert("Merci de renseigner votre e-mail et votre mot de passe.");
+      alert(t("login.alert.missing"));
       return;
     }
 
@@ -231,9 +235,9 @@ export function setupLogin() {
       if (result?.token) {
         localStorage.setItem("token", result.token);
       }
-      window.location.href = "/dashboard";
+      window.location.href = "/profil";
     } catch (error: any) {
-      alert(error?.message ?? "Impossible de se connecter pour le moment.");
+      alert(error?.message ?? t("login.alert.error"));
     }
   });
 }
