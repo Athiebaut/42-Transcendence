@@ -4,79 +4,107 @@ services:
     build:
       context: ./back_to_back
       dockerfile: Dockerfile.backend
-    env_file:
-      - .env
     volumes:
       - ./back_to_back/src:/app/back_to_back/src
       - ./back_to_back/prisma:/app/prisma
       - ./back_to_back/avatar:/app/back_to_back/avatar
       - /app/back_to_back/node_modules
+      - ./common/vault-entrypoint.sh:/usr/local/bin/vault-entrypoint.sh
+      - ./config_shared:/vault/config:ro
     ports:
       - "3042:3042"
     environment:
       NODE_ENV: development
+      VAULT_ADDR: "http://vault:8200"
+      VAULT_SECRET_PATH: "secret/data/backend/config"
+      OUTPUT_ENV_FILE: "/app/.env"
+    entrypoint: ["/bin/sh", "/usr/local/bin/vault-entrypoint.sh"]
+    depends_on:
+      vault:
+        condition: service_healthy
+    command: ["sh", "-c", "npx prisma migrate deploy && npm run dev"]
 
-  nginx: # On garde le nom "nginx" ou "waf"
+  nginx:
     container_name: waf_modsecurity
     build:
-      context: ./waf  # Le contexte est le dossier waf créé
+      context: ./waf
       dockerfile: Dockerfile
     depends_on:
       - back_to_back
     ports:
-      - "443:443" # Accès direct via https://localhost
-      - "80:80"   # Accès direct via http://localhost (pour la redirection)
+      - "443:443"
+      - "80:80"
     volumes:
-      # Montage des fichiers statiques du Frontend
       - ./web/dist:/usr/share/nginx/html:ro
-      # Montage des certificats SSL
       - ./certs:/etc/nginx/certs:ro
-      # Montage des logs pour vérifier ModSecurity
       - ./logs/modsec_audit.log:/var/log/modsec_audit.log
     restart: always
 
-  # prometheus:
-  #   build:
-  #     context: ./monitoring/prometheus
-  #     dockerfile: Dockerfile
-  #   container_name: prometheus
-  #   ports:
-  #     - "9090:9090" #allow access to Prometheus web
-  #   volumes:
-  #     - prometheus_data:/prometheus #persistent data for prometheus
-  #   restart: always
-  # grafana:
-  #   container_name: grafana
-  #   depends_on: #needs prometheus to be running first
-  #     - prometheus
-  #   ports:
-  #     - "3000:3000"
-  #   build:
-  #     context: ./monitoring/grafana
-  #     dockerfile: Dockerfile
-  #   # extra_hosts:
-  #   #   - "host.docker.internal:host-gateway"
-  #   volumes:
-  #     - grafana_data:/var/lib/grafana #persistent data for grafana
-  #     - grafana_data:/grafana/data #persistent data for grafana
-  #   restart: always
+  vault:
+    image: hashicorp/vault:1.13.3
+    container_name: vault
+    ports:
+      - "8200:8200"
+    restart: unless-stopped
+    environment:
+      VAULT_ADDR: "http://vault:8200"
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "sh", "-c", "curl -fsS http://vault:8200/v1/sys/health | grep '\"sealed\":false'"]
+      interval: 5s
+      timeout: 10s
+      retries: 20
+      start_period: 20s
+    command: >
+      sh -c "
+        /vault/init-vault.sh &
+        vault server -config=/vault/config.hcl
+      "
+    volumes:
+      - ./vault/config.hcl:/vault/config.hcl:ro
+      - ./vault/init-vault.sh:/vault/init-vault.sh:ro
+      - vault_data:/vault/data
+      - ./config_shared:/vault/config_output
 
-  cadvisor: #monitor docker containers
+  prometheus:
+    build:
+      context: ./monitoring/prometheus
+      dockerfile: Dockerfile
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - prometheus_data:/prometheus
+    restart: always
+
+  grafana:
+    container_name: grafana
+    depends_on:
+      - prometheus
+    ports:
+      - "3000:3000"
+    build:
+      context: ./monitoring/grafana
+      dockerfile: Dockerfile
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - grafana_data:/grafana/data
+    restart: always
+
+  cadvisor:
     build:
       context: ./monitoring/cadvisor
       dockerfile: Dockerfile
     container_name: cadvisor
-    # ports:
-    #   - "8080:8080"
-    volumes: #necessary volumes for cadvisor to monitor docker and system stats
+    volumes:
       - /run/user/${USER_ID_MONITORING}/docker.sock:/var/run/docker.sock:ro
       - /run/user/${USER_ID_MONITORING}/docker/containerd/containerd.sock:/run/containerd/containerd.sock
       - /sys:/sys:ro
       - /:/rootfs:ro
-        #- /var/lib/docker:/var/lib/docker:ro #installation with apt
-        #- /var/snap/docker/common/var-lib-docker:/var/lib/docker:ro #installation with snap
     restart: always
 
 volumes:
   grafana_data:
   prometheus_data:
+  vault_data:
