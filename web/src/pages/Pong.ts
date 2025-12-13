@@ -118,7 +118,7 @@ export default function Pong(): string {
                 <span>🎮</span>
                 <span>${t("pong.controls.title")}</span>
               </h2>
-              <ul class="space-y-1.5 text-[0.75rem] sm:text-xs text-slate-200/90">
+              <ul id="pong-controls-list" class="space-y-1.5 text-[0.75rem] sm:text-xs text-slate-200/90">
                 <li>${t("pong.controls.left")} <span class="font-semibold">W / S</span></li>
                 <li>${t("pong.controls.right")} <span class="font-semibold">↑ / ↓</span></li>
                 <li>${t("pong.controls.pause")}</li>

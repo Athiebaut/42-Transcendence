@@ -17,12 +17,14 @@ function createKeyboardHandler(keys: string[]): KeyState {
     
     window.addEventListener("keydown", (ev) => {
         if (keys.includes(ev.code)) {
+            ev.preventDefault();
             state[ev.code] = true;
         }
     });
     
     window.addEventListener("keyup", (ev) => {
         if (keys.includes(ev.code)) {
+            ev.preventDefault();
             state[ev.code] = false;
         }
     });

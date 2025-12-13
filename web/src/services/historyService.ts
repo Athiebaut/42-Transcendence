@@ -6,7 +6,7 @@ export interface GameHistoryEntry {
   opponentId: number;
   score: string;
   durationMs: number;
-  DateTime: string;
+  date: string;
 }
 
 export const historyService = {

@@ -8,7 +8,7 @@ import type { GameMode } from "./config/gameModeConfig";
 import { showVictoryScreen } from './ui/Victory';
 import { showTournamentMatchEnd } from './tournament/MatchEnd';
 import { clearTournament } from "./tournament/TournamentLogic";
-import { updatePlayerNames } from "./ui/displayPlayerNames";
+import { initGameUI, updateGameTimer } from "./ui/gameUI";
 import { userService } from "../services/userService";
 import { historyService } from "../services/historyService";
 
@@ -65,7 +65,7 @@ export async function initPongGame(mode: GameMode = 'pvp1v1'): Promise<boolean> 
         setupScene(scene, mode);
         setupControls(scene, engine, mode);
 
-        updatePlayerNames(mode);
+        initGameUI(mode);
         
         // Initialisation du système de physique
         ballPhysics = createBallPhysics(scene, mode);
@@ -110,6 +110,7 @@ export async function initPongGame(mode: GameMode = 'pvp1v1'): Promise<boolean> 
         engine.runRenderLoop(() => {
             if (scene) {
                 scene.render();
+                updateGameTimer(gameStartTime);
             }
         });
         

@@ -72,11 +72,7 @@ function setupFourPlayerMode(scene: Scene): void {
 }
 
 function setupCamera(scene: Scene): void {
-    const camera = new ArcRotateCamera("Camera", Math.PI / 2, 0, 10, Vector3.Zero(), scene);
-    camera.attachControl(scene.getEngine().getRenderingCanvas()!, true);
-    
-    // Désactiver SEULEMENT les contrôles clavier, garder la souris
-    camera.inputs.removeByType("ArcRotateCameraKeyboardMoveInput");
+    new ArcRotateCamera("Camera", Math.PI / 2, 0, 10, Vector3.Zero(), scene);
 }
 
 function setupLights(scene: Scene): void {

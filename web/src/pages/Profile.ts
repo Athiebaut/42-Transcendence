@@ -156,7 +156,7 @@ export default function Profile(): string {
                 </button>
               </div>
 
-              <div class="overflow-x-auto">
+              <div class="overflow-x-auto max-h-80 overflow-y-auto custom-scrollbar">
                 <table class="w-full text-xs sm:text-sm">
                   <thead class="text-slate-400 uppercase text-[0.65rem] tracking-wide bg-slate-900/70">
                     <tr>
@@ -240,6 +240,13 @@ export function setupProfile() {
   loadHistory();
 }
 
+function formatDuration(ms: number): string {
+    const seconds = Math.floor(ms / 1000);
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}m ${s}s`;
+}
+
 async function loadHistory() {
     const user = userService.getUser();
     if (!user) return;
@@ -263,12 +270,15 @@ async function loadHistory() {
         }
 
         tbody.innerHTML = history.map(match => {
-            // Logique simple pour déterminer victoire/défaite (à améliorer selon qui est player1/2)
-            // Pour l'instant on suppose que le score est "Moi - Lui"
-            const [myScore, opScore] = match.score.split('-').map(Number);
+            // Logique simple pour déterminer victoire/défaite
+            // Format attendu score: "Moi - Lui" (ex: "10 - 4")
+            const parts = match.score.split('-').map(s => parseInt(s.trim()));
+            const myScore = parts[0] || 0;
+            const opScore = parts[1] || 0;
+            
             const isWin = myScore > opScore;
             const isDraw = myScore === opScore;
-            
+
             let resultClass = "bg-rose-500/15 text-rose-300";
             let resultText = "Défaite";
             
@@ -280,6 +290,10 @@ async function loadHistory() {
                 resultText = "Égalité";
             }
 
+            const dateObj = new Date(match.date);
+            const dateStr = dateObj.toLocaleDateString();
+            const durationStr = formatDuration(match.durationMs); // Conversion
+
             return `
                 <tr>
                     <td class="px-3 py-2">
@@ -290,12 +304,18 @@ async function loadHistory() {
                         <span>Adversaire #${match.opponentId}</span>
                         </div>
                     </td>
-                    <td class="px-3 py-2 text-center">${match.score}</td>
-                    <td class="px-3 py-2 text-center text-slate-400">Classique</td>
+                    <td class="px-3 py-2 text-center font-mono text-slate-300">${match.score}</td>
+                    <td class="px-3 py-2 text-center">
+                        <span class="text-xs text-slate-400">Classique</span>
+                        <div class="text-[0.6rem] text-slate-500 mt-0.5">⏱️ ${durationStr}</div> <!-- AJOUT ICI -->
+                    </td>
                     <td class="px-3 py-2 text-right">
-                        <span class="inline-flex items-center px-2 py-1 rounded-full ${resultClass} text-[0.7rem]">
-                        ${resultText}
-                        </span>
+                        <div class="flex flex-col items-end gap-1">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full ${resultClass} text-[0.65rem] font-medium">
+                                ${resultText}
+                            </span>
+                            <span class="text-[0.65rem] text-slate-500">${dateStr}</span>
+                        </div>
                     </td>
                 </tr>
             `;
