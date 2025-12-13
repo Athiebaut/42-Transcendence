@@ -43,13 +43,13 @@ model RefreshToken {
 
 model GameHistory {
   id         Int      @id @default(autoincrement())
-  opponentId Int
   durationMs Int
   playerId   Int
   score      String
   date       DateTime @default(now())
   User       User?    @relation(fields: [userId], references: [id])
   userId     Int?
+  mode       String
 }
 
 model Friend {

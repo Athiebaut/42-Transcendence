@@ -6,33 +6,33 @@ const prisma = new PrismaClient();
 const gameHistorySchema: FastifySchema = {
 	body: {
 		type: 'object',
-		required: ['playerId', 'durationMs', 'opponentId', 'score'],
+		required: ['playerId', 'durationMs', 'score', 'mode'],
 		properties: {
 			playerId: { type: 'integer', description: "ID de l'utilisateur qui enregistre la partie." },
 			durationMs: { type: 'integer', description: 'Durée de la partie en millisecondes.' },
-			opponentId: { type: 'integer', description: "ID de l'adversaire." },
 			score: { type: 'string', description: 'Le score final ou résultat.' },
+			mode: { type: 'string', description: 'Le mode de jeu.' }
 		}
 	}
 };
 interface GameHistoryBody {
 	playerId: number;
 	durationMs: number;
-	opponentId: number;
 	score: string;
+	mode: string;
 }
 export default async function history(app: FastifyInstance) {
 	app.post("/history", { schema: gameHistorySchema },
 		async (request: FastifyRequest<{ Body: GameHistoryBody}>, reply)=> {
-			const { playerId, durationMs, opponentId, score } = request.body;
+			const { playerId, durationMs, score, mode } = request.body;
 
 			try {
 				const newGame = await prisma.gameHistory.create({
 					data: {
 						durationMs: durationMs,
-						opponentId: opponentId,
 						score: score,
 						playerId: playerId,
+						mode: mode,
 						User: {
 							connect: { id: playerId }
 						}
@@ -69,9 +69,9 @@ export default async function history(app: FastifyInstance) {
 				},
 				select: {
 					durationMs: true,
-					opponentId: true,
 					score: true,
-					date: true
+					date: true,
+					mode: true
 				}
 			});
 			// if (history.length === 0) {

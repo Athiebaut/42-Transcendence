@@ -3,22 +3,22 @@ import { api } from "./api";
 export interface GameHistoryEntry {
   id: number;
   playerId: number;
-  opponentId: number;
   score: string;
   durationMs: number;
   date: string;
+  mode: string; // AJOUT : mode de jeu
 }
 
 export const historyService = {
   /**
    * Sauvegarde une partie terminée
    */
-  async saveMatch(playerId: number, opponentId: number, score: string, durationMs: number) {
+  async saveMatch(playerId: number, score: string, durationMs: number, mode: string) {
     return api.post("/history", {
       playerId,
-      opponentId,
       score,
-      durationMs
+      durationMs,
+      mode, // ENVOI du mode
     });
   },
 

@@ -3,6 +3,7 @@ import { t } from "../i18n";
 import { logout } from "../utils/auth";
 import { userService } from "../services/userService";
 import { historyService} from "../services/historyService";
+import { loadTournament, getRoundName } from '../game/tournament/TournamentLogic';
 
 
 // const resultStyles: Record<string, string> = {
@@ -160,7 +161,6 @@ export default function Profile(): string {
                 <table class="w-full text-xs sm:text-sm">
                   <thead class="text-slate-400 uppercase text-[0.65rem] tracking-wide bg-slate-900/70">
                     <tr>
-                      <th class="px-3 py-2 text-left">${t("profile.history.table.opponent")}</th>
                       <th class="px-3 py-2 text-center">${t("profile.history.table.score")}</th>
                       <th class="px-3 py-2 text-center">${t("profile.history.table.mode")}</th>
                       <th class="px-3 py-2 text-right">${t("profile.history.table.result")}</th>
@@ -168,9 +168,9 @@ export default function Profile(): string {
                   </thead>
                   <tbody class="divide-y divide-slate-800" id="history-table-body">
                     <tr>
-                        <td colspan="4" class="p-4 text-center text-slate-500 text-xs">
-                            Chargement de l'historique...
-                        </td>
+                      <td colspan="3" class="p-4 text-center text-slate-500 text-xs">
+                        Chargement de l'historique...
+                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -259,19 +259,24 @@ async function loadHistory() {
         const history = data.history || [];
 
         if (history.length === 0) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="4" class="p-4 text-center text-slate-500 text-xs">
-                        Aucune partie jouée pour le moment.
-                    </td>
-                </tr>
-            `;
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="3" class="p-4 text-center text-slate-500 text-xs">
+              Aucune partie jouée pour le moment.
+            </td>
+          </tr>
+        `;
             return;
         }
 
+        const modeMap: Record<string, string> = {
+            pvp1v1: t("profile.match.mode.1v1"),
+            pvp2v2: t("profile.match.mode.2v2"),
+            vsai: t("profile.match.mode.vIA"),
+            tournament: t("profile.match.mode.tournament"),
+        };
+
         tbody.innerHTML = history.map(match => {
-            // Logique simple pour déterminer victoire/défaite
-            // Format attendu score: "Moi - Lui" (ex: "10 - 4")
             const parts = match.score.split('-').map(s => parseInt(s.trim()));
             const myScore = parts[0] || 0;
             const opScore = parts[1] || 0;
@@ -280,44 +285,49 @@ async function loadHistory() {
             const isDraw = myScore === opScore;
 
             let resultClass = "bg-rose-500/15 text-rose-300";
-            let resultText = "Défaite";
+            let resultText = t("profile.match.result.loss") || "Défaite";
             
             if (isWin) {
                 resultClass = "bg-emerald-500/15 text-emerald-300";
-                resultText = "Victoire";
+                resultText = t("profile.match.result.win") || "Victoire";
             } else if (isDraw) {
                 resultClass = "bg-slate-500/20 text-slate-200";
-                resultText = "Égalité";
+                resultText = t("profile.match.result.draw") || "Égalité";
             }
 
             const dateObj = new Date(match.date);
             const dateStr = dateObj.toLocaleDateString();
             const durationStr = formatDuration(match.durationMs); // Conversion
 
+            let modeLabel = modeMap[match.mode] || match.mode;
+            if (match.mode === 'tournament') {
+              try {
+                const tournament = loadTournament();
+                if (tournament) {
+                  const roundName = getRoundName(tournament);
+                  modeLabel = `${modeLabel} — ${roundName}`;
+                }
+              } catch (e) {
+                // ignore if no tournament data in session
+              }
+            }
+
             return `
-                <tr>
-                    <td class="px-3 py-2">
-                        <div class="flex items-center gap-2">
-                        <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-slate-700 text-slate-300 text-[0.65rem] font-bold">
-                            OP
-                        </span>
-                        <span>Adversaire #${match.opponentId}</span>
-                        </div>
-                    </td>
-                    <td class="px-3 py-2 text-center font-mono text-slate-300">${match.score}</td>
-                    <td class="px-3 py-2 text-center">
-                        <span class="text-xs text-slate-400">Classique</span>
-                        <div class="text-[0.6rem] text-slate-500 mt-0.5">⏱️ ${durationStr}</div> <!-- AJOUT ICI -->
-                    </td>
-                    <td class="px-3 py-2 text-right">
-                        <div class="flex flex-col items-end gap-1">
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-full ${resultClass} text-[0.65rem] font-medium">
-                                ${resultText}
-                            </span>
-                            <span class="text-[0.65rem] text-slate-500">${dateStr}</span>
-                        </div>
-                    </td>
-                </tr>
+              <tr>
+                <td class="px-3 py-2 text-center font-mono text-slate-300">${match.score}</td>
+                <td class="px-3 py-2 text-center">
+                  <span class="text-xs text-slate-400">${modeLabel}</span>
+                  <div class="text-[0.6rem] text-slate-500 mt-0.5">⏱️ ${durationStr}</div>
+                </td>
+                <td class="px-3 py-2 text-right">
+                  <div class="flex flex-col items-end gap-1">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full ${resultClass} text-[0.65rem] font-medium">
+                      ${resultText}
+                    </span>
+                    <span class="text-[0.65rem] text-slate-500">${dateStr}</span>
+                  </div>
+                </td>
+              </tr>
             `;
         }).join('');
 

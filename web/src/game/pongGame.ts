@@ -76,17 +76,14 @@ export async function initPongGame(mode: GameMode = 'pvp1v1'): Promise<boolean> 
             
             const score = ballPhysics.score;
 
-            // 💾 SAUVEGARDE DE L'HISTORIQUE (Uniquement hors tournoi pour l'instant)
+            // 💾 SAUVEGARDE DE L'HISTORIQUE (inclut maintenant les tournois)
             const user = userService.getUser();
-            if (user && mode !== 'tournament') {
+            if (user) {
                 const duration = Date.now() - gameStartTime;
                 const scoreString = `${score.player1} - ${score.player2}`;
                 
-                // Note: Pour l'instant on met 0 pour l'ID adversaire (IA ou Local)
-                const opponentId = 0; 
-
                 try {
-                    await historyService.saveMatch(user.id, opponentId, scoreString, duration);
+                    await historyService.saveMatch(user.id, scoreString, duration, mode);
                     console.log("✅ Partie sauvegardée !");
                 } catch (e) {
                     console.error("Erreur sauvegarde historique", e);

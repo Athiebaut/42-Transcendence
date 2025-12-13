@@ -12,20 +12,6 @@ export const statCards: StatCardConfig[] = [
   { labelKey: "profile.stats.playtime.label", value: "3 h 18", infoKey: "profile.stats.playtime.info" },
 ];
 
-export type RecentMatch = {
-  opponent: string;
-  score: string;
-  modeKey: string;
-  resultKey: string;
-};
-
-export const recentMatches: RecentMatch[] = [
-  { opponent: "GooseValkyrie", score: "10 - 7", modeKey: "profile.match.mode.ranked", resultKey: "profile.match.result.win" },
-  { opponent: "LittleGoose", score: "8 - 10", modeKey: "profile.match.mode.friendly", resultKey: "profile.match.result.loss" },
-  { opponent: "OieBourrue", score: "9 - 9", modeKey: "profile.match.mode.chaos", resultKey: "profile.match.result.draw" },
-  { opponent: "NoisyMallard", score: "10 - 4", modeKey: "profile.match.mode.ranked", resultKey: "profile.match.result.win" },
-];
-
 export type FriendActionVariant = "primary" | "secondary" | "muted";
 
 export type FriendStatusEntry = {
