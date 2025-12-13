@@ -91,14 +91,24 @@ export default function Play(): string {
       <header
         class="relative z-10 px-4 sm:px-6 py-4 flex items-center justify-between border-b border-slate-800/80 bg-slate-950/70 backdrop-blur"
       >
-        <a
-          href="/"
-          data-nav
-          class="inline-flex items-center gap-2 text-slate-200 hover:text-white transition-colors text-sm"
-        >
-          <span class="text-lg">🦢</span>
-          <span class="font-semibold tracking-tight">${t("settings.backVillage")}</span>
-        </a>
+        <div class="flex items-center gap-4">
+          <a
+            href="/"
+            data-nav
+            class="inline-flex items-center gap-2 text-slate-200 hover:text-white transition-colors text-sm"
+          >
+            <span class="text-lg">🦢</span>
+            <span class="font-semibold tracking-tight">${t("settings.backVillage")}</span>
+          </a>
+
+          <a
+            href="/profile"
+            data-nav
+            class="px-4 py-2 rounded-full border border-emerald-400/40 text-xs font-medium text-emerald-200 hover:bg-emerald-400/10 transition-colors"
+          >
+            ${t("cta.profile")}
+          </a>
+        </div>
 
         <div class="hidden sm:flex flex-col items-end text-xs">
           <span class="uppercase tracking-[0.25em] text-slate-500">

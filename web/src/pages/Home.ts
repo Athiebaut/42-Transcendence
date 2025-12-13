@@ -1,4 +1,4 @@
-import { isAuthenticated } from "../utils/auth";
+import { isAuthenticated, logout } from "../utils/auth";
 import { t } from "../i18n";
 
 export default function Home(): string {

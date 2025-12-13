@@ -53,11 +53,26 @@ export const userService = {
    */
   async fetchProfile(): Promise<User | null> {
     try {
+      const token = localStorage.getItem("token");
+      if (!token) return null;
+
       const response = await fetch("/back_to_back/profile", {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${token}`,
         },
       });
+
+      // AJOUT : Si le token est invalide (401) ou l'user introuvable (404 - cas du reset DB)
+      if (response.status === 401 || response.status === 404) {
+        console.warn("Session invalide ou utilisateur inexistant, déconnexion forcée.");
+        this.clearUser();
+        localStorage.removeItem("token");
+        // Optionnel : rediriger vers login si on n'y est pas déjà
+        if (window.location.pathname !== "/login" && window.location.pathname !== "/register") {
+           window.location.href = "/login";
+        }
+        return null;
+      }
 
       if (!response.ok) throw new Error("Failed to fetch profile");
 

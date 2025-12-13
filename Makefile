@@ -17,8 +17,8 @@ CERT_DIR        := certs
 CERT_KEY        := $(CERT_DIR)/selfsigned.key
 CERT_CRT        := $(CERT_DIR)/selfsigned.crt
 
-ENV_FILE        := api/.env
-ENV_EXAMPLE     := api/.env.example
+ENV_FILE        := .env
+ENV_EXAMPLE     := .env.example
 
 .DEFAULT_GOAL := help
 
@@ -84,12 +84,12 @@ setup-monitoring:
 	@./prometheus-configurer.sh &
 
 # -------- Main flows --------
-up: setup-monitoring certs build-front
+up: setup-monitoring certs
 	$(call hr)
-# 	$(MAKE) guard-env
+	$(MAKE) guard-env
 	@# Ne bloque pas si le port est occupé, mais avertit
 	@if ss -ltn | grep -q ":$(PORT) "; then $(call warn,Le port $(PORT) semble occupé, le démarrage de nginx peut échouer.); fi
-	$(COMPOSE) up --build
+	$(COMPOSE) up
 	$(call ok,Stack démarrée. Ouvre: https://localhost:$(PORT))
 
 down:
@@ -97,8 +97,8 @@ down:
 	$(call ok,Stack stoppée.)
 
 restart:
-	$(COMPOSE) restart $(NGINX_SERVICE) $(API_SERVICE)
-	$(call ok,Services redémarrés: $(NGINX_SERVICE), $(API_SERVICE))
+	$(COMPOSE) restart $(NGINX_SERVICE)
+	$(call ok,Services redémarrés: $(NGINX_SERVICE))
 
 ps:
 	$(COMPOSE) ps
@@ -129,9 +129,14 @@ reload-nginx:
 	 $(call ok,Nginx rechargé.)
 
 # -------- Build --------
-build:
-	$(COMPOSE) build --no-cache
+build: build-front
+	$(COMPOSE) build
 	$(call ok,Images reconstruites.)
+
+build-front:
+	@echo "→ Installation des dépendances et build du front..."
+	@cd web && npm install && npm run build
+	$(call ok,Front buildé dans web/dist.)
 
 # -------- Certs & env --------
 certs:
@@ -160,7 +165,7 @@ env-init:
 # -------- Utilities --------
 reset:
 	$(MAKE) down
-	$(MAKE) build-front
+	$(MAKE) build
 	$(MAKE) up
 
 clean: clean-front clean-api

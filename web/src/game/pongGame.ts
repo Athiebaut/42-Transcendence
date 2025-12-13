@@ -9,11 +9,14 @@ import { showVictoryScreen } from './ui/Victory';
 import { showTournamentMatchEnd } from './tournament/MatchEnd';
 import { clearTournament } from "./tournament/TournamentLogic";
 import { updatePlayerNames } from "./ui/displayPlayerNames";
+import { userService } from "../services/userService";
+import { historyService } from "../services/historyService";
 
 
 let engine: Engine | null = null;
 let scene: Scene | null = null;
 let ballPhysics: ComposedPhysicsSystem | null = null;
+let gameStartTime: number = 0;
 
 /**
  * Met à jour l'affichage du score dans l'interface utilisateur
@@ -46,6 +49,8 @@ export async function initPongGame(mode: GameMode = 'pvp1v1'): Promise<boolean> 
     // Nettoyage préventif de l'état précédent
     disposePongGame();
     
+    gameStartTime = Date.now(); // ⏱️ On lance le chrono
+
     if (mode === 'tournament') {
         window.addEventListener('beforeunload', clearTournament);
     }
@@ -66,10 +71,28 @@ export async function initPongGame(mode: GameMode = 'pvp1v1'): Promise<boolean> 
         ballPhysics = createBallPhysics(scene, mode);
         ballPhysics.onScoreUpdate = updateScoreDisplay;
         
-        ballPhysics.onGameOver = (winner: number) => {
+        ballPhysics.onGameOver = async (winner: number) => {
             if (!ballPhysics) return;
             
             const score = ballPhysics.score;
+
+            // 💾 SAUVEGARDE DE L'HISTORIQUE (Uniquement hors tournoi pour l'instant)
+            const user = userService.getUser();
+            if (user && mode !== 'tournament') {
+                const duration = Date.now() - gameStartTime;
+                const scoreString = `${score.player1} - ${score.player2}`;
+                
+                // Note: Pour l'instant on met 0 pour l'ID adversaire (IA ou Local)
+                const opponentId = 0; 
+
+                try {
+                    await historyService.saveMatch(user.id, opponentId, scoreString, duration);
+                    console.log("✅ Partie sauvegardée !");
+                } catch (e) {
+                    console.error("Erreur sauvegarde historique", e);
+                }
+            }
+
             if (mode === 'tournament') {
                 showTournamentMatchEnd(winner, score, () => {
                     if (scene) resetPaddles(scene, mode);
@@ -79,6 +102,7 @@ export async function initPongGame(mode: GameMode = 'pvp1v1'): Promise<boolean> 
                 showVictoryScreen(winner, score, mode, () => {
                     if (scene) resetPaddles(scene, mode);
                     ballPhysics?.resetGame();
+                    gameStartTime = Date.now(); // Reset chrono
                 });
             }
         };

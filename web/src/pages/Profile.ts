@@ -1,14 +1,15 @@
-import { statCards, recentMatches, friendStatus, type FriendActionVariant } from "../data/profile";
+import { statCards, friendStatus, type FriendActionVariant } from "../data/profile";
 import { t } from "../i18n";
 import { logout } from "../utils/auth";
 import { userService } from "../services/userService";
+import { historyService} from "../services/historyService";
 
 
-const resultStyles: Record<string, string> = {
-  "profile.match.result.win": "bg-emerald-500/15 text-emerald-300",
-  "profile.match.result.loss": "bg-rose-500/15 text-rose-300",
-  "profile.match.result.draw": "bg-slate-500/20 text-slate-200",
-};
+// const resultStyles: Record<string, string> = {
+//   "profile.match.result.win": "bg-emerald-500/15 text-emerald-300",
+//   "profile.match.result.loss": "bg-rose-500/15 text-rose-300",
+//   "profile.match.result.draw": "bg-slate-500/20 text-slate-200",
+// };
 
 const friendActionStyles: Record<FriendActionVariant, string> = {
   primary: "px-3 py-1.5 rounded-full border border-emerald-500/50 bg-emerald-500/10 text-[0.7rem] sm:text-xs text-emerald-300 hover:bg-emerald-500/20 transition-colors",
@@ -36,7 +37,7 @@ export default function Profile(): string {
         </a>
 
         <nav class="flex items-center gap-3 text-xs sm:text-sm">
-          <a href="/pong" data-nav class="px-3 py-1.5 rounded-full border border-white/10 bg-black/30 hover:bg-white/5 transition-colors">
+          <a href="/play" data-nav class="px-3 py-1.5 rounded-full border border-white/10 bg-black/30 hover:bg-white/5 transition-colors">
             🎮 ${t("profile.header.playPong")}
           </a>
           <a href="/profile" data-nav class="hidden sm:inline text-emerald-300 font-semibold">
@@ -90,7 +91,7 @@ export default function Profile(): string {
               <!-- Boutons d'actions rapides -->
               <div class="flex flex-wrap gap-3 mt-2">
                 <a
-                  href="/pong"
+                  href="/play"
                   data-nav
                   class="wood-sign-btn text-sm sm:text-base px-6 py-3"
                 >
@@ -165,30 +166,12 @@ export default function Profile(): string {
                       <th class="px-3 py-2 text-right">${t("profile.history.table.result")}</th>
                     </tr>
                   </thead>
-                  <tbody class="divide-y divide-slate-800">
-                    ${recentMatches
-                      .map(
-                        (match) => `
-                      <tr>
-                        <td class="px-3 py-2">
-                          <div class="flex items-center gap-2">
-                            <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/80 text-slate-950 text-[0.65rem] font-bold">
-                              ${match.opponent.slice(0, 2).toUpperCase()}
-                            </span>
-                            <span>${match.opponent}</span>
-                          </div>
+                  <tbody class="divide-y divide-slate-800" id="history-table-body">
+                    <tr>
+                        <td colspan="4" class="p-4 text-center text-slate-500 text-xs">
+                            Chargement de l'historique...
                         </td>
-                        <td class="px-3 py-2 text-center">${match.score}</td>
-                        <td class="px-3 py-2 text-center text-slate-400">${t(match.modeKey)}</td>
-                        <td class="px-3 py-2 text-right">
-                          <span class="inline-flex items-center px-2 py-1 rounded-full ${resultStyles[match.resultKey]} text-[0.7rem]">
-                            ${t(match.resultKey)}
-                          </span>
-                        </td>
-                      </tr>
-                    `
-                      )
-                      .join("")}
+                    </tr>
                   </tbody>
                 </table>
               </div>
@@ -253,4 +236,79 @@ export function setupProfile() {
       await logout();
     }
   });
+  // CHARGEMENT DIFFÉRÉ DE L'HISTORIQUE
+  loadHistory();
+}
+
+async function loadHistory() {
+    const user = userService.getUser();
+    if (!user) return;
+
+    const tbody = document.getElementById("history-table-body");
+    if (!tbody) return;
+
+    try {
+        const data = await historyService.getHistory(user.id);
+        const history = data.history || [];
+
+        if (history.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="4" class="p-4 text-center text-slate-500 text-xs">
+                        Aucune partie jouée pour le moment.
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        tbody.innerHTML = history.map(match => {
+            // Logique simple pour déterminer victoire/défaite (à améliorer selon qui est player1/2)
+            // Pour l'instant on suppose que le score est "Moi - Lui"
+            const [myScore, opScore] = match.score.split('-').map(Number);
+            const isWin = myScore > opScore;
+            const isDraw = myScore === opScore;
+            
+            let resultClass = "bg-rose-500/15 text-rose-300";
+            let resultText = "Défaite";
+            
+            if (isWin) {
+                resultClass = "bg-emerald-500/15 text-emerald-300";
+                resultText = "Victoire";
+            } else if (isDraw) {
+                resultClass = "bg-slate-500/20 text-slate-200";
+                resultText = "Égalité";
+            }
+
+            return `
+                <tr>
+                    <td class="px-3 py-2">
+                        <div class="flex items-center gap-2">
+                        <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-slate-700 text-slate-300 text-[0.65rem] font-bold">
+                            OP
+                        </span>
+                        <span>Adversaire #${match.opponentId}</span>
+                        </div>
+                    </td>
+                    <td class="px-3 py-2 text-center">${match.score}</td>
+                    <td class="px-3 py-2 text-center text-slate-400">Classique</td>
+                    <td class="px-3 py-2 text-right">
+                        <span class="inline-flex items-center px-2 py-1 rounded-full ${resultClass} text-[0.7rem]">
+                        ${resultText}
+                        </span>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+
+    } catch (error) {
+        console.error("Erreur chargement historique", error);
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="4" class="p-4 text-center text-rose-400 text-xs">
+                    Erreur lors du chargement de l'historique.
+                </td>
+            </tr>
+        `;
+    }
 }

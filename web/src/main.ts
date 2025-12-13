@@ -6,6 +6,7 @@ import { mountDecorControls, refreshDecorControls } from "./components/ui/DecorC
 import { mountAuthDebugToggle } from "./components/ui/AuthDebugToggle";
 import { initI18n } from "./i18n";
 import { mountLanguageSwitcher } from "./components/ui/LanguageSwitcher";
+import { userService } from "./services/userService";
 import "./style.css";
 import "./village-theme.css";
 
@@ -29,6 +30,11 @@ async function bootstrap() {
   mountDecorControls();
   mountAuthDebugToggle();
   mountLanguageSwitcher();
+  
+  // AJOUT : Vérification de la session au démarrage
+  if (localStorage.getItem("token")) {
+    await userService.fetchProfile();
+  }
   
   // Ajouter le bouton de changement manuel (optionnel)
   // initBackgroundSelector();

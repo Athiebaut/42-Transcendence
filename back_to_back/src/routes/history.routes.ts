@@ -32,7 +32,8 @@ export default async function history(app: FastifyInstance) {
 						durationMs: durationMs,
 						opponentId: opponentId,
 						score: score,
-						player: {
+						playerId: playerId,
+						User: {
 							connect: { id: playerId }
 						}
 					}
@@ -64,19 +65,19 @@ export default async function history(app: FastifyInstance) {
 					playerId: Number(playerId),
 				},
 				orderBy: {
-					DateTime: 'desc',
+					date: 'desc',
 				},
 				select: {
 					durationMs: true,
 					opponentId: true,
 					score: true,
-					DateTime: true
+					date: true
 				}
 			});
-			if (history.length === 0) {
-				reply.code(404).send({ message: "Aucune partie trouve pour ce joueur." });
-				return ;
-			}
+			// if (history.length === 0) {
+			// 	reply.code(404).send({ message: "Aucune partie trouve pour ce joueur." });
+			// 	return ;
+			// }
 			reply.code(200).send({
 				player: playerId,
 				history: history

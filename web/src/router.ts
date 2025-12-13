@@ -31,7 +31,7 @@ const routes: Record<string, RouteHandler> = {
   "/profile-settings": ProfileSettings,
   "/profile": Profile
 };
-const protectedRoutes = new Set(["/dashboard", "/profile-settings"]);
+const protectedRoutes = new Set(["/dashboard", "/profile-settings", "/profile"]);
 
 export async function renderRoute(path: string) {
   const app = document.querySelector<HTMLDivElement>("#app");

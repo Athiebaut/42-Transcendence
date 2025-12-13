@@ -1,13 +1,14 @@
 import { loadTournament, getCurrentMatch } from '../tournament/TournamentLogic';
 import type { GameMode } from '../config/gameModeConfig';
+import { userService } from '../../services/userService';
 
 
 /**
  * Récupère le nom du joueur connecté (si disponible)
  */
 export function getConnectedUserName(): string | null {
-    // a faire plus tard
-    return "Billy";
+    const user = userService.getUser();
+    return user ? user.username : null;
 }
 
 /**
