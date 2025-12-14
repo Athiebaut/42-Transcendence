@@ -111,7 +111,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
             return reply.status(401).send({ error: "Unauthorized" });
         }
     });
-    fastify.post("/auth/2fa/turn-on", async (request, reply) => {
+    const handle2FATurnOn = async (request, reply) => {
         const { code } = request.body as { code: string };
         const authHeader = request.headers.authorization;
         try {
@@ -130,6 +130,31 @@ export default async function authRoutes(fastify: FastifyInstance) {
             );
             return reply.send({ message: "2FA activated", token: newToken });
         } catch (e) {
+            return reply.status(401).send({ error: "Unauthorized" });
+        }
+    };
+    fastify.post("/auth/2fa/turn-on", handle2FATurnOn);
+    // Compatibility with older front versions
+    fastify.post("/auth/2fa/enable", handle2FATurnOn);
+
+    fastify.post("/auth/2fa/disable", async (request, reply) => {
+        const authHeader = request.headers.authorization;
+        try {
+            if (!authHeader) throw new Error();
+            const decoded = verifyJwt(authHeader.split(" ")[1]);
+            const user = await prisma.user.findUnique({ where: { id: decoded.userId } });
+            if (!user) {
+                return reply.status(404).send({ error: "User not found" });
+            }
+            await prisma.user.update({
+                where: { id: user.id },
+                data: {
+                    twoFactorAuthenticationSecret: null,
+                    isTwoFactorAuthenticationEnabled: false
+                }
+            });
+            return reply.send({ message: "2FA disabled" });
+        } catch (error) {
             return reply.status(401).send({ error: "Unauthorized" });
         }
     });

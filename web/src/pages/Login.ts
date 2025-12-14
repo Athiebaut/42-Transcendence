@@ -183,6 +183,29 @@ export default function Login(): string {
                   </button>
                 </form>
 
+                <div id="login-2fa-section" class="hidden space-y-3 rounded-2xl border border-emerald-400/30 bg-black/30 p-4">
+                  <div>
+                    <p class="text-xs uppercase tracking-[0.25em] text-emerald-300">${t("login.2fa.title")}</p>
+                    <p class="text-sm text-slate-300 mt-1">${t("login.2fa.subtitle")}</p>
+                  </div>
+                  <form id="login-2fa-form" class="flex flex-col sm:flex-row gap-3">
+                    <input
+                      id="login-2fa-code"
+                      type="text"
+                      inputmode="numeric"
+                      pattern="[0-9]{6}"
+                      maxlength="6"
+                      class="flex-1 rounded-lg border border-white/10 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:ring-2 focus:ring-emerald-500/70 focus:border-emerald-400/80"
+                      placeholder="${t("login.2fa.placeholder")}"
+                      required
+                    />
+                    <div class="flex gap-2 w-full sm:w-auto">
+                      <button type="submit" class="btn-main flex-1 justify-center">${t("login.2fa.confirm")}</button>
+                      <button type="button" id="login-2fa-cancel" class="btn-secondary flex-1 justify-center">${t("login.2fa.cancel")}</button>
+                    </div>
+                  </form>
+                </div>
+
                 <!-- Séparateur -->
                 <div class="flex items-center gap-3 text-[0.7rem] text-slate-500">
                   <div class="h-px flex-1 bg-slate-800"></div>
@@ -227,11 +250,35 @@ export default function Login(): string {
 }
 
 export function setupLogin() {
-  const form = document.querySelector("form") as HTMLFormElement | null;
+  const form = document.getElementById("loginForm") as HTMLFormElement | null;
+  const twoFaSection = document.getElementById("login-2fa-section");
+  const twoFaForm = document.getElementById("login-2fa-form") as HTMLFormElement | null;
+  const twoFaCodeInput = document.getElementById("login-2fa-code") as HTMLInputElement | null;
+  const twoFaCancelBtn = document.getElementById("login-2fa-cancel") as HTMLButtonElement | null;
+
   if (!form) {
     console.error("Login form not found");
     return;
   }
+
+  let pendingTwoFAToken: string | null = null;
+
+  const show2FAStep = (token: string) => {
+    pendingTwoFAToken = token;
+    twoFaSection?.classList.remove("hidden");
+    twoFaCodeInput?.focus();
+  };
+
+  const reset2FAStep = () => {
+    pendingTwoFAToken = null;
+    if (twoFaSection && !twoFaSection.classList.contains("hidden")) {
+      twoFaSection.classList.add("hidden");
+    }
+    if (twoFaCodeInput) {
+      twoFaCodeInput.value = "";
+      twoFaCodeInput.disabled = false;
+    }
+  };
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -246,11 +293,19 @@ export function setupLogin() {
     }
 
     try {
-      const result = await api.post<{ token?: string }>("/login", { 
+      const result = await api.post<{ token?: string; is2faEnabled?: boolean }>("/login", { 
         LogEmail: email,
         LogPassword: password
       });
       
+      if (result?.is2faEnabled) {
+        if (result.token) {
+          show2FAStep(result.token);
+          alert(t("login.2fa.prompt"));
+        }
+        return;
+      }
+
       if (result?.token) {
         localStorage.setItem("token", result.token);
         
@@ -262,5 +317,59 @@ export function setupLogin() {
     } catch (error: any) {
       alert(error?.message ?? "Impossible de se connecter pour le moment.");
     }
+  });
+
+  twoFaForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!twoFaCodeInput) return;
+    const code = twoFaCodeInput.value.trim();
+
+    if (!pendingTwoFAToken) {
+      alert(t("login.2fa.sessionExpired"));
+      reset2FAStep();
+      return;
+    }
+
+    if (!code) {
+      alert(t("login.2fa.codeMissing"));
+      return;
+    }
+
+    try {
+      twoFaCodeInput.disabled = true;
+      const response = await fetch("/back_to_back/auth/2fa/authenticate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${pendingTwoFAToken}`
+        },
+        body: JSON.stringify({ code })
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Invalid code");
+      }
+
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+        await userService.fetchProfile();
+        window.location.href = "/dashboard";
+      } else {
+        throw new Error("Missing token after 2FA");
+      }
+    } catch (error: any) {
+      alert(error?.message || t("login.2fa.error"));
+    } finally {
+      if (twoFaCodeInput) {
+        twoFaCodeInput.disabled = false;
+        twoFaCodeInput.value = "";
+        twoFaCodeInput.focus();
+      }
+    }
+  });
+
+  twoFaCancelBtn?.addEventListener("click", () => {
+    reset2FAStep();
   });
 }
