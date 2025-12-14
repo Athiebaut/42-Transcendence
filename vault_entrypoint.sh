@@ -40,6 +40,8 @@ echo "Fetching secrets from path: $VAULT_SECRET_PATH"
 
 SECRETS_RESPONSE=$(curl -s --header "X-Vault-Token: $VAULT_TOKEN" "$VAULT_ADDR/v1/$VAULT_SECRET_PATH")
 
+echo "DEBUG VAULT RESPONSE: $SECRETS_RESPONSE"
+
 if echo "$SECRETS_RESPONSE" | grep -q "errors"; then
     echo "WARNING: Could not fetch secrets from $VAULT_SECRET_PATH"
 else

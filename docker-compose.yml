@@ -9,7 +9,7 @@ services:
       - ./back_to_back/prisma:/app/prisma
       - ./back_to_back/avatar:/app/back_to_back/avatar
       - /app/back_to_back/node_modules
-      - ./common/vault-entrypoint.sh:/usr/local/bin/vault-entrypoint.sh
+      - ./vault_entrypoint.sh:/usr/local/bin/vault_entrypoint.sh
       - ./config_shared:/vault/config:ro
     ports:
       - "3042:3042"
@@ -18,7 +18,7 @@ services:
       VAULT_ADDR: "http://vault:8200"
       VAULT_SECRET_PATH: "secret/data/backend/config"
       OUTPUT_ENV_FILE: "/app/.env"
-    entrypoint: ["/bin/sh", "/usr/local/bin/vault-entrypoint.sh"]
+    entrypoint: ["/bin/sh", "/usr/local/bin/vault_entrypoint.sh"]
     depends_on:
       vault:
         condition: service_healthy
