@@ -5,7 +5,7 @@ import { userService } from "../services/userService";
 import { historyService} from "../services/historyService";
 import { loadTournament, getRoundName } from '../game/tournament/TournamentLogic';
 import { api } from "../services/api";
-import { renderHeaderQuickLinks } from "../components/ui/HeaderQuickLinks";
+import { renderHeaderContextMessage } from "../components/ui/HeaderContextMessage";
 
 function timeAgo(ts: number | null | undefined) {
   if (!ts) return t('profile.friends.status.never');
@@ -29,18 +29,31 @@ export default function Profile(): string {
       </div>
 
       <!-- HEADER du dashboard -->
-      <header class="z-20 px-6 py-4 flex items-center justify-between border-b border-slate-800/80 bg-slate-950/70 backdrop-blur">
-        <a href="/" data-nav class="flex items-center gap-2">
-          <span class="text-2xl">🦢</span>
-          <span class="font-semibold tracking-tight">Honk Village</span>
-        </a>
-
-        <div class="flex flex-wrap items-center gap-3 text-xs sm:text-sm">
-          ${renderHeaderQuickLinks("flex items-center gap-3 text-xs sm:text-sm text-slate-300")}
-          <span class="hidden sm:inline text-slate-700">•</span>
-          <a href="#" id="profile-logout-btn" class="hidden sm:inline text-slate-300 hover:text-white transition-colors">
-            ${t("nav.logout")}
-          </a>
+      <header class="z-20 px-4 sm:px-6 py-4 border-b border-slate-800/80 bg-slate-950/70 backdrop-blur">
+        <div class="relative w-full">
+          ${renderHeaderContextMessage("header.profile.title", "header.profile.subtitle")}
+          <div class="flex flex-wrap items-center gap-3 w-full">
+            <div class="flex items-center gap-2">
+              <a href="/" data-nav class="flex items-center gap-2">
+                <span class="text-2xl">🦢</span>
+                <span class="font-semibold tracking-tight">Honk Village</span>
+              </a>
+            </div>
+            <div class="ml-auto flex items-center gap-3 justify-end w-full sm:w-auto">
+              <nav class="flex items-center gap-3 text-xs sm:text-sm text-slate-300">
+                <a href="/play" data-nav class="hover:text-white transition-colors">${t("nav.playModes")}
+                </a>
+                <span class="hidden sm:inline text-slate-700">•</span>
+                <button
+                  id="profile-logout-btn"
+                  class="flex items-center gap-3 text-xs sm:text-sm text-slate-300"
+                  type="button"
+                >
+                  ${t("nav.logout")}
+                </button>
+              </nav>
+            </div>
+          </div>
         </div>
       </header>
 

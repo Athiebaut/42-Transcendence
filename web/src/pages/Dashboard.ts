@@ -1,6 +1,7 @@
 import { t } from "../i18n";
 import { logout } from "../utils/auth";
 import { renderHeaderQuickLinks } from "../components/ui/HeaderQuickLinks";
+import { renderHeaderContextMessage } from "../components/ui/HeaderContextMessage";
 import {
   activityFeed,
   campfireStats,
@@ -127,12 +128,21 @@ export default function Dashboard(): string {
         <div class="absolute -bottom-40 -right-36 w-80 h-80 bg-emerald-400/20 rounded-full blur-3xl"></div>
       </div>
 
-      <header class="z-20 px-6 py-4 flex items-center justify-between border-b border-slate-800/80 bg-slate-950/70 backdrop-blur">
-        <a href="/" data-nav class="inline-flex items-center gap-2 text-slate-200 hover:text-white transition-colors">
-          <span class="text-lg">🦢</span>
-          <span class="font-semibold tracking-tight">Honk village</span>
-        </a>
-        ${renderHeaderQuickLinks()}
+      <header class="z-20 px-4 sm:px-6 py-4 border-b border-slate-800/80 bg-slate-950/70 backdrop-blur">
+        <div class="relative w-full">
+          ${renderHeaderContextMessage("header.dashboard.title", "header.dashboard.subtitle")}
+          <div class="flex flex-wrap items-center gap-3 w-full">
+            <div class="flex items-center gap-2">
+              <a href="/" data-nav class="inline-flex items-center gap-2 text-slate-200 hover:text-white transition-colors">
+                <span class="text-lg">🦢</span>
+                <span class="font-semibold tracking-tight">Honk village</span>
+              </a>
+            </div>
+            <div class="ml-auto flex items-center gap-3 justify-end w-full sm:w-auto">
+              ${renderHeaderQuickLinks()}
+            </div>
+          </div>
+        </div>
       </header>
 
       <main class="relative z-10 flex-1 px-4 sm:px-6 pb-12 pt-6">

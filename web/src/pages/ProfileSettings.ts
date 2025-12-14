@@ -2,6 +2,7 @@ import { t } from "../i18n";
 import { api } from "../services/api";
 import { userService, type User } from "../services/userService";
 import { renderHeaderQuickLinks } from "../components/ui/HeaderQuickLinks";
+import { renderHeaderContextMessage } from "../components/ui/HeaderContextMessage";
 
 export default function ProfileSettings(): string {
   const user = userService.getUser();
@@ -17,12 +18,21 @@ export default function ProfileSettings(): string {
         <div class="absolute -bottom-40 -right-32 w-80 h-80 bg-sky-500/20 rounded-full blur-3xl"></div>
       </div>
 
-      <header class="relative z-10 px-4 sm:px-6 py-4 flex items-center justify-between border-b border-slate-800/80 bg-slate-950/70 backdrop-blur">
-        <a href="/" data-nav class="inline-flex items-center gap-2 text-slate-200 hover:text-white transition-colors text-sm">
-          <span class="text-lg">🦢</span>
-          <span class="font-semibold tracking-tight">${t("settings.backVillage")}</span>
-        </a>
-        ${renderHeaderQuickLinks()}
+      <header class="relative z-10 px-4 sm:px-6 py-4 border-b border-slate-800/80 bg-slate-950/70 backdrop-blur">
+        <div class="relative w-full">
+          ${renderHeaderContextMessage("header.profileSettings.title", "header.profileSettings.subtitle")}
+          <div class="flex flex-wrap items-center gap-3 w-full">
+            <div class="flex items-center gap-2">
+              <a href="/" data-nav class="inline-flex items-center gap-2 text-slate-200 hover:text-white transition-colors text-sm">
+                <span class="text-lg">🦢</span>
+                <span class="font-semibold tracking-tight">${t("settings.backVillage")}</span>
+              </a>
+            </div>
+            <div class="ml-auto flex items-center gap-3 justify-end w-full sm:w-auto">
+              ${renderHeaderQuickLinks()}
+            </div>
+          </div>
+        </div>
       </header>
 
       <main class="relative z-10 flex-1 px-4 sm:px-6 lg:px-10 py-8">

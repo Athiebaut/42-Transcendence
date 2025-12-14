@@ -16,6 +16,10 @@ import friendRoutes from './routes/friend.routes.js';
 
 const app = fastify({ logger: true });
 const prisma = new PrismaClient();
+app.decorate("prisma", prisma);
+app.addHook("onClose", async () => {
+	await prisma.$disconnect();
+});
 
 const start = async () => {
 	try {

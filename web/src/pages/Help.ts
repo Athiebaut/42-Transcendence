@@ -1,4 +1,5 @@
 import { renderHeaderQuickLinks } from "../components/ui/HeaderQuickLinks";
+import { renderHeaderContextMessage } from "../components/ui/HeaderContextMessage";
 
 type HelpCard = {
   icon: string;
@@ -58,11 +59,20 @@ export default function Help(): string {
         <div class="absolute -bottom-40 -right-36 w-96 h-96 bg-sky-500/20 rounded-full blur-[120px]"></div>
       </div>
 
-      <header class="relative z-10 px-4 sm:px-6 py-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-b border-slate-800/80 bg-slate-950/70 backdrop-blur">
-        <a href="/" data-nav class="inline-flex items-center text-sm text-emerald-300 hover:text-emerald-200">
-          ← Retour à l'accueil
-        </a>
-        ${renderHeaderQuickLinks("flex items-center gap-3 text-xs sm:text-sm text-slate-300")}
+      <header class="relative z-10 px-4 sm:px-6 py-4 border-b border-slate-800/80 bg-slate-950/70 backdrop-blur">
+        <div class="relative w-full">
+          ${renderHeaderContextMessage("header.help.title", "header.help.subtitle")}
+          <div class="flex flex-wrap items-center gap-3 w-full">
+            <div class="flex items-center">
+              <a href="/" data-nav class="inline-flex items-center text-sm text-emerald-300 hover:text-emerald-200">
+                ← Retour à l'accueil
+              </a>
+            </div>
+            <div class="ml-auto flex items-center gap-3 justify-end w-full sm:w-auto">
+              ${renderHeaderQuickLinks("flex items-center gap-3 text-xs sm:text-sm text-slate-300")}
+            </div>
+          </div>
+        </div>
       </header>
 
       <main class="relative z-10 flex-1 w-full px-4 sm:px-6 pb-14 pt-10 space-y-10">

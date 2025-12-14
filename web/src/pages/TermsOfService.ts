@@ -1,4 +1,5 @@
 import { renderHeaderQuickLinks } from "../components/ui/HeaderQuickLinks";
+import { renderHeaderContextMessage } from "../components/ui/HeaderContextMessage";
 
 export default function TermsOfService(): string {
   const lastUpdated = "Avril 2024";
@@ -10,11 +11,20 @@ export default function TermsOfService(): string {
         <div class="absolute -bottom-40 -right-36 w-96 h-96 bg-rose-500/15 rounded-full blur-[120px]"></div>
       </div>
 
-      <header class="relative z-10 px-4 sm:px-6 py-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-b border-slate-800/80 bg-slate-950/70 backdrop-blur">
-        <a href="/" data-nav class="inline-flex items-center text-sm text-emerald-300 hover:text-emerald-200">
-          ← Retour à l'accueil
-        </a>
-        ${renderHeaderQuickLinks("flex items-center gap-3 text-xs sm:text-sm text-slate-300")}
+      <header class="relative z-10 px-4 sm:px-6 py-4 border-b border-slate-800/80 bg-slate-950/70 backdrop-blur">
+        <div class="relative w-full">
+          ${renderHeaderContextMessage("header.terms.title", "header.terms.subtitle")}
+          <div class="flex flex-wrap items-center gap-3 w-full">
+            <div class="flex items-center">
+              <a href="/" data-nav class="inline-flex items-center text-sm text-emerald-300 hover:text-emerald-200">
+                ← Retour à l'accueil
+              </a>
+            </div>
+            <div class="ml-auto flex items-center gap-3 justify-end w-full sm:w-auto">
+              ${renderHeaderQuickLinks("flex items-center gap-3 text-xs sm:text-sm text-slate-300")}
+            </div>
+          </div>
+        </div>
       </header>
 
       <main class="relative z-10 flex-1 px-4 sm:px-6 pb-16 pt-10">

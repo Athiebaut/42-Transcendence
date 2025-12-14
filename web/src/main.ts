@@ -28,9 +28,14 @@ async function bootstrap() {
   initBackgroundRotator("random");
   mountDecorControls();
   mountLanguageSwitcher();
+
+  const oauthToken = consumeOAuthToken();
   
   // AJOUT : Vérification de la session au démarrage
-  if (localStorage.getItem("token")) {
+  if (oauthToken || localStorage.getItem("token")) {
+    if (oauthToken) {
+      localStorage.setItem("token", oauthToken);
+    }
     await userService.fetchProfile();
   }
   
@@ -77,3 +82,15 @@ async function bootstrap() {
 }
 
 bootstrap();
+function consumeOAuthToken(): string | null {
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get("token");
+  if (token) {
+    params.delete("token");
+    const newSearch = params.toString();
+    const newUrl = `${window.location.pathname}${newSearch ? `?${newSearch}` : ""}${window.location.hash}`;
+    window.history.replaceState({}, "", newUrl);
+    return token;
+  }
+  return null;
+}

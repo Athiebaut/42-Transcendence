@@ -1,5 +1,6 @@
 import { t } from "../i18n";
 import { renderHeaderQuickLinks } from "../components/ui/HeaderQuickLinks";
+import { renderHeaderContextMessage } from "../components/ui/HeaderContextMessage";
 
 type PlayCard = {
   href: string;
@@ -89,29 +90,23 @@ export default function Play(): string {
       </div>
 
       <!-- HEADER -->
-      <header
-        class="relative z-10 px-4 sm:px-6 py-4 flex items-center justify-between border-b border-slate-800/80 bg-slate-950/70 backdrop-blur"
-      >
-        <div class="flex items-center gap-4">
-          <a
-            href="/"
-            data-nav
-            class="inline-flex items-center gap-2 text-slate-200 hover:text-white transition-colors text-sm"
-          >
-            <span class="text-lg">🦢</span>
-            <span class="font-semibold tracking-tight">${t("settings.backVillage")}</span>
-          </a>
-        </div>
-
-        <div class="flex flex-col items-end gap-2">
-          ${renderHeaderQuickLinks("flex items-center gap-3 text-xs sm:text-sm text-slate-300 justify-end")}
-          <div class="hidden sm:flex flex-col items-end text-xs">
-            <span class="uppercase tracking-[0.25em] text-slate-500">
-              ${t("shared.modeChoice.label")}
-            </span>
-            <span class="text-slate-400">
-              ${t("shared.modeChoice.helper")}
-            </span>
+      <header class="relative z-10 px-4 sm:px-6 py-4 border-b border-slate-800/80 bg-slate-950/70 backdrop-blur">
+        <div class="relative w-full">
+          ${renderHeaderContextMessage("header.play.title", "header.play.subtitle")}
+          <div class="flex flex-wrap items-center gap-3 w-full">
+            <div class="flex items-center gap-4">
+              <a
+                href="/"
+                data-nav
+                class="inline-flex items-center gap-2 text-slate-200 hover:text-white transition-colors text-sm"
+              >
+                <span class="text-lg">🦢</span>
+                <span class="font-semibold tracking-tight">${t("settings.backVillage")}</span>
+              </a>
+            </div>
+            <div class="ml-auto flex items-center gap-3 justify-end w-full sm:w-auto">
+              ${renderHeaderQuickLinks("flex items-center gap-3 text-xs sm:text-sm text-slate-300")}
+            </div>
           </div>
         </div>
       </header>

@@ -1,6 +1,7 @@
 import { logout } from "../utils/auth";
 import { t } from "../i18n";
 import { renderHeaderQuickLinks } from "../components/ui/HeaderQuickLinks";
+import { renderHeaderContextMessage } from "../components/ui/HeaderContextMessage";
 
 export default function Home(): string {
   //const loggedIn = isAuthenticated();
@@ -13,25 +14,29 @@ export default function Home(): string {
       </div>
 
       <!-- HEADER -->
-      <header
-        class="relative z-10 px-4 sm:px-6 py-4 flex items-center justify-between border-b border-slate-800/80 bg-slate-950/70 backdrop-blur"
-      >
-        <a
-          href="/"
-          data-nav
-          class="inline-flex items-center gap-2 text-slate-200 hover:text-white transition-colors text-sm"
-        >
-          <span class="text-lg">🦢</span>
-          <span class="font-semibold tracking-tight">Honk village</span>
-        </a>
-
-        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-6">
-          <nav class="flex items-center gap-4 text-sm">
-            <a href="#roles" class="hover:text-white/80 transition-colors">${t("nav.roles")}</a>
-            <a href="#ladder" class="hover:text-white/80 transition-colors">${t("nav.ladder")}</a>
-            <a href="#customize" class="hover:text-white/80 transition-colors">${t("nav.customize")}</a>
-          </nav>
-          ${renderHeaderQuickLinks("flex items-center gap-3 text-xs sm:text-sm text-slate-300")}
+      <header class="relative z-10 px-4 sm:px-6 py-4 border-b border-slate-800/80 bg-slate-950/70 backdrop-blur">
+        <div class="relative w-full">
+          ${renderHeaderContextMessage("header.home.title", "header.home.subtitle")}
+          <div class="flex flex-wrap items-center gap-3 w-full">
+            <div class="flex items-center gap-2">
+              <a
+                href="/"
+                data-nav
+                class="inline-flex items-center gap-2 text-slate-200 hover:text-white transition-colors text-sm"
+              >
+                <span class="text-lg">🦢</span>
+                <span class="font-semibold tracking-tight">Honk village</span>
+              </a>
+            </div>
+            <div class="ml-auto flex flex-wrap items-center gap-4 justify-end w-full sm:w-auto">
+              <nav class="flex items-center gap-4 text-sm">
+                <a href="#roles" class="hover:text-white/80 transition-colors">${t("nav.roles")}</a>
+                <a href="#ladder" class="hover:text-white/80 transition-colors">${t("nav.ladder")}</a>
+                <a href="#customize" class="hover:text-white/80 transition-colors">${t("nav.customize")}</a>
+              </nav>
+              ${renderHeaderQuickLinks("flex items-center gap-3 text-xs sm:text-sm text-slate-300")}
+            </div>
+          </div>
         </div>
       </header>
 

@@ -112,6 +112,9 @@ export default async function authGoogleRoutes(app: FastifyInstance) {
       httpOnly: true, secure: true, sameSite: 'lax', path: '/', maxAge: 60 * 60 * 24 * 7,
     });
 
-    return reply.redirect(FRONT + next);
+    const redirectUrl = new URL(FRONT + next);
+    redirectUrl.searchParams.set("token", jwt);
+
+    return reply.redirect(redirectUrl.toString());
   });
 }
