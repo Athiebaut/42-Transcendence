@@ -1,9 +1,7 @@
 #!/bin/sh
 set -e
 
-# Configuration par défaut
 : "${VAULT_ADDR:=http://vault:8200}"
-# Chaque service devra définir cette variable dans le docker-compose !
 : "${VAULT_SECRET_PATH:=secret/data/common}"
 
 ROLE_ID_FILE="/vault/config/role_id.txt"
@@ -35,7 +33,7 @@ if [ -z "$VAULT_TOKEN" ] || [ "$VAULT_TOKEN" = "null" ]; then
     exit 1
 fi
 
-# --- 2. INJECTION DES SECRETS (La partie magique) ---
+# --- 2. INJECTION DES SECRETS ---
 echo "Fetching secrets from path: $VAULT_SECRET_PATH"
 
 SECRETS_RESPONSE=$(curl -s --header "X-Vault-Token: $VAULT_TOKEN" "$VAULT_ADDR/v1/$VAULT_SECRET_PATH")
@@ -45,12 +43,20 @@ echo "DEBUG VAULT RESPONSE: $SECRETS_RESPONSE"
 if echo "$SECRETS_RESPONSE" | grep -q "errors"; then
     echo "WARNING: Could not fetch secrets from $VAULT_SECRET_PATH"
 else
+    # A. Injection en mémoire (pour le processus Node.js actuel)
     echo "$SECRETS_RESPONSE" | jq -r '.data.data | to_entries | .[] | "export \(.key)=\"\(.value)\""' > /tmp/env_vars.sh
-
     . /tmp/env_vars.sh
+    rm /tmp/env_vars.sh
+
+    # B. Création du fichier physique
+    if [ -n "$OUTPUT_ENV_FILE" ]; then
+        echo "Creating .env file at $OUTPUT_ENV_FILE"
+        echo "$SECRETS_RESPONSE" | jq -r '.data.data | to_entries | .[] | "\(.key)=\"\(.value)\""' > "$OUTPUT_ENV_FILE"
+
+        chmod 600 "$OUTPUT_ENV_FILE"
+    fi
 
     echo "Secrets injected into environment variables successfully."
-    rm /tmp/env_vars.sh
 fi
 
 # --- 3. LANCEMENT DU SERVICE ---
