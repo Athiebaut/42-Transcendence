@@ -193,12 +193,15 @@ function setupIdentityForm() {
       // Cela garantit que le FormData est envoyé en "multipart/form-data"
       // et non transformé en JSON vide par l'utilitaire api.
       const response = await fetch("/back_to_back/profile", {
-        method: "PUT",
+        method: "PATCH",
         headers: {
+          "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
-          // IMPORTANT : Ne pas définir Content-Type, le navigateur le fait automatiquement pour FormData
         },
-        body: formData,
+        body: JSON.stringify({
+          username,
+          email,
+        }),
       });
 
       if (!response.ok) {
@@ -249,11 +252,25 @@ function setupPasswordForm() {
     }
 
     try {
-      const result = await api.put<{ message: string }>("/profile/password", {
-        currentPassword,
-        newPassword,
+      const response = await fetch("/back_to_back/profile/password", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({
+          currentPassword,
+          newPassword,
+          confirmPassword,
+        }),
       });
 
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || errorData.message || `Erreur ${response.status}`);
+      }
+
+      const result = await response.json();
       alert(result.message || "Mot de passe mis à jour avec succès !");
       form.reset();
     } catch (error: any) {

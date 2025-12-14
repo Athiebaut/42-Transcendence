@@ -1,5 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifySchema } from "fastify";
 import { PrismaClient } from "@prisma/client";
+import {verifToken2FA} from "../middleware/auth.js";
 
 const prisma = new PrismaClient();
 
@@ -22,6 +23,7 @@ interface GameHistoryBody {
 	mode: string;
 }
 export default async function history(app: FastifyInstance) {
+	app.addHook("preHandler", verifToken2FA);
 	app.post("/history", { schema: gameHistorySchema },
 		async (request: FastifyRequest<{ Body: GameHistoryBody}>, reply)=> {
 			const { playerId, durationMs, score, mode } = request.body;

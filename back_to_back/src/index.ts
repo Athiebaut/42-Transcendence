@@ -8,9 +8,10 @@ import { PrismaClient } from '@prisma/client';
 
 import userRoutes from './routes/user.routes.js';
 import authRoutes from './routes/auth.routes.js';
-import profileRoutes from './routes/profile.routes.js';
+import profileAccountRoutes from './routes/profile.account.routes.js';
 import historyRoutes from './routes/history.routes.js';
 import authGoogleRoutes from "./routes/auth-google.routes.js";
+import avatarRoutes from "./routes/avatar.routes.js";
 
 const app = fastify({ logger: true });
 const prisma = new PrismaClient();
@@ -30,8 +31,9 @@ const start = async () => {
 		await app.register(authGoogleRoutes);
 		await app.register(authRoutes);
 		await app.register(userRoutes);
-		await app.register(profileRoutes);
+		await app.register(profileAccountRoutes);
 		await app.register(historyRoutes);
+		await app.register(avatarRoutes);
 		app.get("/test", async () => ({ message: "API OK" }));
 		app.get("/", async () => ({ message: "Serveur en ligne" }));
 		await app.ready();

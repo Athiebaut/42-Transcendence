@@ -14,13 +14,14 @@ const verifyJwt = (token: string) => {
 
 export default async function authRoutes(fastify: FastifyInstance) {
 	fastify.post("/register", async (request, reply) => {
-		const { email, password, username } = request.body as {
+		const { email, password, passwordConfirm,username } = request.body as {
 			email: string;
 			password: string;
+			passwordConfirm: string;
 			username: string;
 		};
 		console.log(email);
-		if (!email || !password || !username)
+		if (!email || !password || !passwordConfirm || !username)
 			return reply.status(400).send({ error: "Champs manquants" });
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 		if (!emailRegex.test(email))
@@ -39,6 +40,8 @@ export default async function authRoutes(fastify: FastifyInstance) {
 			return reply.status(400).send({
 				error: "Le mot de passe doit contenir 8 caractères minimum",
 			});
+		if (passwordConfirm != password)
+			return reply.status(400).send({ error: "differente Password"});
 		if (!/[A-Z]/.test(password) || !/[0-9]/.test(password))
 			return reply.status(400).send({
 				error: "Le mot de passe doit contenir au moins une majuscule et un chiffre",

@@ -269,7 +269,8 @@ export function setupRegister() {
       const dataToSend = {
           username: formData.get('username'), 
           email: formData.get('email'),
-          password: formData.get('password'), 
+          password: formData.get('password'),
+          passwordConfirm: formData.get('password_confirm'),
       };
 
       try {
@@ -283,4 +284,8 @@ export function setupRegister() {
           alert(t("register.alert.error", { message: error?.message ?? "?" }));
       }
   });
+}
+
+export function registerWithGoogle() {
+  alert(t("register.alert.google"));
 }
