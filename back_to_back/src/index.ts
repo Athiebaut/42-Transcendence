@@ -12,6 +12,7 @@ import profileAccountRoutes from './routes/profile.account.routes.js';
 import historyRoutes from './routes/history.routes.js';
 import authGoogleRoutes from "./routes/auth-google.routes.js";
 import avatarRoutes from "./routes/avatar.routes.js";
+import friendRoutes from './routes/friend.routes.js';
 
 const app = fastify({ logger: true });
 const prisma = new PrismaClient();
@@ -32,6 +33,7 @@ const start = async () => {
 		await app.register(authRoutes);
 		await app.register(userRoutes);
 		await app.register(profileAccountRoutes);
+		await app.register(friendRoutes);
 		await app.register(historyRoutes);
 		await app.register(avatarRoutes);
 		app.get("/test", async () => ({ message: "API OK" }));

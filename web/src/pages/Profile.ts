@@ -1,22 +1,19 @@
-import { statCards, friendStatus, type FriendActionVariant } from "../data/profile";
+import { statCards } from "../data/profile";
 import { t } from "../i18n";
 import { logout } from "../utils/auth";
 import { userService } from "../services/userService";
 import { historyService} from "../services/historyService";
 import { loadTournament, getRoundName } from '../game/tournament/TournamentLogic';
+import { api } from "../services/api";
 
-
-// const resultStyles: Record<string, string> = {
-//   "profile.match.result.win": "bg-emerald-500/15 text-emerald-300",
-//   "profile.match.result.loss": "bg-rose-500/15 text-rose-300",
-//   "profile.match.result.draw": "bg-slate-500/20 text-slate-200",
-// };
-
-const friendActionStyles: Record<FriendActionVariant, string> = {
-  primary: "px-3 py-1.5 rounded-full border border-emerald-500/50 bg-emerald-500/10 text-[0.7rem] sm:text-xs text-emerald-300 hover:bg-emerald-500/20 transition-colors",
-  secondary: "px-3 py-1.5 rounded-full border border-slate-600 bg-black/40 text-[0.7rem] sm:text-xs hover:bg-white/5 transition-colors",
-  muted: "text-[0.7rem] sm:text-xs text-slate-500",
-};
+function timeAgo(ts: number | null | undefined) {
+  if (!ts) return t('profile.friends.status.never');
+  const diff = Math.floor((Date.now() - ts) / 1000);
+  if (diff < 60) return `${diff}s`;
+  if (diff < 3600) return `${Math.floor(diff / 60)} min`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)} h`;
+  return `${Math.floor(diff / 86400)} j`;
+}
 
 export default function Profile(): string {
   const user = userService.getUser();
@@ -157,6 +154,11 @@ export default function Profile(): string {
                 </button>
               </div>
 
+              <div id="history-header" class="flex items-center justify-between mb-2">
+                <h3 class="text-sm font-semibold" id="history-title">${t('profile.history')}</h3>
+                <button id="history-back-btn" class="px-3 py-1 rounded-full bg-transparent text-sm text-slate-400 hidden">${t('profile.history.back')}</button>
+              </div>
+
               <div class="overflow-x-auto max-h-80 overflow-y-auto custom-scrollbar">
                 <table class="w-full text-xs sm:text-sm">
                   <thead class="text-slate-400 uppercase text-[0.65rem] tracking-wide bg-slate-900/70">
@@ -188,35 +190,27 @@ export default function Profile(): string {
               </div>
 
               <div class="space-y-3">
-                ${friendStatus
-                  .map(
-                    (friend) => `
-                  <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                      <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500/80 text-slate-950 text-xs font-bold">
-                        ${friend.badge}
-                      </span>
-                      <div class="text-xs sm:text-sm">
-                        <p class="font-medium">${friend.name}</p>
-                        <p class="text-slate-400 text-[0.7rem]">${t(friend.statusKey, friend.statusVars)}</p>
-                      </div>
-                    </div>
-                    ${
-                      friend.actionVariant === "muted"
-                        ? `<span class="${friendActionStyles.muted}">${t(friend.actionKey)}</span>`
-                        : `<button type="button" class="${friendActionStyles[friend.actionVariant]}">
-                        ${t(friend.actionKey)}
-                      </button>`
-                    }
+                <div>
+                  <div class="flex gap-2 items-center mb-3">
+                    <input id="friend-username-input" placeholder="${t("profile.friends.enterUsername")}" class="flex-1 bg-slate-900/50 px-3 py-2 rounded" />
+                    <button id="friend-send-btn" class="px-3 py-2 rounded-full border border-emerald-500/50 bg-emerald-500/10 text-[0.8rem] text-emerald-300">${t("profile.friends.send")}</button>
                   </div>
-                `
-                  )
-                  .join("")}
-              </div>
 
-              <p class="text-[0.7rem] text-slate-500 mt-4">
-                ${t("profile.friends.note")}
-              </p>
+                    <div class="flex items-center gap-2 mb-3" id="friends-tabs">
+                    <button id="friends-tab-accepted" class="px-3 py-1 rounded-full bg-emerald-500/20 text-sm">${t("profile.friends.accepted")}</button>
+                    <button id="friends-tab-received" class="px-3 py-1 rounded-full bg-transparent text-sm text-slate-400">${t("profile.friends.pendingReceived")} <span id="friends-tab-received-badge" class="ml-2 inline-flex items-center justify-center px-2 py-0.5 text-[0.65rem] rounded-full bg-rose-500 text-white hidden">0</span></button>
+                    <button id="friends-tab-sent" class="px-3 py-1 rounded-full bg-transparent text-sm text-slate-400">${t("profile.friends.pendingSent")}</button>
+                  </div>
+
+                  <div id="friends-tab-contents">
+                    <div id="friends-accepted" class="space-y-2"></div>
+                    <div id="friends-pending-received" class="space-y-2 hidden"></div>
+                    <div id="friends-pending-sent" class="space-y-2 hidden"></div>
+                  </div>
+                </div>
+              </div>
+              
+              
             </article>
           </section>
         </div>
@@ -236,8 +230,21 @@ export function setupProfile() {
       await logout();
     }
   });
-  // CHARGEMENT DIFFÉRÉ DE L'HISTORIQUE
+  // CHARGEMENT DIFFÉRÉ DE L'HISTORIQUE + amis
   loadHistory();
+  // attach friend send button
+  const sendBtn = document.getElementById("friend-send-btn");
+  sendBtn?.addEventListener("click", async () => {
+    await sendFriendRequest();
+  });
+  // load friends list
+  loadFriends();
+  // friends tabs
+  document.getElementById('friends-tab-accepted')?.addEventListener('click', () => setFriendsTab('accepted'));
+  document.getElementById('friends-tab-received')?.addEventListener('click', () => setFriendsTab('received'));
+  document.getElementById('friends-tab-sent')?.addEventListener('click', () => setFriendsTab('sent'));
+  // ensure default tab
+  setFriendsTab('accepted');
 }
 
 function formatDuration(ms: number): string {
@@ -247,15 +254,35 @@ function formatDuration(ms: number): string {
     return `${m}m ${s}s`;
 }
 
-async function loadHistory() {
+async function loadHistory(playerId?: number, playerName?: string) {
     const user = userService.getUser();
-    if (!user) return;
+  if (!user && typeof playerId !== 'number') return;
 
     const tbody = document.getElementById("history-table-body");
     if (!tbody) return;
 
     try {
-        const data = await historyService.getHistory(user.id);
+      // update header / back button
+      const titleEl = document.getElementById('history-title');
+      const backBtn = document.getElementById('history-back-btn');
+      if (titleEl && backBtn) {
+        if (typeof playerId === 'number' && playerId !== user?.id) {
+          titleEl.textContent = t('profile.history.for', { name: playerName || String(playerId) });
+          backBtn.classList.remove('hidden');
+        } else {
+          titleEl.textContent = t('profile.history');
+          backBtn.classList.add('hidden');
+        }
+      }
+
+      // back button handler
+      document.getElementById('history-back-btn')?.addEventListener('click', async (e) => {
+        e.preventDefault();
+        await loadHistory();
+      });
+
+    const targetId = typeof playerId === 'number' ? playerId : user!.id;
+    const data = await historyService.getHistory(targetId);
         const history = data.history || [];
 
         if (history.length === 0) {
@@ -388,4 +415,170 @@ async function loadHistory() {
             </tr>
         `;
     }
+}
+
+// ---------- Friends UI & API helpers ----------
+async function loadFriends() {
+  try {
+    const res = await api.get<any>("/friends");
+    const accepted = res.accepted || [];
+    const pendingReceived = res.pendingReceived || [];
+    const pendingSent = res.pendingSent || [];
+
+    const elAccepted = document.getElementById('friends-accepted');
+    const elPendingReceived = document.getElementById('friends-pending-received');
+    const elPendingSent = document.getElementById('friends-pending-sent');
+    if (elAccepted) elAccepted.innerHTML = accepted.map((u: any) => renderFriendItem(u, true)).join('');
+    if (elPendingReceived) elPendingReceived.innerHTML = pendingReceived.map((u: any) => renderFriendPendingReceived(u)).join('');
+    if (elPendingSent) elPendingSent.innerHTML = pendingSent.map((u: any) => renderFriendPendingSent(u)).join('');
+
+    // update received badge (use inline style for reliability)
+    const badge = document.getElementById('friends-tab-received-badge') as HTMLElement | null;
+    if (badge) {
+      if (pendingReceived.length > 0) {
+        badge.textContent = String(pendingReceived.length);
+        badge.classList.remove('hidden');
+        badge.style.display = '';
+      } else {
+        badge.textContent = '';
+        badge.classList.add('hidden');
+        badge.style.display = 'none';
+      }
+    }
+
+    // attach event listeners
+    document.querySelectorAll('[data-friend-action]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const action = btn.getAttribute('data-action');
+        const senderId = Number(btn.getAttribute('data-id'));
+          if (action === 'accept' || action === 'reject') {
+            await respondFriend(senderId, action);
+          } else if (action === 'view') {
+            const name = btn.getAttribute('data-username') || undefined;
+            await loadHistory(senderId, name);
+        } else if (action === 'remove') {
+          await removeFriend(senderId);
+        }
+        await loadFriends();
+      });
+    });
+  } catch (err) {
+    console.error('Failed to load friends', err);
+  }
+}
+
+function setFriendsTab(tab: 'accepted' | 'received' | 'sent') {
+  const acceptedEl = document.getElementById('friends-accepted');
+  const receivedEl = document.getElementById('friends-pending-received');
+  const sentEl = document.getElementById('friends-pending-sent');
+  const btnAccepted = document.getElementById('friends-tab-accepted');
+  const btnReceived = document.getElementById('friends-tab-received');
+  const btnSent = document.getElementById('friends-tab-sent');
+
+  if (acceptedEl && receivedEl && sentEl && btnAccepted && btnReceived && btnSent) {
+    acceptedEl.classList.toggle('hidden', tab !== 'accepted');
+    receivedEl.classList.toggle('hidden', tab !== 'received');
+    sentEl.classList.toggle('hidden', tab !== 'sent');
+
+    // simple active style
+    btnAccepted.classList.toggle('bg-emerald-500/20', tab === 'accepted');
+    btnAccepted.classList.toggle('text-slate-400', tab !== 'accepted');
+    btnReceived.classList.toggle('bg-emerald-500/20', tab === 'received');
+    btnReceived.classList.toggle('text-slate-400', tab !== 'received');
+    btnSent.classList.toggle('bg-emerald-500/20', tab === 'sent');
+    btnSent.classList.toggle('text-slate-400', tab !== 'sent');
+  }
+}
+
+function avatarBlock(u: any, size = 36) {
+  if (u.avatarUrl) {
+    return `<img src="${u.avatarUrl}" alt="${u.username||'avatar'}" class="h-${Math.floor(size/4)} w-${Math.floor(size/4)} rounded-full object-cover" style="width:${size}px;height:${size}px;">`;
+  }
+  const name = (u.username||u.name||`user${u.id}`).toString();
+  return `<span class="inline-flex h-${Math.floor(size/4)} w-${Math.floor(size/4)} items-center justify-center rounded-full bg-emerald-500/80 text-slate-950 text-xs font-bold" style="width:${size}px;height:${size}px;">${(name[0]||'U').toUpperCase()}</span>`;
+}
+
+function renderFriendItem(u: any, _accepted = false) {
+  const name = u.username || u.name || `user${u.id}`;
+  return `<div class="flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="flex items-center">
+        <span class="inline-block h-2 w-2 rounded-full mr-2 ${u.isOnline ? 'bg-emerald-400' : 'bg-slate-600'}" title="${u.isOnline ? t('profile.status.online') : t('profile.friends.status.never')}"></span>
+        <div class="mr-2">${avatarBlock(u, 36)}</div>
+      </div>
+      <div class="text-xs sm:text-sm"><p class="font-medium">${name}</p></div>
+    </div>
+    <div class="flex items-center gap-2">
+      <button data-friend-action data-action="view" data-id="${u.id}" data-username="${name}" class="px-3 py-1 rounded bg-slate-800/60 text-xs">${t('profile.friends.viewHistory')}</button>
+      ${_accepted ? `<button data-friend-action data-action="remove" data-id="${u.id}" class="px-3 py-1 rounded bg-rose-600/10 text-rose-300 text-xs">${t('profile.friends.remove')}</button>` : ''}
+    </div>
+  </div>`;
+}
+
+function renderFriendPendingReceived(u: any) {
+  const name = u.username || u.name || `user${u.id}`;
+  const offlineTitle = t('profile.friends.status.offlineAt', { time: timeAgo(u.lastSeen) });
+  return `<div class="flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="flex items-center">
+        <span class="inline-block h-2 w-2 rounded-full mr-2 ${u.isOnline ? 'bg-emerald-400' : 'bg-slate-600'}" title="${u.isOnline ? t('profile.status.online') : offlineTitle}"></span>
+        <div class="mr-2">${avatarBlock(u, 32)}</div>
+      </div>
+      <div class="text-xs sm:text-sm"><p class="font-medium">${name}</p></div>
+    </div>
+    <div class="flex items-center gap-2">
+      <button data-friend-action data-action="accept" data-id="${u.id}" class="px-3 py-1 rounded bg-emerald-500/15 text-emerald-300 text-xs">${t('profile.friends.accept')}</button>
+      <button data-friend-action data-action="reject" data-id="${u.id}" class="px-3 py-1 rounded bg-rose-500/10 text-rose-300 text-xs">${t('profile.friends.reject')}</button>
+    </div>
+  </div>`;
+}
+
+function renderFriendPendingSent(u: any) {
+  const name = u.username || u.name || `user${u.id}`;
+  return `<div class="flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="flex items-center">
+        <div class="mr-2">${avatarBlock(u, 32)}</div>
+      </div>
+      <div class="text-xs sm:text-sm"><p class="font-medium">${name}</p><p class="text-[0.7rem] text-slate-500">${t('profile.friends.requestSent')}</p></div>
+    </div>
+  </div>`;
+}
+
+async function sendFriendRequest() {
+  const input = (document.getElementById('friend-username-input') as HTMLInputElement | null);
+  if (!input) return;
+  const username = input.value.trim();
+  if (!username) { alert(t('profile.friends.enterUsername')); return; }
+  try {
+    await api.post('/friends/send', { receiverUsername: username });
+    input.value = '';
+    await loadFriends();
+    alert(t('profile.friends.requestSentOk'));
+  } catch (err: any) {
+    console.error('sendFriendRequest', err);
+    alert(err.message || t('profile.friends.requestFailed'));
+  }
+}
+
+async function removeFriend(otherId: number) {
+  try {
+    await api.delete(`/friends/${otherId}`);
+    await loadFriends();
+    alert(t('profile.friends.removedOk'));
+  } catch (err: any) {
+    console.error('removeFriend', err);
+    alert(err?.message || t('profile.friends.removeFailed'));
+  }
+}
+
+async function respondFriend(senderId: number, action: 'accept' | 'reject') {
+  try {
+    await api.post('/friends/respond', { senderId, action });
+    await loadFriends();
+    if (action === 'accept') alert(t('profile.friends.requestAccepted'));
+  } catch (err: any) {
+    console.error('respondFriend', err);
+    alert(err.message || t('profile.friends.requestFailed'));
+  }
 }

@@ -1,5 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import jwt from "jsonwebtoken";
+import { setLastSeen } from "../lib/presence.js";
 
 type JwtPayload = {
 	userId: number;
@@ -22,6 +23,10 @@ export async function verifToken(request: FastifyRequest, reply: FastifyReply) {
 	try {
 		const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
 		request.user = decoded;
+		// update presence for this authenticated user
+		if (decoded && typeof decoded.userId === 'number') {
+			setLastSeen(decoded.userId);
+		}
 	} catch {
 		return reply.status(401).send({ error: "Token invalide" });
 	}
