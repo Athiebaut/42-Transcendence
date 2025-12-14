@@ -44,13 +44,13 @@ export default function Profile(): string {
                 <a href="/play" data-nav class="hover:text-white transition-colors">${t("nav.playModes")}
                 </a>
                 <span class="hidden sm:inline text-slate-700">•</span>
-                <button
+                <a
+                  href="#logout"
                   id="profile-logout-btn"
-                  class="flex items-center gap-3 text-xs sm:text-sm text-slate-300"
-                  type="button"
+                  class="hover:text-white transition-colors text-slate-300"
                 >
                   ${t("nav.logout")}
-                </button>
+                </a>
               </nav>
             </div>
           </div>
