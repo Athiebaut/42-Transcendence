@@ -20,9 +20,9 @@ scrape_configs: #targets to scrap metrics from
   scrape_timeout: 10s
   metrics_path: /metrics #what web path used to scrap metrics (can see the result on web search or even curl)
   static_configs:
+    - targets: #list of targets to scrap metrics from
+        - prometheus:9090 #ip adress to get metrics from
     scheme: https
-  - targets: #list of targets to scrap metrics from
-    - prometheus:9090 #ip adress to get metrics from
 - job_name: cadvisor
   honor_timestamps: true
   static_configs:
