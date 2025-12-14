@@ -21,11 +21,14 @@ export default function ProfileSettings(): string {
           <span class="text-lg">🦢</span>
           <span class="font-semibold tracking-tight">${t("settings.backVillage")}</span>
         </a>
-
         <nav class="flex items-center gap-3 text-xs sm:text-sm text-slate-300">
-          <a href="/profile" data-nav class="hover:text-white transition-colors">${t("nav.profile")}</a>
-          <span class="text-slate-600">•</span>
-          <a href="/play" data-nav class="hover:text-white transition-colors">${t("nav.playModes")}</a>
+          <a href="/play" data-nav class="hover:text-white transition-colors">
+            ${t("nav.playModes")}
+          </a>
+          <span class="hidden sm:inline text-slate-700">•</span>
+          <a href="/profile" data-nav class="hover:text-white transition-colors">
+            ${t("nav.profile")}
+          </a>
         </nav>
       </header>
 
@@ -148,8 +151,24 @@ export default function ProfileSettings(): string {
                 </div>
                 <button type="button" id="toggle-2fa-btn" class="btn-main">${is2FAEnabled ? t("profile.settings.2faDisable") : t("profile.settings.2faEnable")}</button>
               </div>
-              <div id="2fa-qr-container" class="hidden">
-                <!-- Le QR code sera inséré ici dynamiquement -->
+              <div id="2fa-qr-section" class="hidden space-y-3 rounded-2xl border border-emerald-400/30 bg-black/20 p-4">
+                <p class="text-sm text-slate-200">${t("profile.settings.2faScanInstructions")}</p>
+                <div id="2fa-qr-container" class="flex justify-center"></div>
+                <form id="2fa-confirm-form" class="flex flex-col gap-3 sm:flex-row">
+                  <input
+                    id="2fa-code-input"
+                    type="text"
+                    inputmode="numeric"
+                    pattern="[0-9]{6}"
+                    maxlength="6"
+                    class="flex-1 rounded-xl border border-white/10 bg-slate-900/60 px-3 py-2 text-sm text-white focus:ring-2 focus:ring-emerald-400/60 focus:outline-none"
+                    placeholder="${t("profile.settings.2faCodePlaceholder")}"
+                  />
+                  <div class="flex gap-2 w-full sm:w-auto">
+                    <button type="submit" id="2fa-confirm-btn" class="btn-main flex-1 justify-center">${t("profile.settings.2faConfirm")}</button>
+                    <button type="button" id="2fa-cancel-btn" class="btn-secondary flex-1 justify-center">${t("profile.settings.2faCancel")}</button>
+                  </div>
+                </form>
               </div>
             </article>
           </div>
@@ -330,45 +349,134 @@ function setupAvatarForm() {
 
 // Gestion du toggle 2FA
 function setup2FAToggle() {
-  const toggleBtn = document.getElementById("toggle-2fa-btn");
+  const toggleBtn = document.getElementById("toggle-2fa-btn") as HTMLButtonElement | null;
+  const qrSection = document.getElementById("2fa-qr-section");
   const qrContainer = document.getElementById("2fa-qr-container");
+  const confirmForm = document.getElementById("2fa-confirm-form") as HTMLFormElement | null;
+  const codeInput = document.getElementById("2fa-code-input") as HTMLInputElement | null;
+  const confirmBtn = document.getElementById("2fa-confirm-btn") as HTMLButtonElement | null;
+  const cancelBtn = document.getElementById("2fa-cancel-btn") as HTMLButtonElement | null;
+  const statusSpan = document.getElementById("2fa-status");
 
-  toggleBtn?.addEventListener("click", async () => {
-    // CORRECTION : On utilise userService.getUser() ici aussi
-    const user = userService.getUser();
-    const is2FAEnabled = user?.isTwoFactorAuthenticationEnabled || false;
+  if (!toggleBtn) return;
+
+  let is2FAEnabled = userService.getUser()?.isTwoFactorAuthenticationEnabled || false;
+
+  const hideEnrollmentUI = () => {
+    qrSection?.classList.add("hidden");
+    if (qrContainer) {
+      qrContainer.innerHTML = "";
+    }
+    if (codeInput) {
+      codeInput.value = "";
+      codeInput.disabled = false;
+    }
+    if (confirmBtn) confirmBtn.disabled = false;
+    if (cancelBtn) cancelBtn.disabled = false;
+  };
+
+  const applyState = (enabled: boolean) => {
+    is2FAEnabled = enabled;
+    if (statusSpan) {
+      statusSpan.textContent = enabled
+        ? t("profile.settings.2faEnabled")
+        : t("profile.settings.2faDisabled");
+      statusSpan.classList.remove("text-emerald-300", "text-rose-300");
+      statusSpan.classList.add(enabled ? "text-emerald-300" : "text-rose-300");
+    }
+    toggleBtn.textContent = enabled
+      ? t("profile.settings.2faDisable")
+      : t("profile.settings.2faEnable");
+    if (enabled) {
+      hideEnrollmentUI();
+    }
+  };
+
+  const refreshUserState = async () => {
+    const updated = await userService.fetchProfile();
+    applyState(updated?.isTwoFactorAuthenticationEnabled ?? false);
+  };
+
+  const startEnrollment = async () => {
+    toggleBtn.disabled = true;
+    try {
+      const result = await api.get<{ qrCodeUrl: string }>("/auth/2fa/generate");
+
+      if (result.qrCodeUrl && qrContainer) {
+        qrContainer.innerHTML = `
+          <div class="p-4 bg-white rounded-lg inline-block">
+            <p class="text-slate-900 text-sm mb-2">${t("profile.settings.2faScanInstructions")}</p>
+            <img src="${result.qrCodeUrl}" alt="QR Code 2FA" class="mx-auto w-48 h-48 object-contain" />
+          </div>
+        `;
+      }
+
+      qrSection?.classList.remove("hidden");
+      codeInput?.focus();
+    } catch (error: any) {
+      alert(error?.message || "Erreur lors de la génération du QR code");
+    } finally {
+      toggleBtn.disabled = false;
+    }
+  };
+
+  toggleBtn.addEventListener("click", async () => {
+    if (!is2FAEnabled) {
+      await startEnrollment();
+      return;
+    }
+
+    if (!confirm(t("profile.settings.2faDisableConfirm"))) {
+      return;
+    }
+
+    toggleBtn.disabled = true;
+    try {
+      await api.post("/auth/2fa/disable", {});
+      await refreshUserState();
+      alert(t("profile.settings.2faDisableSuccess"));
+    } catch (error: any) {
+      alert(error?.message || "Erreur lors de la désactivation de la 2FA");
+    } finally {
+      toggleBtn.disabled = false;
+    }
+  });
+
+  confirmForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const code = codeInput?.value.trim();
+
+    if (!code) {
+      alert(t("profile.settings.2faCodeMissing"));
+      return;
+    }
+
+    if (codeInput) codeInput.disabled = true;
+    if (confirmBtn) confirmBtn.disabled = true;
+    if (cancelBtn) cancelBtn.disabled = true;
 
     try {
-      if (!is2FAEnabled) {
-        // Activer 2FA - récupérer le QR code
-        const result = await api.get<{ qrCodeUrl: string }>("/auth/2fa/generate");
-
-        if (result.qrCodeUrl && qrContainer) {
-          qrContainer.innerHTML = `
-            <div class="p-4 bg-white rounded-lg">
-              <p class="text-slate-900 text-sm mb-2">Scanne ce QR code avec ton app d'authentification :</p>
-              <img src="${result.qrCodeUrl}" alt="QR Code 2FA" class="mx-auto" />
-            </div>
-          `;
-          qrContainer.classList.remove("hidden");
-        }
-
-        alert("Scanne le QR code et active la 2FA depuis ton app d'authentification");
-      } else {
-        // Désactiver 2FA
-        if (!confirm("Voulez-vous vraiment désactiver la 2FA ?")) return;
-
-        await api.post("/auth/2fa/disable", {});
-        
-        alert("2FA désactivée avec succès !");
-        window.location.reload();
+      const response = await api.post<{ token?: string }>("/auth/2fa/turn-on", { code });
+      if (response?.token) {
+        localStorage.setItem("token", response.token);
       }
+      await refreshUserState();
+      alert(t("profile.settings.2faSuccess"));
     } catch (error: any) {
       applyFormApiError(error, {
         fieldNames: ["email", "password", "passwordConfirm"],
         globalId: "error-global",
       });
+      alert(error?.message || "Erreur lors de l'activation de la 2FA");
+    } finally {
+      if (codeInput) codeInput.disabled = false;
+      if (confirmBtn) confirmBtn.disabled = false;
+      if (cancelBtn) cancelBtn.disabled = false;
     }
+  });
+
+  cancelBtn?.addEventListener("click", () => {
+    hideEnrollmentUI();
   });
 }
 

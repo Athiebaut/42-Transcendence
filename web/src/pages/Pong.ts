@@ -21,15 +21,17 @@ export default function Pong(): string {
           </span>
         </a>
 
-        <nav class="flex items-center gap-3 text-xs sm:text-sm">
-          <a
-            href="/home"
-            data-nav
-            class="px-3 py-1.5 rounded-full border border-slate-700/80 bg-slate-900/70 text-slate-100 hover:bg-slate-800 hover:border-slate-500 transition-colors"
-          >
-            ${t("settings.backVillage")}
-          </a>
-        </nav>
+        <div class="flex items-center gap-3 text-xs sm:text-sm">
+          <nav class="flex items-center gap-3 text-xs sm:text-sm text-slate-300">
+            <a href="/play" data-nav class="hover:text-white transition-colors">
+              ${t("nav.playModes")}
+            </a>
+            <span class="hidden sm:inline text-slate-700">•</span>
+            <a href="/profile" data-nav class="hover:text-white transition-colors">
+              ${t("nav.profile")}
+            </a>
+          </nav>
+        </div>
       </header>
 
       <!-- CONTENU -->

@@ -14,13 +14,8 @@ function createControls(): HTMLDivElement {
   container.className = "decor-controls";
   container.innerHTML = `
     <button type="button" class="decor-controls__action" aria-live="polite">
-      <span class="decor-controls__icon">🌅</span>
       <span>Changer le décor</span>
     </button>
-    <div class="decor-controls__info">
-      <span class="decor-controls__label">Décor actuel</span>
-      <span class="decor-controls__value" data-bg-label></span>
-    </div>
   `;
   return container;
 }

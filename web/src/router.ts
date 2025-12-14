@@ -4,11 +4,12 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
-import Pong from "./pages/Pong";
 import Play from "./pages/Play";
 import ProfileSettings from "./pages/ProfileSettings";
 import Profile from "./pages/Profile";
-import { setGoose3DActive } from "./goose3d";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import Help from "./pages/Help";
 import type { GameMode } from "./game/config/gameModeConfig";
 import { setupRegister } from "./pages/Register";
 import { setupLogin } from "./pages/Login";
@@ -17,8 +18,26 @@ import { setupProfileSettings } from "./pages/ProfileSettings";
 import { setupDashboard } from "./pages/Dashboard";
 import { setupHome } from "./pages/Home";
 import { setupProfile } from "./pages/Profile";
+import LegalFooter from "./components/ui/LegalFooter";
 
 type RouteHandler = () => string;
+
+let pongModulePromise: Promise<typeof import("./pages/Pong")> | null = null;
+function loadPongModule() {
+  if (!pongModulePromise) {
+    pongModulePromise = import("./pages/Pong");
+  }
+  return pongModulePromise;
+}
+
+let gooseModulePromise: Promise<typeof import("./goose3d")> | null = null;
+async function setGooseActive(active: boolean) {
+  if (!gooseModulePromise) {
+    gooseModulePromise = import("./goose3d");
+  }
+  const { setGoose3DActive } = await gooseModulePromise;
+  setGoose3DActive(active);
+}
 
 const routes: Record<string, RouteHandler> = {
   "/": Home,
@@ -26,10 +45,12 @@ const routes: Record<string, RouteHandler> = {
   "/login": Login,
   "/register": Register,
   "/dashboard": Dashboard,
-  "/pong": Pong,
   "/play": Play,
   "/profile-settings": ProfileSettings,
-  "/profile": Profile
+  "/profile": Profile,
+  "/help": Help,
+  "/privacy-policy": PrivacyPolicy,
+  "/terms-of-service": TermsOfService
 };
 const protectedRoutes = new Set(["/dashboard", "/profile-settings", "/profile"]);
 
@@ -52,19 +73,28 @@ export async function renderRoute(path: string) {
 
   // Oie visible sur toutes les pages SAUF Pong
   const isPongPage = targetPath === "/pong";
-  setGoose3DActive(!isPongPage);
+  await setGooseActive(!isPongPage);
 
   // Nettoyer le jeu Pong précédent si on quitte la page Pong
   if (previousPath === "/pong" && targetPath !== "/pong") {
-    const { disposePongGame } = await import("./pages/Pong");
+    const { disposePongGame } = await loadPongModule();
     await disposePongGame();
   }
 
-  app.innerHTML = handler();
+  const pageHtml =
+    targetPath === "/pong"
+      ? (await loadPongModule()).default()
+      : handler();
+  app.innerHTML = `
+    <div class="page-content">
+      ${pageHtml}
+    </div>
+    ${LegalFooter()}
+  `;
 
   // Initialiser le jeu Pong si on arrive sur la page Pong
   if (targetPath === "/pong") {
-    const { initPongGame } = await import("./pages/Pong");
+    const { initPongGame } = await loadPongModule();
     
     // Extraire le paramètre mode de l'URL
     const urlParams = new URLSearchParams(window.location.search);

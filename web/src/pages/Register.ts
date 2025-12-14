@@ -20,15 +20,26 @@ export default function Register(): string {
           <span class="font-semibold tracking-tight">${t("settings.backVillage")}</span>
         </a>
 
-        <nav class="flex items-center gap-3 text-xs sm:text-sm">
-          <a
-            href="/login"
-            data-nav
-            class="px-4 py-2 rounded-full border border-white/20 bg-black/30 text-xs font-medium hover:bg-white/10 transition-colors"
-          >
-            ${t("login.button")}
-          </a>
-        </nav>
+        <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+          <nav class="flex items-center gap-3 text-xs sm:text-sm text-slate-300">
+            <a href="/play" data-nav class="hover:text-white transition-colors">
+              ${t("nav.playModes")}
+            </a>
+            <span class="hidden sm:inline text-slate-700">•</span>
+            <a href="/profile" data-nav class="hover:text-white transition-colors">
+              ${t("nav.profile")}
+            </a>
+          </nav>
+          <nav class="flex items-center gap-3 text-xs sm:text-sm">
+            <a
+              href="/login"
+              data-nav
+              class="px-4 py-2 rounded-full border border-white/20 bg-black/30 text-xs font-medium hover:bg-white/10 transition-colors"
+            >
+              ${t("login.button")}
+            </a>
+          </nav>
+        </div>
       </header>
 
       <main class="relative z-10 flex-1 px-4 sm:px-6 lg:px-8 py-8 flex items-center">
