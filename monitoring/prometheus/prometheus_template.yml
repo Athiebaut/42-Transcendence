@@ -6,7 +6,7 @@ alerting: #alertmanager allows to group alerts. Not used here
   alertmanagers:
   - static_configs:
     - targets: []
-    scheme: https
+    scheme: http
     timeout: 10s
     api_version: v2
 
@@ -25,6 +25,5 @@ scrape_configs: #targets to scrap metrics from
 - job_name: cadvisor
   honor_timestamps: true
   static_configs:
-    scheme: http
     - targets:
         - cadvisor:8080
