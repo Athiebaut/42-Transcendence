@@ -16,7 +16,6 @@ import { setupLogin } from "./pages/Login";
 import { isAuthenticated } from "./utils/auth";
 import { setupProfileSettings } from "./pages/ProfileSettings";
 import { setupDashboard } from "./pages/Dashboard";
-import { setupHome } from "./pages/Home";
 import { setupProfile } from "./pages/Profile";
 import LegalFooter from "./components/ui/LegalFooter";
 
@@ -119,10 +118,6 @@ export async function renderRoute(path: string) {
     setupDashboard();
   }
   
-  if (targetPath === "/" || targetPath === "/home") {
-    setupHome();
-  }
-
   if (targetPath === "/profile") {
     setupProfile();
   }

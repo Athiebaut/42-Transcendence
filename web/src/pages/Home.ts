@@ -1,4 +1,3 @@
-import { logout } from "../utils/auth";
 import { t } from "../i18n";
 import { renderHeaderQuickLinks } from "../components/ui/HeaderQuickLinks";
 import { renderHeaderContextMessage } from "../components/ui/HeaderContextMessage";
@@ -538,19 +537,4 @@ export default function Home(): string {
 
     </div>
   `;
-}
-
-
-export function setupHome() {
-  const logoutBtn = document.getElementById("home-logout-btn");
-  
-  logoutBtn?.addEventListener("click", async () => {
-    if (confirm("Voulez-vous vraiment vous déconnecter ?")) {
-      // Désactiver le bouton pendant la déconnexion
-      logoutBtn.textContent = "⏳ Déconnexion...";
-      (logoutBtn as HTMLButtonElement).disabled = true;
-      
-      await logout();
-    }
-  });
 }
