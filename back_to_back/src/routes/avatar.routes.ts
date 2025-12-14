@@ -17,6 +17,11 @@ export default async function avatarRoutes(app: FastifyInstance) {
         const userId = (request.user as any)?.userId as number | undefined;
         if (!userId) return reply.status(401).send({ error: "Unauthorized" });
 
+        const current = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { avatarUrl: true },
+        });
+
         const part = await request.file({
             limits: {
                 fileSize: MAX_AVATAR_BYTES,
@@ -61,6 +66,13 @@ export default async function avatarRoutes(app: FastifyInstance) {
                 data: { avatarUrl },
                 select: { id: true, username: true, email: true, avatarUrl: true },
             });
+
+            const old = current?.avatarUrl;
+            if (old && old.startsWith("/avatar/") && old !== avatarUrl) {
+                const oldFilename = old.replace("/avatar/", "");
+                const oldPath = path.join(uploadDir, oldFilename);
+                fs.promises.unlink(oldPath).catch(() => {});
+            }
 
             return reply.send({ message: "Avatar mis à jour", user });
         } catch (error) {
