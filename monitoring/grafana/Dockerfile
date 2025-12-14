@@ -13,8 +13,6 @@ WORKDIR /
 RUN openssl req -x509 -newkey rsa:4096 -keyout /grafana/grafana.key -out /grafana/grafana.crt -days 365 -nodes -subj "/CN=localhost"
 
 COPY grafana.ini /grafana.ini
-#COPY ./grafana.key /grafana/grafana.key
-#COPY ./grafana.crt /grafana/grafana.crt
 
 RUN chgrp -R grafana /grafana/grafana.crt /grafana/grafana.key
 RUN chmod 440 /grafana/grafana.crt /grafana/grafana.key
