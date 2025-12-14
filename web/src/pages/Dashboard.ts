@@ -1,5 +1,6 @@
 import { t } from "../i18n";
 import { logout } from "../utils/auth";
+import { renderHeaderQuickLinks } from "../components/ui/HeaderQuickLinks";
 import {
   activityFeed,
   campfireStats,
@@ -131,15 +132,7 @@ export default function Dashboard(): string {
           <span class="text-lg">🦢</span>
           <span class="font-semibold tracking-tight">Honk village</span>
         </a>
-        <nav class="flex items-center gap-3 text-xs sm:text-sm text-slate-300">
-          <a href="/play" data-nav class="hover:text-white transition-colors">
-            ${t("nav.playModes")}
-          </a>
-          <span class="hidden sm:inline text-slate-700">•</span>
-          <a href="/profile" data-nav class="hover:text-white transition-colors">
-            ${t("nav.profile")}
-          </a>
-        </nav>
+        ${renderHeaderQuickLinks()}
       </header>
 
       <main class="relative z-10 flex-1 px-4 sm:px-6 pb-12 pt-6">

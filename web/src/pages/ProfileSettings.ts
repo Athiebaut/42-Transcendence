@@ -1,6 +1,7 @@
 import { t } from "../i18n";
 import { api } from "../services/api";
 import { userService, type User } from "../services/userService";
+import { renderHeaderQuickLinks } from "../components/ui/HeaderQuickLinks";
 
 export default function ProfileSettings(): string {
   const user = userService.getUser();
@@ -21,15 +22,7 @@ export default function ProfileSettings(): string {
           <span class="text-lg">🦢</span>
           <span class="font-semibold tracking-tight">${t("settings.backVillage")}</span>
         </a>
-        <nav class="flex items-center gap-3 text-xs sm:text-sm text-slate-300">
-          <a href="/play" data-nav class="hover:text-white transition-colors">
-            ${t("nav.playModes")}
-          </a>
-          <span class="hidden sm:inline text-slate-700">•</span>
-          <a href="/profile" data-nav class="hover:text-white transition-colors">
-            ${t("nav.profile")}
-          </a>
-        </nav>
+        ${renderHeaderQuickLinks()}
       </header>
 
       <main class="relative z-10 flex-1 px-4 sm:px-6 lg:px-10 py-8">

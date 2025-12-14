@@ -1,5 +1,6 @@
 import { logout } from "../utils/auth";
 import { t } from "../i18n";
+import { renderHeaderQuickLinks } from "../components/ui/HeaderQuickLinks";
 
 export default function Home(): string {
   //const loggedIn = isAuthenticated();
@@ -30,15 +31,7 @@ export default function Home(): string {
             <a href="#ladder" class="hover:text-white/80 transition-colors">${t("nav.ladder")}</a>
             <a href="#customize" class="hover:text-white/80 transition-colors">${t("nav.customize")}</a>
           </nav>
-          <nav class="flex items-center gap-3 text-xs sm:text-sm text-slate-300">
-            <a href="/play" data-nav class="hover:text-white transition-colors">
-              ${t("nav.playModes")}
-            </a>
-            <span class="hidden sm:inline text-slate-700">•</span>
-            <a href="/profile" data-nav class="hover:text-white transition-colors">
-              ${t("nav.profile")}
-            </a>
-          </nav>
+          ${renderHeaderQuickLinks("flex items-center gap-3 text-xs sm:text-sm text-slate-300")}
         </div>
       </header>
 
