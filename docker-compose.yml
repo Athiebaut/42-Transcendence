@@ -8,7 +8,7 @@ services:
       - .env
     volumes:
       - ./back_to_back/src:/app/back_to_back/src
-      - ./back_to_back/prisma:/app/prisma
+      - ./back_to_back/prisma:/app/back_to_back/prisma
       - ./back_to_back/avatar:/app/back_to_back/avatar
       - /app/back_to_back/node_modules
     ports:

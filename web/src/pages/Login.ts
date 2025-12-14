@@ -1,6 +1,9 @@
 import { userService } from "../services/userService";
 import { api } from "../services/api";
 import { t } from "../i18n";
+import { applyFormApiError, clearFormErrors } from "../services/helper.ts";
+
+clearFormErrors(["email", "password", "passwordConfirm"], "error-global")
 
 const loginReasons = [
   { icon: "🏅", textKey: "login.reasons.rank" },
@@ -127,6 +130,7 @@ export default function Login(): string {
                       placeholder="${t("login.placeholder.email")}"
                       required
                     />
+                    <p id="error-email" class="text-xs text-red-300"></p>
                   </div>
 
                   <div class="space-y-1">
@@ -145,6 +149,7 @@ export default function Login(): string {
                       placeholder="${t("login.placeholder.password")}"
                       required
                     />
+                    <p id="error-password" class="text-xs text-red-300"></p>
                   </div>
 
                   <div class="flex items-center justify-between text-[0.7rem] text-slate-400">
@@ -153,6 +158,7 @@ export default function Login(): string {
                         type="checkbox"
                         class="h-3 w-3 rounded border-slate-700 bg-slate-900 text-emerald-500 focus:ring-emerald-500/60"
                       />
+                      <p id="error-passwordConfirm" class="text-xs text-red-300"></p>
                       <span>${t("login.remember")}</span>
                     </label>
                     <button
@@ -161,6 +167,7 @@ export default function Login(): string {
                     >
                       ${t("login.forgot")}
                     </button>
+                    <p id="error-global" class="text-xs text-red-300"></p>
                   </div>
 
                   <button
@@ -235,21 +242,24 @@ export function setupLogin() {
     }
 
     try {
-      const result = await api.post<{ token?: string }>("/login", { 
+      const result = await api.post<{ token?: string }>("/login", {
         LogEmail: email,
         LogPassword: password
       });
-      
+
       if (result?.token) {
         localStorage.setItem("token", result.token);
-        
+
         // 🆕 RÉCUPÉRER LES INFOS UTILISATEUR
         await userService.fetchProfile();
-        
+
         window.location.href = "/dashboard";
       }
-    } catch (error: any) {
-      alert(error?.message ?? "Impossible de se connecter pour le moment.");
+    } catch (e: unknown) {
+      applyFormApiError(e, {
+        fieldNames: ["email", "password", "passwordConfirm"],
+        globalId: "error-global",
+      });
     }
   });
 }

@@ -1,5 +1,6 @@
 import { api } from "../services/api";
 import { t } from "../i18n";
+import { ApiError } from "../services/api.ts";
 
 export default function Register(): string {
   return `
@@ -116,6 +117,7 @@ export default function Register(): string {
                       "
                       placeholder="${t("form.placeholder.username")}"
                     />
+                    <p id="error-username" class="text-xs text-red-300"></p>
                   </div>
 
                   <div class="space-y-1">
@@ -143,6 +145,7 @@ export default function Register(): string {
                       "
                       placeholder="${t("form.placeholder.email")}"
                     />
+                    <p id="error-email" class="text-xs text-red-300"></p>
                   </div>
 
                   <div class="space-y-1">
@@ -170,6 +173,7 @@ export default function Register(): string {
                       "
                       placeholder="••••••••"
                     />
+                    <p id="error-password" class="text-xs text-red-300"></p>
                   </div>
 
                   <div class="space-y-1">
@@ -197,6 +201,7 @@ export default function Register(): string {
                       "
                       placeholder="••••••••"
                     />
+                    <p id="error-passwordConfirm" class="text-xs text-red-300"></p>
                   </div>
 
                   <div class="flex items-start gap-2 text-xs sm:text-sm">
@@ -258,12 +263,39 @@ export default function Register(): string {
   `;
 }
 
+function clearErrors() {
+    (document.getElementById('error-username') as HTMLFormElement | null)?.replaceChildren();
+    (document.getElementById("error-email") as HTMLElement | null)?.replaceChildren();
+    (document.getElementById("error-password") as HTMLElement | null)?.replaceChildren();
+    (document.getElementById("error-passwordConfirm") as HTMLElement | null)?.replaceChildren();
+    (document.getElementById("error-global") as HTMLElement | null)?.replaceChildren();
+}
+
+function setFieldError(field: string, message: string) {
+    const el = document.getElementById(`error-${field}`);
+    if (el) el.textContent = message;
+}
+
+type ValidationErrorPayload = {
+    error: "VALIDATION_ERROR";
+    message?: string;
+    fieldErrors?: Record<string, string[]>;
+    formErrors?: string[];
+};
+
+function isValidationErrorPayload(data: unknown): data is ValidationErrorPayload {
+    if (!data || typeof data !== "object") return false;
+    const d = data as any;
+    return d.error === "VALIDATION_ERROR";
+}
+
 export function setupRegister() {
   const form = document.getElementById('registrationForm') as HTMLFormElement;
   if (!form) return;
 
   form.addEventListener('submit', async function(event) {
       event.preventDefault();
+      clearErrors();
       
       const formData = new FormData(form);
       const dataToSend = {
@@ -280,8 +312,40 @@ export function setupRegister() {
           console.log(t("register.alert.success"), result);
           alert(t("register.alert.success"));
           window.location.href = '/login';
-      } catch (error: any) {
-          alert(t("register.alert.error", { message: error?.message ?? "?" }));
+      } catch (error: unknown) {
+          if (error instanceof ApiError) {
+              const data: unknown = error.data;
+
+              // Erreurs Zod: affichage sous les champs
+              if (isValidationErrorPayload(data)) {
+                  const fieldErrors = data.fieldErrors ?? {};
+                  for (const [field, messages] of Object.entries(fieldErrors)) {
+                      if (Array.isArray(messages) && messages.length > 0) {
+                          setFieldError(field, messages[0]);
+                      }
+                  }
+                  const global = document.getElementById("error-global") as HTMLElement | null;
+                  if (global && Array.isArray(data.formErrors) && data.formErrors.length > 0) {
+                      global.textContent = data.formErrors[0];
+                  }
+                  return;
+              }
+
+              // Autres erreurs backend (409 etc.)
+              const global = document.getElementById("error-global") as HTMLElement | null;
+              if (global) {
+                  if (data && typeof data === "object" && typeof (data as any).error === "string") {
+                      global.textContent = (data as any).error;
+                      return;
+                  }
+                  global.textContent = error.message;
+                  return;
+              }
+          }
+
+          // Fallback
+          const msg = error instanceof Error ? error.message : "?";
+          alert(t("register.alert.error", { message: msg }));
       }
   });
 }

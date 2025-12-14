@@ -1,6 +1,7 @@
 import { FastifyInstance } from "fastify";
 import bcrypt from "bcrypt";
 import jwt from 'jsonwebtoken';
+import { z } from "zod"
 import { TwoFactorService } from '../services/2fa.service.js';
 import {logoutHandler} from "./auth.controller.js";
 import { prisma } from "../middleware/prisma.js"
@@ -12,47 +13,53 @@ const verifyJwt = (token: string) => {
     return jwt.verify(token, process.env.JWT_SECRET!) as { userId: number, isSecondFactorAuthenticated: boolean };
 };
 
+const registerSchema = z.object({
+	email: z.string().trim().email("Invalid email"),
+	username: z.string().trim().max(32, "Username to long").min(3, "Username must be at least 3 characters long"),
+	password: z.string().min(8, "Password must be at least 8 characters long").regex(/[A-Z]/, "Password must contain at least 1 uppercase letter").regex(/[0-9]/, "Password must contain at least 1 number"),
+	passwordConfirm: z.string().min(1, "Confirm your password"),
+}).refine((v) => v.password === v.passwordConfirm, {
+	message: "Passwords do not match",
+	path: ["passwordConfirm"]
+});
+
+type RegisterBody = z.infer<typeof registerSchema>;
+
 export default async function authRoutes(fastify: FastifyInstance) {
-	fastify.post("/register", async (request, reply) => {
-		const { email, password, passwordConfirm,username } = request.body as {
-			email: string;
-			password: string;
-			passwordConfirm: string;
-			username: string;
-		};
-		console.log(email);
-		if (!email || !password || !passwordConfirm || !username)
-			return reply.status(400).send({ error: "Champs manquants" });
-		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-		if (!emailRegex.test(email))
-			return reply.status(400).send({ error: "Email invalide" });
+	fastify.post("/register", async (request: FastifyRequest<{Body: RegisterBody}>,reply: FastifyReply) => {
+		const parsed = registerSchema.safeParse(request.body);
+		if (!parsed.success) {
+			const flat = parsed.error.flatten();
+			return reply.status(400).send({
+				error: "VALIDATION_ERROR",
+				message: "Validation error",
+				fieldErrors: flat.fieldErrors,
+				formErrors: flat.formErrors,
+			});
+		}
+		const {email, username, password} = parsed.data;
+
+
+		const emailLower = email.toLowerCase();
+		const usernameLower = username.toLowerCase();
+
 		const existingUser = await prisma.user.findFirst({
-			where: { OR: [{ email }, { username }] },
+			where: { OR: [{ emailLower }, { usernameLower }] },
+			select: { id: true, emailLower: true, usernameLower: true},
 		});
-		if (existingUser)
-			return reply.status(400).send({ error: "Un compte est deja cree avec ce mail" });
-		const existUsername = await prisma.user.findFirst({
-			where: { OR: [{ email }, { username }] },
-		});
-		if (existUsername)
-			return reply.status(400).send({ error: "Username deja utiliser" });
-		if (password.length < 8)
-			return reply.status(400).send({
-				error: "Le mot de passe doit contenir 8 caractères minimum",
-			});
-		if (passwordConfirm != password)
-			return reply.status(400).send({ error: "differente Password"});
-		if (!/[A-Z]/.test(password) || !/[0-9]/.test(password))
-			return reply.status(400).send({
-				error: "Le mot de passe doit contenir au moins une majuscule et un chiffre",
-			});
+		if (existingUser?.emailLower === emailLower) {
+			return reply.status(409).send({ error: "Un compte est deja cree avec ce mail" });
+		}
+		if (existingUser?.usernameLower === usernameLower) {
+			return reply.status(409).send({ error: "Un compte est deja cree avec ce username" });
+		}
 		const hashedPassword = await bcrypt.hash(password, 10);
 		const newUser = await prisma.user.create({
 			data: {
 				username,
-				usernameLower: username.toLowerCase(),
+				usernameLower,
 				email,
-				emailLower: email.toLowerCase(),
+				emailLower,
 				passwordHash: hashedPassword,
 			},
 		});

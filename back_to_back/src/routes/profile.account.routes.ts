@@ -3,12 +3,12 @@ import { prisma } from "../middleware/prisma.js";
 import jwt from "jsonwebtoken";
 import { z } from "zod";
 import bcrypt from "bcrypt";
-import {verifToken2FA} from "../middleware/auth.js";
+import { verifToken2FA } from "../middleware/auth.js";
 
 const updateIdentitySchema = z
 	.object({
-		email: z.string().email().optional(),
-		username: z.string().min(3).max(32).optional(),
+		email: z.string().email("invalid email").optional(),
+		username: z.string().trim().max(32, "Username to long").min(3, "Username must be at least 3 characters long").optional(),
 	})
 	.refine((v) => v.email !== undefined || v.username !== undefined, {
 		message: "Nothing to update",
@@ -18,8 +18,8 @@ const updateIdentitySchema = z
 const updatePasswordSchema = z
 	.object({
 		currentPassword: z.string().min(1),
-		newPassword: z.string().min(8),
-		confirmPassword: z.string().min(8),
+		newPassword: z.string().min(8, "Password must be at least 8 characters long").regex(/[A-Z]/, "Password must contain at least 1 uppercase letter").regex(/[0-9]/, "Password must contain at least 1 number"),
+		confirmPassword: z.string().min(1, "Confirm your password"),
 	})
 	.refine((v) => v.newPassword === v.confirmPassword, {
 		message: "Passwords do not match",
@@ -36,12 +36,18 @@ export default async function profileAccountRoutes(app: FastifyInstance) {
 
 		const parsed = updateIdentitySchema.safeParse(request.body);
 		if (!parsed.success) {
-			return reply.status(400).send({ error: "Invalid data", details: parsed.error.issues });
+			const flat = parsed.error.flatten();
+			return reply.status(400).send({
+				error: "VALIDATION_ERROR",
+				message: "Validation error",
+				fieldErrors: flat.fieldErrors,
+				formErrors: flat.formErrors,
+			});
 		}
 
 		const body = parsed.data;
 
-		const data: Prisma.UserUpdateInput = {};
+		const data: prisma.UserUpdateInput = {};
 		if (body.email !== undefined) {
 			data.email = body.email;
 			data.emailLower = body.email.toLowerCase();
@@ -87,8 +93,13 @@ export default async function profileAccountRoutes(app: FastifyInstance) {
 
 		const parsed = updatePasswordSchema.safeParse(request.body);
 		if (!parsed.success) {
-			console.log(parsed.error.issues);
-			return reply.status(400).send({ error: "Invalid data", details: parsed.error.issues });
+			const flat = parsed.error.flatten();
+			return reply.status(400).send({
+				error: "VALIDATION_ERROR",
+				message: "Validation error",
+				fieldErrors: flat.fieldErrors,
+				formErrors: flat.formErrors,
+			});
 		}
 
 		const { currentPassword, newPassword } = parsed.data;

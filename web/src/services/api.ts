@@ -4,6 +4,18 @@ interface ApiOptions extends RequestInit {
   token?: string;
 }
 
+export class ApiError extends Error {
+  status: number;
+  data: unknown;
+
+  constructor(message: string, status: number, data: unknown) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+    this.data = data;
+  }
+}
+
 class ApiClient {
   private getToken(): string | null {
     return localStorage.getItem('token');
@@ -31,10 +43,21 @@ class ApiClient {
 
     try {
       const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
-      
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || errorData.message || `Erreur ${response.status}`);
+
+        // Privilégie un message lisible, pas le code "VALIDATION_ERROR"
+        let message =
+            (typeof (errorData as any)?.message === "string" && (errorData as any).message) ||
+            `Erreur ${response.status}`;
+
+        // Si l'API renvoie un code d'erreur lisible (ex: "Email already used"), on peut l'afficher
+        if (typeof (errorData as any)?.error === "string" && (errorData as any).error !== "VALIDATION_ERROR") {
+          message = (errorData as any).error;
+        }
+
+        throw new ApiError(message, response.status, errorData);
       }
 
       if (response.status === 204) {

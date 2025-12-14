@@ -1,14 +1,14 @@
 import { t } from "../i18n";
-import { api } from "../services/api";
+import { api, ApiError } from "../services/api";
 import { userService, type User } from "../services/userService";
+import { applyFormApiError, clearFormErrors } from "../services/helper.ts";
 
 export default function ProfileSettings(): string {
   const user = userService.getUser();
-  const username = user?.username || "";
   const email = user?.email || "";
+  const username = user?.username || "";
   const avatarUrl = user?.avatarUrl || "";
   const is2FAEnabled = user?.isTwoFactorAuthenticationEnabled || false;
-
   return `
     <div class="min-h-screen flex flex-col relative overflow-hidden">
       <div class="absolute inset-0 pointer-events-none">
@@ -56,11 +56,14 @@ export default function ProfileSettings(): string {
                 <label class="space-y-1 block text-xs font-medium text-slate-200/80">
                   ${t("form.username")}
                   <input type="text" name="username" value="${username}" class="w-full rounded-lg border border-[#d4c4a0]/70 bg-[#3a5548]/80 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-400 focus:ring-2 focus:ring-emerald-400/70 focus:border-emerald-300" placeholder="${t("profile.settings.placeholder.username")}" />
+                  <p id="error-username" class="text-xs text-red-300"></p>
                 </label>
                 <label class="space-y-1 block text-xs font-medium text-slate-200/80">
                   ${t("form.email")}
                   <input type="email" name="email" value="${email}" class="w-full rounded-lg border border-[#d4c4a0]/70 bg-[#3a5548]/80 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-400 focus:ring-2 focus:ring-emerald-400/70 focus:border-emerald-300" placeholder="${t("profile.settings.placeholder.email")}" />
+                  <p id="error-email" class="text-xs text-red-300"></p>
                 </label>
+                <p id="error-identity-global" class="text-xs text-red-300"></p>
                 <button type="submit" class="btn-main w-full justify-center">${t("form.save")}</button>
               </form>
             </article>
@@ -78,16 +81,20 @@ export default function ProfileSettings(): string {
                 <label class="space-y-1 block text-xs font-medium text-slate-200/80">
                   ${t("form.password.current")}
                   <input type="password" name="currentPassword" class="w-full rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 focus:ring-2 focus:ring-rose-400/60 focus:border-rose-300" placeholder="••••••••" />
+                  <p id="error-currentPassword" class="text-xs text-red-300"></p>
                 </label>
                 <label class="space-y-1 block text-xs font-medium text-slate-200/80">
                   ${t("form.password.new")}
                   <input type="password" name="newPassword" class="w-full rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 focus:ring-2 focus:ring-rose-400/60 focus:border-rose-300" placeholder="••••••••" />
+                  <p id="error-newPassword" class="text-xs text-red-300"></p>
                 </label>
                 <label class="space-y-1 block text-xs font-medium text-slate-200/80">
                   ${t("form.password.confirm")}
                   <input type="password" name="confirmPassword" class="w-full rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 focus:ring-2 focus:ring-rose-400/60 focus:border-rose-300" placeholder="••••••••" />
+                  <p id="error-confirmPassword" class="text-xs text-red-300"></p>
                 </label>
                 <button type="submit" class="btn-main w-full justify-center bg-amber-400/90 text-slate-950 hover:bg-amber-300">${t("form.update")}</button>
+                <p id="error-password-global" class="text-xs text-red-300"></p>
               </form>
             </article>
 
@@ -117,6 +124,7 @@ export default function ProfileSettings(): string {
                 <div class="flex gap-3">
                   <button type="submit" class="btn-main flex-1 justify-center">${t("form.upload")}</button>
                   <button type="button" id="reset-avatar-btn" class="btn-secondary flex-1 justify-center text-center">${t("form.reset")}</button>
+                  <p id="error-global" class="text-xs text-red-300"></p>
                 </div>
               </form>
             </article>
@@ -158,6 +166,15 @@ export function setupProfileSettings() {
   setup2FAToggle();
 }
 
+async function fetchToApiError(response: Response): Promise<never> {
+  const errorData = await response.json().catch(() => ({}));
+  const message =
+      (typeof (errorData as any)?.message === "string" && (errorData as any).message) ||
+      (typeof (errorData as any)?.error === "string" && (errorData as any).error) ||
+      `Erreur ${response.status}`;
+  throw new ApiError(message, response.status, errorData);
+}
+
 // Gestion du formulaire d'identité (username + email)
 function setupIdentityForm() {
   const form = document.getElementById("profile-identity-form") as HTMLFormElement | null;
@@ -166,63 +183,35 @@ function setupIdentityForm() {
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
+    clearFormErrors(["username", "email"], "error-identity-global");
+
     const formData = new FormData(form);
     const username = formData.get("username")?.toString().trim();
     const email = formData.get("email")?.toString().trim();
 
-    if (!username || !email) {
-      alert("Tous les champs sont requis");
-      return;
-    }
-
-    // Validation de la longueur pour correspondre au backend (min 3 caractères)
-    if (username.length < 3) {
-      alert("Le nom d'utilisateur doit contenir au moins 3 caractères");
-      return;
-    }
-
-    // Validation du format de l'email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      alert("Veuillez entrer une adresse e-mail valide");
-      return;
-    }
-
     try {
-      // On utilise fetch directement au lieu de api.put.
-      // Cela garantit que le FormData est envoyé en "multipart/form-data"
-      // et non transformé en JSON vide par l'utilitaire api.
       const response = await fetch("/back_to_back/profile", {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        body: JSON.stringify({
-          username,
-          email,
-        }),
+        body: JSON.stringify({ username, email }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || "Erreur lors de la mise à jour");
-      }
+      if (!response.ok) await fetchToApiError(response);
 
       const result = await response.json();
-
-      // Mettre à jour le localStorage
-      if (result.user) {
-        localStorage.setItem("user", JSON.stringify(result.user));
-      }
-
+      if (result.user) localStorage.setItem("user", JSON.stringify(result.user));
       alert(result.message || "Profil mis à jour avec succès !");
-    } catch (error: any) {
-      alert("Erreur : " + error.message);
+    } catch (err: unknown) {
+      applyFormApiError(err, {
+        fieldNames: ["username", "email"],
+        globalId: "error-identity-global",
+      });
     }
   });
 }
-
 // Gestion du formulaire de mot de passe
 function setupPasswordForm() {
   const form = document.getElementById("profile-password-form") as HTMLFormElement | null;
@@ -231,25 +220,12 @@ function setupPasswordForm() {
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
+    clearFormErrors(["currentPassword", "newPassword", "confirmPassword"], "error-password-global");
+
     const formData = new FormData(form);
     const currentPassword = formData.get("currentPassword")?.toString();
     const newPassword = formData.get("newPassword")?.toString();
     const confirmPassword = formData.get("confirmPassword")?.toString();
-
-    if (!currentPassword || !newPassword || !confirmPassword) {
-      alert("Tous les champs sont requis");
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      alert("Les mots de passe ne correspondent pas");
-      return;
-    }
-
-    if (newPassword.length < 8) {
-      alert("Le mot de passe doit contenir au moins 8 caractères");
-      return;
-    }
 
     try {
       const response = await fetch("/back_to_back/profile/password", {
@@ -258,23 +234,19 @@ function setupPasswordForm() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        body: JSON.stringify({
-          currentPassword,
-          newPassword,
-          confirmPassword,
-        }),
+        body: JSON.stringify({ currentPassword, newPassword, confirmPassword }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || errorData.message || `Erreur ${response.status}`);
-      }
+      if (!response.ok) await fetchToApiError(response);
 
       const result = await response.json();
       alert(result.message || "Mot de passe mis à jour avec succès !");
       form.reset();
-    } catch (error: any) {
-      alert("Erreur : " + error.message);
+    } catch (err: unknown) {
+      applyFormApiError(err, {
+        fieldNames: ["currentPassword", "newPassword", "confirmPassword"],
+        globalId: "error-password-global",
+      });
     }
   });
 }
@@ -348,7 +320,10 @@ function setupAvatarForm() {
 
       alert(result.message || "Avatar réinitialisé !");
     } catch (error: any) {
-      alert("Erreur : " + error.message);
+      applyFormApiError(error, {
+        fieldNames: ["email", "password", "passwordConfirm"],
+        globalId: "error-global",
+      });
     }
   });
 }
@@ -389,7 +364,10 @@ function setup2FAToggle() {
         window.location.reload();
       }
     } catch (error: any) {
-      alert("Erreur : " + error.message);
+      applyFormApiError(error, {
+        fieldNames: ["email", "password", "passwordConfirm"],
+        globalId: "error-global",
+      });
     }
   });
 }
