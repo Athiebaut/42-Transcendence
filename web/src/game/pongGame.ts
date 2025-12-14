@@ -76,22 +76,26 @@ export async function initPongGame(mode: GameMode = 'pvp1v1'): Promise<boolean> 
             
             const score = ballPhysics.score;
 
-            // 💾 SAUVEGARDE DE L'HISTORIQUE (inclut maintenant les tournois)
+            // 💾 SAUVEGARDE DE L'HISTORIQUE
             const user = userService.getUser();
+            const duration = Date.now() - gameStartTime;
+            const scoreString = `${score.player1} - ${score.player2}`;
             if (user) {
-                const duration = Date.now() - gameStartTime;
-                const scoreString = `${score.player1} - ${score.player2}`;
-                
                 try {
-                    await historyService.saveMatch(user.id, scoreString, duration, mode);
-                    console.log("✅ Partie sauvegardée !");
+                    if (mode === 'tournament') {
+                        // pour les tournois, la sauvegarde sera gérée par le flow de tournoi
+                        // (on enregistre seulement le dernier match joué par l'utilisateur)
+                    } else {
+                        await historyService.saveMatch(user.id, scoreString, duration, mode);
+                        console.log("✅ Partie sauvegardée !");
+                    }
                 } catch (e) {
                     console.error("Erreur sauvegarde historique", e);
                 }
             }
 
             if (mode === 'tournament') {
-                showTournamentMatchEnd(winner, score, () => {
+                await showTournamentMatchEnd(winner, score, duration, () => {
                     if (scene) resetPaddles(scene, mode);
                     ballPhysics?.resetGame();
                 });

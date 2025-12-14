@@ -7,19 +7,26 @@ export interface GameHistoryEntry {
   durationMs: number;
   date: string;
   mode: string; // AJOUT : mode de jeu
+  tournamentRound?: number;
+  tournamentPlayersCount?: number;
+  playerPosition?: number;
 }
 
 export const historyService = {
   /**
    * Sauvegarde une partie terminée
    */
-  async saveMatch(playerId: number, score: string, durationMs: number, mode: string) {
-    return api.post("/history", {
+  async saveMatch(playerId: number, score: string, durationMs: number, mode: string, tournamentRound?: number, tournamentPlayersCount?: number, playerPosition?: number) {
+    const body: any = {
       playerId,
       score,
       durationMs,
-      mode, // ENVOI du mode
-    });
+      mode,
+    };
+    if (typeof tournamentRound === 'number') body.tournamentRound = tournamentRound;
+    if (typeof tournamentPlayersCount === 'number') body.tournamentPlayersCount = tournamentPlayersCount;
+    if (typeof playerPosition === 'number') body.playerPosition = playerPosition;
+    return api.post("/history", body);
   },
 
   /**

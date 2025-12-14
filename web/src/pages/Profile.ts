@@ -276,11 +276,51 @@ async function loadHistory() {
             tournament: t("profile.match.mode.tournament"),
         };
 
+        function getRoundLabel(round: number, totalPlayers?: number) {
+          // Si on a le nombre total de joueurs, on calcule le nombre de rounds
+          if (typeof totalPlayers === 'number' && totalPlayers >= 2) {
+            const totalRounds = Math.log2(totalPlayers);
+            if (!Number.isFinite(totalRounds) || Math.floor(totalRounds) !== totalRounds) {
+              // non puissance de 2 -> fallback heuristique
+            } else {
+              const roundsFromEnd = totalRounds - round + 1;
+              if (roundsFromEnd === 1) return "🏆 Finale";
+              if (roundsFromEnd === 2) return "⚔️ Demi-finales";
+              if (roundsFromEnd === 3) return "🎯 Quarts de finale";
+              if (roundsFromEnd === 4) return "1/8 de finale";
+              if (roundsFromEnd === 5) return "1/16 de finale";
+              return `Tour ${round}`;
+            }
+          }
+
+          // Fallback simple si on ne connait pas la taille du tournoi
+          if (round <= 1) return "Premier tour";
+          if (round === 2) return "Deuxième tour";
+          if (round === 3) return "Quarts de finale";
+          if (round === 4) return "Demi-finales";
+          if (round >= 5) return "Finale";
+          return `Tour ${round}`;
+        }
+
         tbody.innerHTML = history.map(match => {
             const parts = match.score.split('-').map(s => parseInt(s.trim()));
-            const myScore = parts[0] || 0;
-            const opScore = parts[1] || 0;
-            
+            let myScore = 0;
+            let opScore = 0;
+            if (typeof (match as any).playerPosition === 'number') {
+              const pos = (match as any).playerPosition as number;
+              if (pos === 1) {
+                myScore = parts[0] || 0;
+                opScore = parts[1] || 0;
+              } else {
+                myScore = parts[1] || 0;
+                opScore = parts[0] || 0;
+              }
+            } else {
+              // fallback: assume first score is user
+              myScore = parts[0] || 0;
+              opScore = parts[1] || 0;
+            }
+
             const isWin = myScore > opScore;
             const isDraw = myScore === opScore;
 
@@ -301,14 +341,21 @@ async function loadHistory() {
 
             let modeLabel = modeMap[match.mode] || match.mode;
             if (match.mode === 'tournament') {
-              try {
-                const tournament = loadTournament();
-                if (tournament) {
-                  const roundName = getRoundName(tournament);
-                  modeLabel = `${modeLabel} — ${roundName}`;
+              // Prefer tournamentRound + tournamentPlayersCount stockés en DB. Sinon fallback sur le tournoi en session.
+              const totalPlayersFromMatch = (match as any).tournamentPlayersCount as number | undefined;
+              if (typeof match.tournamentRound === 'number') {
+                const roundLabel = getRoundLabel(match.tournamentRound, totalPlayersFromMatch);
+                modeLabel = `${modeLabel} — ${roundLabel}`;
+              } else {
+                try {
+                  const tournament = loadTournament();
+                  if (tournament) {
+                    const roundName = getRoundName(tournament);
+                    modeLabel = `${modeLabel} — ${roundName}`;
+                  }
+                } catch (e) {
+                  // ignore if no tournament data in session
                 }
-              } catch (e) {
-                // ignore if no tournament data in session
               }
             }
 

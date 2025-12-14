@@ -12,15 +12,18 @@ import { renderFirstMatchHTML, renderNextMatchHTML, renderChampionHTML } from '.
 import { disposePongGame, initPongGame } from '../pongGame';
 import { initTournamentSetup, renderTournamentSetup } from './TournamentSetup';
 import { resetPlayerNames, updatePlayerNames } from '../ui/displayPlayerNames';
+import { userService } from '../../services/userService';
+import { historyService } from '../../services/historyService';
 
 /**
  * Affiche l'écran de fin de match en tournoi
  */
-export function showTournamentMatchEnd(
+export async function showTournamentMatchEnd(
     winner: number, 
     score: { player1: number; player2: number },
+    durationMs: number,
     onNextMatch: () => void
-): void {
+): Promise<void> {
     const tournament = loadTournament();
     if (!tournament) {
         console.error('Aucun tournoi en cours');
@@ -35,6 +38,42 @@ export function showTournamentMatchEnd(
     
     const updatedTournament = recordMatchResult(tournament, winner as 1 | 2, score);
     saveTournament(updatedTournament);
+
+    // Si l'utilisateur connecté a joué ce match, et qu'il est éliminé (ou que le tournoi est fini),
+    // enregistrer CE match dans l'historique (dernier match joué par l'utilisateur)
+    try {
+        const user = userService.getUser();
+        if (user && (currentMatch.player1 === user.username || currentMatch.player2 === user.username)) {
+            const playedUsername = user.username;
+            // Déterminer si l'utilisateur a gagné en comparant le score côté auquel il jouait
+            const userIsPlayer1 = currentMatch.player1 === playedUsername;
+            const userScore = userIsPlayer1 ? score.player1 : score.player2;
+            const opponentScore = userIsPlayer1 ? score.player2 : score.player1;
+            const didUserWin = userScore > opponentScore;
+
+            // Détecter si le match était la finale en se basant sur le round et le nombre total de joueurs
+            const totalPlayers = updatedTournament.players.length;
+            const totalRounds = Math.log2(totalPlayers);
+            const isFinalRound = Number.isFinite(totalRounds) && Math.floor(totalRounds) === totalRounds && currentMatch.round === totalRounds;
+            const playedInFinal = updatedTournament.isFinished || isFinalRound;
+            // (removed debug logs)
+
+            // On enregistre si l'utilisateur a été éliminé (il a perdu) ou si c'était la finale (même s'il a gagné)
+            const shouldSave = (!didUserWin) || playedInFinal;
+            if (shouldSave) {
+                const scoreString = `${score.player1} - ${score.player2}`;
+                const roundNumber = currentMatch.round;
+                const playerPosition = userIsPlayer1 ? 1 : 2;
+                try {
+                    await historyService.saveMatch(user.id, scoreString, durationMs, 'tournament', roundNumber, totalPlayers, playerPosition);
+                } catch (e) {
+                    console.error('Erreur sauvegarde historique tournoi', e);
+                }
+            }
+        }
+    } catch (e) {
+        console.error('Erreur lors de la sauvegarde conditionnelle du tournoi', e);
+    }
     
     if (updatedTournament.isFinished) {
         showChampionScreen(updatedTournament);

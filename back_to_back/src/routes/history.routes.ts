@@ -12,7 +12,10 @@ const gameHistorySchema: FastifySchema = {
 			playerId: { type: 'integer', description: "ID de l'utilisateur qui enregistre la partie." },
 			durationMs: { type: 'integer', description: 'Durée de la partie en millisecondes.' },
 			score: { type: 'string', description: 'Le score final ou résultat.' },
-			mode: { type: 'string', description: 'Le mode de jeu.' }
+				mode: { type: 'string', description: 'Le mode de jeu.' },
+				tournamentRound: { type: 'integer', description: 'Round du tournois si applicable.'},
+				tournamentPlayersCount: { type: 'integer', description: 'Nombre total de joueurs dans le tournoi (optionnel).'},
+				playerPosition: { type: 'integer', description: 'Position du joueur dans le match (1 ou 2) (optionnel).'}
 		}
 	}
 };
@@ -21,12 +24,15 @@ interface GameHistoryBody {
 	durationMs: number;
 	score: string;
 	mode: string;
+	tournamentRound?: number;
+	tournamentPlayersCount?: number;
+	playerPosition?: number;
 }
 export default async function history(app: FastifyInstance) {
 	app.addHook("preHandler", verifToken2FA);
 	app.post("/history", { schema: gameHistorySchema },
 		async (request: FastifyRequest<{ Body: GameHistoryBody}>, reply)=> {
-			const { playerId, durationMs, score, mode } = request.body;
+			const { playerId, durationMs, score, mode, tournamentRound, tournamentPlayersCount, playerPosition } = request.body;
 
 			try {
 				const newGame = await prisma.gameHistory.create({
@@ -35,6 +41,9 @@ export default async function history(app: FastifyInstance) {
 						score: score,
 						playerId: playerId,
 						mode: mode,
+						tournamentRound: tournamentRound ?? null,
+						tournamentPlayersCount: tournamentPlayersCount ?? null,
+						playerPosition: playerPosition ?? null,
 						User: {
 							connect: { id: playerId }
 						}
@@ -73,8 +82,12 @@ export default async function history(app: FastifyInstance) {
 					durationMs: true,
 					score: true,
 					date: true,
-					mode: true
+					mode: true,
+					tournamentRound: true,
+					tournamentPlayersCount: true,
+					playerPosition: true
 				}
+
 			});
 			// if (history.length === 0) {
 			// 	reply.code(404).send({ message: "Aucune partie trouve pour ce joueur." });
