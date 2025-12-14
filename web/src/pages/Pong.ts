@@ -1,5 +1,6 @@
 import { t } from "../i18n";
 import type { GameMode } from '../game/config/gameModeConfig';
+import { renderHeaderQuickLinks } from "../components/ui/HeaderQuickLinks";
 
 export default function Pong(): string {
   return `
@@ -22,15 +23,7 @@ export default function Pong(): string {
         </a>
 
         <div class="flex items-center gap-3 text-xs sm:text-sm">
-          <nav class="flex items-center gap-3 text-xs sm:text-sm text-slate-300">
-            <a href="/play" data-nav class="hover:text-white transition-colors">
-              ${t("nav.playModes")}
-            </a>
-            <span class="hidden sm:inline text-slate-700">•</span>
-            <a href="/profile" data-nav class="hover:text-white transition-colors">
-              ${t("nav.profile")}
-            </a>
-          </nav>
+          ${renderHeaderQuickLinks("flex items-center gap-3 text-xs sm:text-sm text-slate-300")}
         </div>
       </header>
 

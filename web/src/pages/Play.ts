@@ -1,4 +1,5 @@
 import { t } from "../i18n";
+import { renderHeaderQuickLinks } from "../components/ui/HeaderQuickLinks";
 
 type PlayCard = {
   href: string;
@@ -103,15 +104,7 @@ export default function Play(): string {
         </div>
 
         <div class="flex flex-col items-end gap-2">
-          <nav class="flex items-center gap-3 text-xs sm:text-sm text-slate-300">
-            <a href="/play" data-nav class="hover:text-white transition-colors">
-              ${t("nav.playModes")}
-            </a>
-            <span class="hidden sm:inline text-slate-700">•</span>
-            <a href="/profile" data-nav class="hover:text-white transition-colors">
-              ${t("nav.profile")}
-            </a>
-          </nav>
+          ${renderHeaderQuickLinks("flex items-center gap-3 text-xs sm:text-sm text-slate-300 justify-end")}
           <div class="hidden sm:flex flex-col items-end text-xs">
             <span class="uppercase tracking-[0.25em] text-slate-500">
               ${t("shared.modeChoice.label")}

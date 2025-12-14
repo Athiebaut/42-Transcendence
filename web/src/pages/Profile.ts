@@ -5,6 +5,7 @@ import { userService } from "../services/userService";
 import { historyService} from "../services/historyService";
 import { loadTournament, getRoundName } from '../game/tournament/TournamentLogic';
 import { api } from "../services/api";
+import { renderHeaderQuickLinks } from "../components/ui/HeaderQuickLinks";
 
 function timeAgo(ts: number | null | undefined) {
   if (!ts) return t('profile.friends.status.never');
@@ -35,12 +36,8 @@ export default function Profile(): string {
         </a>
 
         <div class="flex flex-wrap items-center gap-3 text-xs sm:text-sm">
-          <nav class="flex items-center gap-3 text-xs sm:text-sm text-slate-300">
-            <a href="/play" data-nav class="hover:text-white transition-colors">
-              ${t("nav.playModes")}
-            </a>
+          ${renderHeaderQuickLinks("flex items-center gap-3 text-xs sm:text-sm text-slate-300")}
           <span class="hidden sm:inline text-slate-700">•</span>
-          <!-- MODIFICATION : Ajout de l'ID et changement du href -->
           <a href="#" id="profile-logout-btn" class="hidden sm:inline text-slate-300 hover:text-white transition-colors">
             ${t("nav.logout")}
           </a>

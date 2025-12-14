@@ -1,4 +1,4 @@
-import { t } from "../i18n";
+import { renderHeaderQuickLinks } from "../components/ui/HeaderQuickLinks";
 
 type HelpCard = {
   icon: string;
@@ -62,15 +62,7 @@ export default function Help(): string {
         <a href="/" data-nav class="inline-flex items-center text-sm text-emerald-300 hover:text-emerald-200">
           ← Retour à l'accueil
         </a>
-        <nav class="flex items-center gap-3 text-xs sm:text-sm text-slate-300">
-          <a href="/play" data-nav class="hover:text-white transition-colors">
-            ${t("nav.playModes")}
-          </a>
-          <span class="hidden sm:inline text-slate-700">•</span>
-          <a href="/profile" data-nav class="hover:text-white transition-colors">
-            ${t("nav.profile")}
-          </a>
-        </nav>
+        ${renderHeaderQuickLinks("flex items-center gap-3 text-xs sm:text-sm text-slate-300")}
       </header>
 
       <main class="relative z-10 flex-1 w-full px-4 sm:px-6 pb-14 pt-10 space-y-10">

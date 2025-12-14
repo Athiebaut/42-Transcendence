@@ -1,6 +1,8 @@
 import { api } from "../services/api";
 import { t } from "../i18n";
 import { ApiError } from "../services/api.ts";
+import { renderHeaderQuickLinks } from "../components/ui/HeaderQuickLinks";
+import { startGoogleOAuth } from "../utils/oauth";
 
 export default function Register(): string {
   return `
@@ -21,15 +23,7 @@ export default function Register(): string {
         </a>
 
         <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-          <nav class="flex items-center gap-3 text-xs sm:text-sm text-slate-300">
-            <a href="/play" data-nav class="hover:text-white transition-colors">
-              ${t("nav.playModes")}
-            </a>
-            <span class="hidden sm:inline text-slate-700">•</span>
-            <a href="/profile" data-nav class="hover:text-white transition-colors">
-              ${t("nav.profile")}
-            </a>
-          </nav>
+          ${renderHeaderQuickLinks("flex items-center gap-3 text-xs sm:text-sm text-slate-300")}
           <nav class="flex items-center gap-3 text-xs sm:text-sm">
             <a
               href="/login"
@@ -243,6 +237,7 @@ export default function Register(): string {
                 </div>
 
                 <button
+                  id="register-google-btn"
                   type="button"
                   class="w-full inline-flex items-center justify-center gap-2 rounded-lg border border-slate-700/80 bg-slate-900/80 text-xs sm:text-sm text-slate-100 py-2.5 hover:bg-slate-800 transition-colors"
                 >
@@ -301,66 +296,66 @@ function isValidationErrorPayload(data: unknown): data is ValidationErrorPayload
 }
 
 export function setupRegister() {
-  const form = document.getElementById('registrationForm') as HTMLFormElement;
-  if (!form) return;
+    const form = document.getElementById("registrationForm") as HTMLFormElement | null;
+    const googleBtn = document.getElementById("register-google-btn") as HTMLButtonElement | null;
+    if (!form) return;
 
-  form.addEventListener('submit', async function(event) {
-      event.preventDefault();
-      clearErrors();
-      
-      const formData = new FormData(form);
-      const dataToSend = {
-          username: formData.get('username'), 
-          email: formData.get('email'),
-          password: formData.get('password'),
-          passwordConfirm: formData.get('password_confirm'),
-      };
+    form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        clearErrors();
 
-      try {
-          // APPEL SIMPLIFIÉ
-          const result = await api.post('/register', dataToSend);
-          
-          console.log(t("register.alert.success"), result);
-          alert(t("register.alert.success"));
-          window.location.href = '/login';
-      } catch (error: unknown) {
-          if (error instanceof ApiError) {
-              const data: unknown = error.data;
+        const formData = new FormData(form);
+        const dataToSend = {
+            username: formData.get("username"),
+            email: formData.get("email"),
+            password: formData.get("password"),
+            passwordConfirm: formData.get("password_confirm"),
+        };
 
-              // Erreurs Zod: affichage sous les champs
-              if (isValidationErrorPayload(data)) {
-                  const fieldErrors = data.fieldErrors ?? {};
-                  for (const [field, messages] of Object.entries(fieldErrors)) {
-                      if (Array.isArray(messages) && messages.length > 0) {
-                          setFieldError(field, messages[0]);
-                      }
-                  }
-                  const global = document.getElementById("error-global") as HTMLElement | null;
-                  if (global && Array.isArray(data.formErrors) && data.formErrors.length > 0) {
-                      global.textContent = data.formErrors[0];
-                  }
-                  return;
-              }
+        try {
+            await api.post("/register", dataToSend);
+            alert(t("register.alert.success"));
+            window.location.href = "/login";
+        } catch (error: unknown) {
+            if (error instanceof ApiError) {
+                const data: unknown = error.data;
 
-              // Autres erreurs backend (409 etc.)
-              const global = document.getElementById("error-global") as HTMLElement | null;
-              if (global) {
-                  if (data && typeof data === "object" && typeof (data as any).error === "string") {
-                      global.textContent = (data as any).error;
-                      return;
-                  }
-                  global.textContent = error.message;
-                  return;
-              }
-          }
+                if (isValidationErrorPayload(data)) {
+                    const fieldErrors = data.fieldErrors ?? {};
+                    for (const [field, messages] of Object.entries(fieldErrors)) {
+                        if (Array.isArray(messages) && messages.length > 0) {
+                            setFieldError(field, messages[0]);
+                        }
+                    }
 
-          // Fallback
-          const msg = error instanceof Error ? error.message : "?";
-          alert(t("register.alert.error", { message: msg }));
-      }
-  });
+                    const global = document.getElementById("error-global") as HTMLElement | null;
+                    if (global && Array.isArray(data.formErrors) && data.formErrors.length > 0) {
+                        global.textContent = data.formErrors[0];
+                    }
+                    return;
+                }
+
+                const global = document.getElementById("error-global") as HTMLElement | null;
+                if (global) {
+                    if (data && typeof data === "object" && typeof (data as any).error === "string") {
+                        global.textContent = (data as any).error;
+                        return;
+                    }
+                    global.textContent = error.message;
+                    return;
+                }
+            }
+
+            const msg = error instanceof Error ? error.message : "?";
+            alert(t("register.alert.error", { message: msg }));
+        }
+    });
+
+    googleBtn?.addEventListener("click", () => {
+        startGoogleOAuth("/dashboard");
+    });
 }
 
 export function registerWithGoogle() {
-  alert(t("register.alert.google"));
+  startGoogleOAuth("/dashboard");
 }

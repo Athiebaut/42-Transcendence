@@ -1,6 +1,8 @@
 import { userService } from "../services/userService";
 import { api } from "../services/api";
 import { t } from "../i18n";
+import { renderHeaderQuickLinks } from "../components/ui/HeaderQuickLinks";
+import { startGoogleOAuth } from "../utils/oauth";
 import { applyFormApiError, clearFormErrors } from "../services/helper.ts";
 
 clearFormErrors(["email", "password", "passwordConfirm"], "error-global")
@@ -34,15 +36,7 @@ export default function Login(): string {
         </a>
 
         <div class="flex flex-col items-end gap-2 text-xs text-right">
-          <nav class="flex items-center gap-3 text-xs sm:text-sm text-slate-300">
-            <a href="/play" data-nav class="hover:text-white transition-colors">
-              ${t("nav.playModes")}
-            </a>
-            <span class="hidden sm:inline text-slate-700">•</span>
-            <a href="/profile" data-nav class="hover:text-white transition-colors">
-              ${t("nav.profile")}
-            </a>
-          </nav>
+          ${renderHeaderQuickLinks("flex items-center gap-3 text-xs sm:text-sm text-slate-300")}
           <div class="hidden sm:flex flex-col items-end">
             <span class="uppercase tracking-[0.25em] text-slate-500">
               ${t("shared.modeChoice.label")}
@@ -222,6 +216,7 @@ export default function Login(): string {
 
                 <!-- Bouton Google -->
                 <button
+                  id="login-google-btn"
                   type="button"
                   class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-slate-900/70 border border-slate-700/80 text-xs sm:text-sm text-slate-100 py-2.5 hover:bg-slate-800 transition-colors"
                 >
@@ -262,6 +257,7 @@ export function setupLogin() {
   const twoFaForm = document.getElementById("login-2fa-form") as HTMLFormElement | null;
   const twoFaCodeInput = document.getElementById("login-2fa-code") as HTMLInputElement | null;
   const twoFaCancelBtn = document.getElementById("login-2fa-cancel") as HTMLButtonElement | null;
+  const googleBtn = document.getElementById("login-google-btn") as HTMLButtonElement | null;
 
   if (!form) {
     console.error("Login form not found");
@@ -381,5 +377,9 @@ export function setupLogin() {
 
   twoFaCancelBtn?.addEventListener("click", () => {
     reset2FAStep();
+  });
+
+  googleBtn?.addEventListener("click", () => {
+    startGoogleOAuth("/dashboard");
   });
 }
