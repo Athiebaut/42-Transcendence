@@ -6,7 +6,7 @@ alerting: #alertmanager allows to group alerts. Not used here
   alertmanagers:
   - static_configs:
     - targets: []
-    scheme: http
+    scheme: https
     timeout: 10s
     api_version: v2
 
@@ -19,12 +19,12 @@ scrape_configs: #targets to scrap metrics from
   scrape_interval: 15s #how often to scrap metrics from this target (here not very useful because same values than global)
   scrape_timeout: 10s
   metrics_path: /metrics #what web path used to scrap metrics (can see the result on web search or even curl)
-  scheme: http #http or https
   static_configs:
   - targets: #list of targets to scrap metrics from
     - prometheus:9090 #ip adress to get metrics from
 - job_name: cadvisor
   honor_timestamps: true
   static_configs:
+    scheme: http
     - targets:
         - cadvisor:8080
