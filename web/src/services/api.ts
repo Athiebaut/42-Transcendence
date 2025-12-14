@@ -14,8 +14,8 @@ class ApiClient {
       ...(options.headers as Record<string, string>),
     };
 
-    // On ajoute Content-Type: application/json SEULEMENT si ce n'est pas du FormData
-    if (!(options.body instanceof FormData) && !headers['Content-Type']) {
+    // Add Content-Type only when there is a body and it's not FormData
+    if (options.body && !(options.body instanceof FormData) && !headers['Content-Type']) {
       headers['Content-Type'] = 'application/json';
     }
 
