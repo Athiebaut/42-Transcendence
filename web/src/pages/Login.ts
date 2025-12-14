@@ -310,7 +310,7 @@ export function setupLogin() {
         // 🆕 RÉCUPÉRER LES INFOS UTILISATEUR
         await userService.fetchProfile();
         
-        window.location.href = "/dashboard";
+        window.location.href = "/profile";
       }
     } catch (error: any) {
       alert(error?.message ?? "Impossible de se connecter pour le moment.");
@@ -352,7 +352,7 @@ export function setupLogin() {
       if (data.token) {
         localStorage.setItem("token", data.token);
         await userService.fetchProfile();
-        window.location.href = "/dashboard";
+        window.location.href = "/profile";
       } else {
         throw new Error("Missing token after 2FA");
       }
@@ -372,6 +372,6 @@ export function setupLogin() {
   });
 
   googleBtn?.addEventListener("click", () => {
-    startGoogleOAuth("/dashboard");
+    startGoogleOAuth("/profile");
   });
 }

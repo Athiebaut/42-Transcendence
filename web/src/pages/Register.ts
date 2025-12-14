@@ -3,6 +3,7 @@ import { t } from "../i18n";
 import { renderHeaderQuickLinks } from "../components/ui/HeaderQuickLinks";
 import { renderHeaderContextMessage } from "../components/ui/HeaderContextMessage";
 import { startGoogleOAuth } from "../utils/oauth";
+import { userService } from "../services/userService";
 
 export default function Register(): string {
   return `
@@ -280,21 +281,43 @@ export function setupRegister() {
 
       try {
           // APPEL SIMPLIFIÉ
-          const result = await api.post('/register', dataToSend);
-          
+      const result = await api.post('/register', dataToSend);
+      
           console.log(t("register.alert.success"), result);
           alert(t("register.alert.success"));
+
+          const email = (formData.get('email') || '').toString();
+          const password = (formData.get('password') || '').toString();
+
+          if (email && password) {
+            try {
+              const loginRes = await api.post<{ token?: string; is2faEnabled?: boolean }>("/login", {
+                LogEmail: email,
+                LogPassword: password
+              });
+
+              if (loginRes?.token) {
+                localStorage.setItem("token", loginRes.token);
+                await userService.fetchProfile();
+                window.location.href = "/profile";
+                return;
+              }
+            } catch (loginErr) {
+              console.error("Auto login failed after registration", loginErr);
+            }
+          }
+
           window.location.href = '/login';
       } catch (error: any) {
-      alert(t("register.alert.error", { message: error?.message ?? "?" }));
-  }
+          alert(t("register.alert.error", { message: error?.message ?? "?" }));
+      }
   });
 
   googleBtn?.addEventListener("click", () => {
-    startGoogleOAuth("/dashboard");
+    startGoogleOAuth("/profile");
   });
 }
 
 export function registerWithGoogle() {
-  startGoogleOAuth("/dashboard");
+  startGoogleOAuth("/profile");
 }

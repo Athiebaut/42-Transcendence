@@ -8,6 +8,15 @@ const FRONT = process.env.FRONT_ORIGIN ?? 'https://front.localhost:8443';
 const encSecret = () => new TextEncoder().encode(process.env.JWT_SECRET ?? 'dev-secret');
 const makeState = () => crypto.randomBytes(16).toString('hex');
 const sanitizeUsername = (s: string) => s.toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 24) || 'user';
+const GOOSE_PREFIXES = ['Honk', 'Goose', 'Oie', 'Feather', 'Plume', 'Wing'];
+const GOOSE_TITLES = ['Master', 'Rider', 'Wizard', 'Champion', 'Seeker', 'Rogue'];
+
+function generateFallbackUsername() {
+  const prefix = GOOSE_PREFIXES[Math.floor(Math.random() * GOOSE_PREFIXES.length)];
+  const title = GOOSE_TITLES[Math.floor(Math.random() * GOOSE_TITLES.length)];
+  const number = Math.floor(Math.random() * 900 + 100); // 100-999
+  return sanitizeUsername(`${prefix}${title}${number}`);
+}
 
 async function ensureUniqueUsername(app: FastifyInstance, base: string) {
   let u = base, i = 1;
@@ -18,7 +27,7 @@ async function ensureUniqueUsername(app: FastifyInstance, base: string) {
 }
 
 async function issueToken(userId: number) {
-  return new SignJWT({})
+  return new SignJWT({ userId, isSecondFactorAuthenticated: true })
     .setProtectedHeader({ alg: 'HS256' })
     .setSubject(String(userId))
     .setIssuedAt()
@@ -95,7 +104,11 @@ export default async function authGoogleRoutes(app: FastifyInstance) {
     let user = await app.prisma.user.findFirst({ where: { emailLower } });
 
     if (!user) {
-      const base = sanitizeUsername(profile.name || email.split('@')[0]);
+      const emailHandle = email.split('@')[0] ?? '';
+      let base = sanitizeUsername(emailHandle.slice(0, 8));
+      if (!base || base === 'user') {
+        base = generateFallbackUsername();
+      }
       const username = await ensureUniqueUsername(app, base);
       const usernameLower = username.toLowerCase();
       const randomPwd = crypto.randomBytes(32).toString('hex');

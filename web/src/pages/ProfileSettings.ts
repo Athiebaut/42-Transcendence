@@ -141,7 +141,11 @@ export default function ProfileSettings(): string {
               </p>
               <div class="flex items-center justify-between rounded-xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3">
                 <div class="text-xs text-slate-200">
-                  <p class="font-semibold">${t("profile.settings.2faStatus")} <span class="${is2FAEnabled ? 'text-emerald-300' : 'text-rose-300'}" id="2fa-status">${is2FAEnabled ? t("profile.settings.2faEnabled") : t("profile.settings.2faDisabled")}</span></p>
+                  <p class="font-semibold">${t("profile.settings.2faCurrentState")} :
+                    <span class="${is2FAEnabled ? 'text-emerald-300' : 'text-rose-300'}" id="2fa-status">
+                      ${is2FAEnabled ? t("profile.settings.2faEnabled") : t("profile.settings.2faDisabled")}
+                    </span>
+                  </p>
                   <p class="text-slate-400 mt-1">${t("profile.settings.2faLastChange")}</p>
                 </div>
                 <button type="button" id="toggle-2fa-btn" class="btn-main">${is2FAEnabled ? t("profile.settings.2faDisable") : t("profile.settings.2faEnable")}</button>
@@ -461,6 +465,7 @@ function setup2FAToggle() {
     toggleBtn.disabled = true;
     try {
       await api.post("/auth/2fa/disable", {});
+      applyState(false);
       await refreshUserState();
       alert(t("profile.settings.2faDisableSuccess"));
     } catch (error: any) {
@@ -488,6 +493,7 @@ function setup2FAToggle() {
       if (response?.token) {
         localStorage.setItem("token", response.token);
       }
+      applyState(true);
       await refreshUserState();
       alert(t("profile.settings.2faSuccess"));
     } catch (error: any) {

@@ -118,8 +118,9 @@ const translations: Record<LanguageCode, Record<string, string>> = {
     "profile.settings.2faDescription":
       "Active la protection 2FA pour empêcher les autres oies de s'infiltrer sur ton compte. Tu recevras un QR code à scanner dans ton application d'authentification.",
     "profile.settings.2faStatus": "État actuel :",
+    "profile.settings.2faCurrentState": "État actuel",
     "profile.settings.2faDisabled": "désactivé",
-    "profile.settings.2faEnabled": "activé",
+    "profile.settings.2faEnabled": "valide",
     "profile.settings.2faLastChange": "Dernier changement : jamais",
     "profile.settings.2faEnable": "Activer",
     "profile.settings.2faDisable": "Désactiver",
@@ -502,6 +503,7 @@ const translations: Record<LanguageCode, Record<string, string>> = {
     "profile.settings.2faDescription":
       "Enable 2FA to stop other geese from sneaking into your account. You'll receive a QR code to scan in your authenticator app.",
     "profile.settings.2faStatus": "Current status:",
+    "profile.settings.2faCurrentState": "Current state",
     "profile.settings.2faDisabled": "disabled",
     "profile.settings.2faEnabled": "enabled",
     "profile.settings.2faLastChange": "Last change: never",
@@ -886,6 +888,7 @@ const translations: Record<LanguageCode, Record<string, string>> = {
     "profile.settings.2faDescription":
       "Activa el 2FA para evitar que otros gansos se infiltren en tu cuenta. Recibirás un código QR para escanear en tu app de autenticación.",
     "profile.settings.2faStatus": "Estado actual:",
+    "profile.settings.2faCurrentState": "Estado actual",
     "profile.settings.2faDisabled": "desactivado",
     "profile.settings.2faEnabled": "activado",
     "profile.settings.2faLastChange": "Último cambio: nunca",
