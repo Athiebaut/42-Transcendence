@@ -3,7 +3,6 @@
 import { renderRoute } from "./router";
 import { initBackgroundRotator, forceBackgroundChange } from "./utils/backgroundRotator";
 import { mountDecorControls, refreshDecorControls } from "./components/ui/DecorControls";
-import { mountAuthDebugToggle } from "./components/ui/AuthDebugToggle";
 import { initI18n } from "./i18n";
 import { mountLanguageSwitcher } from "./components/ui/LanguageSwitcher";
 import { userService } from "./services/userService";
@@ -28,7 +27,6 @@ async function bootstrap() {
   // Options: 'random' (change à chaque page), 'session' (garde pendant la session), 'daily' (change une fois par jour)
   initBackgroundRotator("random");
   mountDecorControls();
-  mountAuthDebugToggle();
   mountLanguageSwitcher();
   
   // AJOUT : Vérification de la session au démarrage

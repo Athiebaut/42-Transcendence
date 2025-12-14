@@ -8,6 +8,7 @@ import {
   leaderboard,
 } from "../data/dashboard";
 
+
 export default function Dashboard(): string {
   const podiumCards = leaderboard
     .slice(0, 3)
@@ -131,9 +132,13 @@ export default function Dashboard(): string {
           <span class="font-semibold tracking-tight">Honk village</span>
         </a>
         <nav class="flex items-center gap-3 text-xs sm:text-sm text-slate-300">
-          <a href="/play" data-nav class="hover:text-white transition-colors">${t("nav.playModes")}</a>
+          <a href="/play" data-nav class="hover:text-white transition-colors">
+            ${t("nav.playModes")}
+          </a>
           <span class="hidden sm:inline text-slate-700">•</span>
-          <a href="/profile" data-nav class="hover:text-white transition-colors">${t("nav.profile")}</a>
+          <a href="/profile" data-nav class="hover:text-white transition-colors">
+            ${t("nav.profile")}
+          </a>
         </nav>
       </header>
 

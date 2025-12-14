@@ -34,18 +34,17 @@ export default function Profile(): string {
           <span class="font-semibold tracking-tight">Honk Village</span>
         </a>
 
-        <nav class="flex items-center gap-3 text-xs sm:text-sm">
-          <a href="/play" data-nav class="px-3 py-1.5 rounded-full border border-white/10 bg-black/30 hover:bg-white/5 transition-colors">
-            🎮 ${t("profile.header.playPong")}
-          </a>
-          <a href="/profile" data-nav class="hidden sm:inline text-emerald-300 font-semibold">
-            ${t("nav.profile")}
-          </a>
+        <div class="flex flex-wrap items-center gap-3 text-xs sm:text-sm">
+          <nav class="flex items-center gap-3 text-xs sm:text-sm text-slate-300">
+            <a href="/play" data-nav class="hover:text-white transition-colors">
+              ${t("nav.playModes")}
+            </a>
+          <span class="hidden sm:inline text-slate-700">•</span>
           <!-- MODIFICATION : Ajout de l'ID et changement du href -->
           <a href="#" id="profile-logout-btn" class="hidden sm:inline text-slate-300 hover:text-white transition-colors">
             ${t("nav.logout")}
           </a>
-        </nav>
+        </div>
       </header>
 
       <!-- CONTENU PRINCIPAL -->

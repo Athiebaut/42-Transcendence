@@ -1,8 +1,8 @@
-import { isAuthenticated, logout } from "../utils/auth";
+import { logout } from "../utils/auth";
 import { t } from "../i18n";
 
 export default function Home(): string {
-  const loggedIn = isAuthenticated();
+  //const loggedIn = isAuthenticated();
   return `
     <div class="min-h-screen flex flex-col relative overflow-hidden">
       <!-- Halo de lumière / ambiance -->
@@ -24,39 +24,22 @@ export default function Home(): string {
           <span class="font-semibold tracking-tight">Honk village</span>
         </a>
 
-        <nav class="flex items-center gap-4 text-sm">
-          <a href="#roles" class="hover:text-white/80 transition-colors">${t("nav.roles")}</a>
-          <a href="#ladder" class="hover:text-white/80 transition-colors">${t("nav.ladder")}</a>
-          <a href="#customize" class="hover:text-white/80 transition-colors">${t("nav.customize")}</a>
-
-          <div class="hidden sm:flex items-center gap-2 ml-4">
-            ${!loggedIn ? `
-              <a
-                href="/login"
-                data-nav
-                class="px-4 py-2 rounded-full border border-white/20 bg-black/30 text-xs font-medium hover:bg-white/10 transition-colors"
-              >
-                ${t("cta.login")}
-              </a>
-              <a
-                href="/register"
-                data-nav
-                class="wood-sign-btn text-sm px-5 py-2"
-              >
-                ${t("cta.register")}
-              </a>
-            ` : ""}
-            ${loggedIn ? `
-              <a
-                href="/profile"
-                data-nav
-                class="px-4 py-2 rounded-full border border-emerald-400/40 text-xs font-medium text-emerald-200 hover:bg-emerald-400/10 transition-colors"
-              >
-                ${t("cta.profile")}
-              </a>
-            ` : ""}
-          </div>
-        </nav>
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-6">
+          <nav class="flex items-center gap-4 text-sm">
+            <a href="#roles" class="hover:text-white/80 transition-colors">${t("nav.roles")}</a>
+            <a href="#ladder" class="hover:text-white/80 transition-colors">${t("nav.ladder")}</a>
+            <a href="#customize" class="hover:text-white/80 transition-colors">${t("nav.customize")}</a>
+          </nav>
+          <nav class="flex items-center gap-3 text-xs sm:text-sm text-slate-300">
+            <a href="/play" data-nav class="hover:text-white transition-colors">
+              ${t("nav.playModes")}
+            </a>
+            <span class="hidden sm:inline text-slate-700">•</span>
+            <a href="/profile" data-nav class="hover:text-white transition-colors">
+              ${t("nav.profile")}
+            </a>
+          </nav>
+        </div>
       </header>
 
       <!-- MAIN -->
@@ -555,35 +538,6 @@ export default function Home(): string {
         </section>
       </main>
 
-      <!-- FOOTER (équivalent footer Wolfy) -->
-      <footer
-        class="border-t border-white/10 mt-auto py-6 px-6 text-xs sm:text-sm text-slate-400 bg-black/40"
-      >
-        <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div class="flex items-center gap-2">
-            <span class="text-lg">🦢</span>
-            <span class="font-semibold">Honk Village</span>
-            <span class="text-slate-600 hidden sm:inline">•</span>
-            <span class="text-slate-500 hidden sm:inline">
-              ft_transcendence — Projet 42
-            </span>
-          </div>
-
-          <div class="flex flex-wrap items-center gap-3">
-            <a
-              href="/help"
-              class="hover:text-slate-200 transition-colors"
-              data-i18n="home.footer.help"
-            >
-              Centre d'aide
-            </a>
-            <span class="text-slate-600">•</span>
-            <span data-i18n="home.footer.copy" data-i18n-vars='{"year":"${new Date().getFullYear()}"}'>
-              © ${new Date().getFullYear()} — Toutes oies réservées
-            </span>
-          </div>
-        </div>
-      </footer>
     </div>
   `;
 }

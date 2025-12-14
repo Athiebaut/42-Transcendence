@@ -15,8 +15,10 @@ export function mountLanguageSwitcher() {
   const container = document.createElement("div");
   container.id = "language-switcher";
   container.className =
-    "fixed left-4 bottom-24 z-[100000] flex items-center gap-2 rounded-full border border-white/10 bg-slate-900/70 px-3 py-1.5 text-xs text-slate-200 shadow-lg backdrop-blur";
-  container.style.bottom = "5rem";
+    "fixed left-4 bottom-6 z-[100000] flex items-center gap-2 rounded-full border border-white/10 bg-slate-900/70 px-3 py-1.5 text-xs text-slate-200 shadow-lg backdrop-blur";
+
+  // positionner un peu plus bas
+  container.style.bottom = "2rem";
 
   const label = document.createElement("span");
   label.textContent = t("language.label");

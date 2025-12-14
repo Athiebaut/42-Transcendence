@@ -30,13 +30,24 @@ export default function Login(): string {
           <span class="font-semibold tracking-tight">${t("settings.backVillage")}</span>
         </a>
 
-        <div class="hidden sm:flex flex-col items-end text-xs text-right">
-          <span class="uppercase tracking-[0.25em] text-slate-500">
-            ${t("shared.modeChoice.label")}
-          </span>
-          <span class="text-slate-400">
-            ${t("shared.modeChoice.helper")}
-          </span>
+        <div class="flex flex-col items-end gap-2 text-xs text-right">
+          <nav class="flex items-center gap-3 text-xs sm:text-sm text-slate-300">
+            <a href="/play" data-nav class="hover:text-white transition-colors">
+              ${t("nav.playModes")}
+            </a>
+            <span class="hidden sm:inline text-slate-700">•</span>
+            <a href="/profile" data-nav class="hover:text-white transition-colors">
+              ${t("nav.profile")}
+            </a>
+          </nav>
+          <div class="hidden sm:flex flex-col items-end">
+            <span class="uppercase tracking-[0.25em] text-slate-500">
+              ${t("shared.modeChoice.label")}
+            </span>
+            <span class="text-slate-400">
+              ${t("shared.modeChoice.helper")}
+            </span>
+          </div>
         </div>
       </header>
 

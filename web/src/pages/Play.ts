@@ -100,23 +100,26 @@ export default function Play(): string {
             <span class="text-lg">🦢</span>
             <span class="font-semibold tracking-tight">${t("settings.backVillage")}</span>
           </a>
-
-          <a
-            href="/profile"
-            data-nav
-            class="px-4 py-2 rounded-full border border-emerald-400/40 text-xs font-medium text-emerald-200 hover:bg-emerald-400/10 transition-colors"
-          >
-            ${t("cta.profile")}
-          </a>
         </div>
 
-        <div class="hidden sm:flex flex-col items-end text-xs">
-          <span class="uppercase tracking-[0.25em] text-slate-500">
-            ${t("shared.modeChoice.label")}
-          </span>
-          <span class="text-slate-400">
-            ${t("shared.modeChoice.helper")}
-          </span>
+        <div class="flex flex-col items-end gap-2">
+          <nav class="flex items-center gap-3 text-xs sm:text-sm text-slate-300">
+            <a href="/play" data-nav class="hover:text-white transition-colors">
+              ${t("nav.playModes")}
+            </a>
+            <span class="hidden sm:inline text-slate-700">•</span>
+            <a href="/profile" data-nav class="hover:text-white transition-colors">
+              ${t("nav.profile")}
+            </a>
+          </nav>
+          <div class="hidden sm:flex flex-col items-end text-xs">
+            <span class="uppercase tracking-[0.25em] text-slate-500">
+              ${t("shared.modeChoice.label")}
+            </span>
+            <span class="text-slate-400">
+              ${t("shared.modeChoice.helper")}
+            </span>
+          </div>
         </div>
       </header>
 
