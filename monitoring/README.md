@@ -20,6 +20,7 @@ Click on "Connections" on the left
 Search for Prometheus  
 "Add new data source"  
 Set the connection url to prometheus:9090  
+Set "Skip TLS certificate validation" to allow selfsigned certificates  
 Scroll down and save  
 
 Go to Dashboards  

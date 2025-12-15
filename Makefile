@@ -129,9 +129,9 @@ reload-nginx:
 	 $(call ok,Nginx rechargé.)
 
 # -------- Build --------
-build-up:  setup-monitoring build up
+build-up: build up
 
-build: build-front
+build: setup-monitoring build-front
 	$(COMPOSE) build
 	$(call ok,Images reconstruites.)
 

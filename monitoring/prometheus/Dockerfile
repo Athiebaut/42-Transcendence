@@ -7,7 +7,7 @@ RUN wget https://github.com/prometheus/prometheus/releases/download/v3.6.0/prome
     mv prometheus-3.6.0.linux-amd64 /prometheus && \
     rm prometheus-3.6.0.linux-amd64.tar.gz
 
-RUN openssl req -x509 -newkey rsa:4096 -keyout /prometheus.key -out /prometheus.crt -days 365 -nodes -subj "/CN=localhost"
+RUN openssl req -x509 -newkey rsa:4096 -keyout /prometheus.key -out /prometheus.crt -days 365 -nodes -subj "/CN=prometheus" -addext "subjectAltName=DNS:prometheus,DNS:localhost,IP:127.0.0.1"
 
 RUN chmod 777 /prometheus.crt /prometheus.key
 
