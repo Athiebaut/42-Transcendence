@@ -4,7 +4,7 @@ import * as argon2 from 'argon2';
 import { SignJWT } from 'jose';
 
 const ARGON_OPTS = { type: argon2.argon2id, timeCost: 3, memoryCost: 19456, parallelism: 1 };
-const FRONT = process.env.FRONT_ORIGIN ?? 'https://front.localhost:8443';
+const FRONT = process.env.FRONT_ORIGIN ?? 'https://front.localhost';
 const encSecret = () => new TextEncoder().encode(process.env.JWT_SECRET ?? 'dev-secret');
 const makeState = () => crypto.randomBytes(16).toString('hex');
 const sanitizeUsername = (s: string) => s.toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 24) || 'user';

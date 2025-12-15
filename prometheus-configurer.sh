@@ -27,11 +27,9 @@ cp "$PROMETHEUS_TEMPLATE" "monitoring/prometheus/prometheus.yml"
 echo "" >> "$PROMETHEUS_CONFIG"
 
 while IFS= read -r container; do
-    
     if grep -q "job_name: $container" "$PROMETHEUS_CONFIG"; then
         continue
     fi
-    
     cat >> "$PROMETHEUS_CONFIG" << EOF
 
 - job_name: $container

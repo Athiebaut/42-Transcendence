@@ -23,7 +23,7 @@ ENV_EXAMPLE     := .env.example
 .DEFAULT_GOAL := help
 
 .PHONY: help up down restart ps logs logs-api logs-nginx open curl test-nginx reload-nginx \
-        build build-front certs env-init reset clean clean-front clean-api kill-port
+	build-up build build-front certs env-init reset clean clean-front clean-api kill-port
 
 # -------- Helpers --------
 define hr
@@ -84,7 +84,7 @@ setup-monitoring:
 	@./prometheus-configurer.sh &
 
 # -------- Main flows --------
-up: setup-monitoring certs
+up: certs
 	$(call hr)
 	$(MAKE) guard-env
 	@# Ne bloque pas si le port est occupé, mais avertit
@@ -129,6 +129,8 @@ reload-nginx:
 	 $(call ok,Nginx rechargé.)
 
 # -------- Build --------
+build-up:  setup-monitoring build up
+
 build: build-front
 	$(COMPOSE) build
 	$(call ok,Images reconstruites.)

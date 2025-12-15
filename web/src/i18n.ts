@@ -21,7 +21,7 @@ const translations: Record<LanguageCode, Record<string, string>> = {
     "nav.logout": "Se déconnecter",
     "nav.register": "S'inscrire",
     "home.heroBadge": "Étang toujours éveillé",
-    "home.heroTitle": "ft_transcendence, LE pong social au milieu d'un village d'oies",
+    "home.heroTitle": "ft_transcendence ^^, LE pong social au milieu d'un village d'oies",
     "home.heroDescription":
       "Défends ton terrain, honke sur tes adversaires et grimpe le classement sans jamais quitter le village.",
     "home.playNow": "🎮 Jouer maintenant",
@@ -405,7 +405,7 @@ const translations: Record<LanguageCode, Record<string, string>> = {
     "nav.logout": "Log out",
     "nav.register": "Sign up",
     "home.heroBadge": "Ever-awake pond",
-    "home.heroTitle": "ft_transcendence, the social Pong set in a goose village",
+    "home.heroTitle": "ft_transcendence ^^, the social Pong set in a goose village",
     "home.heroDescription":
       "Defend your pond, honk at rivals, and climb the ladder without ever leaving the village.",
     "home.playNow": "🎮 Play now",
@@ -790,7 +790,7 @@ const translations: Record<LanguageCode, Record<string, string>> = {
     "nav.logout": "Cerrar sesión",
     "nav.register": "Registrarse",
     "home.heroBadge": "Laguna siempre despierta",
-    "home.heroTitle": "ft_transcendence, el Pong social en un pueblo de gansos",
+    "home.heroTitle": "ft_transcendence ^^, el Pong social en un pueblo de gansos",
     "home.heroDescription":
       "Defiende tu estanque, grazna a tus rivales y escala la clasificación sin dejar el pueblo.",
     "home.playNow": "🎮 Jugar ahora",
