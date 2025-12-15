@@ -124,6 +124,8 @@ export default async function profileAccountRoutes(app: FastifyInstance) {
 				email: true,
 				avatarUrl: true,
 				isTwoFactorAuthenticationEnabled: true,
+				wins: true,
+				losses: true,
 			},
 		});
 

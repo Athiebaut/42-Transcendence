@@ -13,6 +13,7 @@ const gameHistorySchema: FastifySchema = {
 			durationMs: { type: 'integer', description: 'Durée de la partie en millisecondes.' },
 			score: { type: 'string', description: 'Le score final ou résultat.' },
 				mode: { type: 'string', description: 'Le mode de jeu.' },
+				result: { type: 'string', description: 'Résultat pour le joueur (win|loss|draw).', nullable: true },
 				tournamentRound: { type: 'integer', description: 'Round du tournois si applicable.'},
 				tournamentPlayersCount: { type: 'integer', description: 'Nombre total de joueurs dans le tournoi (optionnel).'},
 				playerPosition: { type: 'integer', description: 'Position du joueur dans le match (1 ou 2) (optionnel).'}
@@ -24,6 +25,7 @@ interface GameHistoryBody {
 	durationMs: number;
 	score: string;
 	mode: string;
+	result?: string;
 	tournamentRound?: number;
 	tournamentPlayersCount?: number;
 	playerPosition?: number;
@@ -49,6 +51,17 @@ export default async function history(app: FastifyInstance) {
 						}
 					}
 				});
+
+				// Si on a un résultat, incrémentez le compteur sur l'utilisateur
+				try {
+					if ((request.body as any).result === 'win') {
+						await prisma.user.update({ where: { id: playerId }, data: { wins: { increment: 1 } } });
+					} else if ((request.body as any).result === 'loss') {
+						await prisma.user.update({ where: { id: playerId }, data: { losses: { increment: 1 } } });
+					}
+				} catch (e) {
+					request.log.error('Failed to update user stats', e);
+				}
 
 				reply.code(201).send({
 					message: 'Historique de partie enregistre avec succes.',

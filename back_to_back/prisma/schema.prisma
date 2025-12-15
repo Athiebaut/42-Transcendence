@@ -19,7 +19,10 @@ model User {
   createdAt                        DateTime @default(now())
   twoFactorAuthenticationSecret    String?
   isTwoFactorAuthenticationEnabled Boolean  @default(false)
-
+  
+  // Statistiques globales utilisateur
+  wins   Int @default(0)
+  losses Int @default(0)
   sentFriendRequests     Friend[] @relation("SentFriendRequests")
   receivedFriendRequests Friend[] @relation("ReceivedFriendRequests")
 

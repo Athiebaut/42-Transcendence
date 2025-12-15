@@ -1,4 +1,3 @@
-import { statCards } from "../data/profile";
 import { t } from "../i18n";
 import { logout } from "../utils/auth";
 import { userService } from "../services/userService";
@@ -130,18 +129,24 @@ export default function Profile(): string {
                 <span class="text-xs text-slate-500">${t("profile.stats.period")}</span>
               </div>
 
-              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs sm:text-sm">
-                ${statCards
-                  .map(
-                    (card) => `
-                  <div class="glass-panel border border-slate-700/70 p-3 rounded-xl">
-                    <p class="text-slate-400 text-[0.7rem] uppercase tracking-wide mb-1">${t(card.labelKey)}</p>
-                    <p class="text-xl font-semibold">${card.value}</p>
-                    <p class="text-[0.7rem] text-slate-400 mt-1">${t(card.infoKey, card.infoVars)}</p>
-                  </div>
-                `
-                  )
-                  .join("")}
+              <!-- Résumé performances (wins / losses) -->
+              <div class="mt-4 flex gap-3" id="performance-summary">
+                <div class="glass-panel border border-slate-700/70 p-3 rounded-xl text-center flex-1">
+                  <p class="text-slate-400 text-[0.7rem] uppercase tracking-wide mb-1">${t("profile.stats.games.label")}</p>
+                  <p id="perf-total" class="text-2xl font-semibold">–</p>
+                </div>
+                <div class="glass-panel border border-slate-700/70 p-3 rounded-xl text-center">
+                  <p class="text-slate-400 text-[0.7rem] uppercase tracking-wide mb-1">${t("profile.stats.winrate.label")}</p>
+                  <p id="perf-winrate" class="text-xl font-semibold text-sky-300">–</p>
+                </div>
+                <div class="glass-panel border border-slate-700/70 p-3 rounded-xl text-center">
+                  <p class="text-slate-400 text-[0.7rem] uppercase tracking-wide mb-1">${t("profile.stats.wins")}</p>
+                  <p id="perf-wins" class="text-xl font-semibold text-emerald-300">–</p>
+                </div>
+                <div class="glass-panel border border-slate-700/70 p-3 rounded-xl text-center">
+                  <p class="text-slate-400 text-[0.7rem] uppercase tracking-wide mb-1">${t("profile.stats.losses")}</p>
+                  <p id="perf-losses" class="text-xl font-semibold text-rose-300">–</p>
+                </div>
               </div>
             </article>
           </section>
@@ -241,6 +246,78 @@ export function setupProfile() {
   });
   // CHARGEMENT DIFFÉRÉ DE L'HISTORIQUE + amis
   loadHistory();
+  // Remplir les statistiques de performance (wins / losses / total)
+  (async () => {
+    try {
+      const user = userService.getUser();
+      if (!user) return;
+      const wins = typeof user.wins === 'number' ? user.wins : undefined;
+      const losses = typeof user.losses === 'number' ? user.losses : undefined;
+      const totalEl = document.getElementById('perf-total');
+      const winsEl = document.getElementById('perf-wins');
+      const lossesEl = document.getElementById('perf-losses');
+      const winrateEl = document.getElementById('perf-winrate');
+
+      if (typeof wins === 'number' && typeof losses === 'number') {
+        const total = wins + losses;
+        if (totalEl) totalEl.textContent = String(total);
+        if (winsEl) winsEl.textContent = String(wins);
+        if (lossesEl) lossesEl.textContent = String(losses);
+        if (winrateEl) {
+          if (total > 0) {
+            const pct = Math.round((wins / total) * 100);
+            winrateEl.textContent = `${pct}%`;
+          } else {
+            winrateEl.textContent = '–';
+          }
+        }
+      } else {
+        // Fallback: calculer depuis l'historique
+        try {
+          const data = await historyService.getHistory(user.id);
+          const history = data.history || [];
+          const winsCount = history.filter((h: any) => {
+            const parts = h.score.split('-').map((s: string) => parseInt(s.trim()));
+            let myScore = parts[0] || 0;
+            let opScore = parts[1] || 0;
+            if (typeof h.playerPosition === 'number') {
+              const pos = h.playerPosition as number;
+              if (pos === 1) { myScore = parts[0] || 0; opScore = parts[1] || 0; }
+              else { myScore = parts[1] || 0; opScore = parts[0] || 0; }
+            }
+            return myScore > opScore;
+          }).length;
+          const lossesCount = history.filter((h: any) => {
+            const parts = h.score.split('-').map((s: string) => parseInt(s.trim()));
+            let myScore = parts[0] || 0;
+            let opScore = parts[1] || 0;
+            if (typeof h.playerPosition === 'number') {
+              const pos = h.playerPosition as number;
+              if (pos === 1) { myScore = parts[0] || 0; opScore = parts[1] || 0; }
+              else { myScore = parts[1] || 0; opScore = parts[0] || 0; }
+            }
+            return myScore < opScore;
+          }).length;
+          const total = history.length;
+          if (totalEl) totalEl.textContent = String(total);
+          if (winsEl) winsEl.textContent = String(winsCount);
+          if (lossesEl) lossesEl.textContent = String(lossesCount);
+          if (winrateEl) {
+            if (total > 0) {
+              const pct = Math.round((winsCount / total) * 100);
+              winrateEl.textContent = `${pct}%`;
+            } else {
+              winrateEl.textContent = '–';
+            }
+          }
+        } catch (e) {
+          console.error('Erreur calcul performances', e);
+        }
+      }
+    } catch (e) {
+      console.error('Erreur initialisation performances', e);
+    }
+  })();
   // attach friend send button
   const sendBtn = document.getElementById("friend-send-btn");
   sendBtn?.addEventListener("click", async () => {

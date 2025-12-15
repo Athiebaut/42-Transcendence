@@ -139,7 +139,7 @@ function setupPlayerVsAI(scene: Scene): void {
         ai.updateVision(ball.position, ballVelocity, rightPaddle.position.x, currentTime);
 
         const decision = ai.makeDecision(rightPaddle.position.z, scene.deltaTime);
-        updatePaddlePosition(rightPaddle, decision.moveUp, decision.moveDown, moveSpeed * 0.8, minZ, maxZ);
+        updatePaddlePosition(rightPaddle, decision.moveUp, decision.moveDown, moveSpeed, minZ, maxZ);
     });
 }
 

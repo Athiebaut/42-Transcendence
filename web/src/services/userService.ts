@@ -6,6 +6,9 @@ export interface User {
   avatarUrl?: string;
   // AJOUT : Champ manquant pour la 2FA
   isTwoFactorAuthenticationEnabled?: boolean;
+  // Statistiques de performance
+  wins?: number;
+  losses?: number;
 }
 
 const USER_KEY = "user";

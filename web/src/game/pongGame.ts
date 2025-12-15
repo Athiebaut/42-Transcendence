@@ -82,11 +82,35 @@ export async function initPongGame(mode: GameMode = 'pvp1v1'): Promise<boolean> 
             const scoreString = `${score.player1} - ${score.player2}`;
             if (user) {
                 try {
+                    // Déterminer la position du joueur local (1 ou 2) en comparant les noms affichés
+                    const leftNameEl = document.querySelector('#player1-info h3') as HTMLElement | null;
+                    const rightNameEl = document.querySelector('#player2-info h3') as HTMLElement | null;
+                    const username = user.username;
+                    let playerPosition: number | undefined;
+                    if (leftNameEl?.textContent?.trim() === username) playerPosition = 1;
+                    else if (rightNameEl?.textContent?.trim() === username) playerPosition = 2;
+
+                    // Calculer le résultat pour l'utilisateur (win|loss|draw)
+                    let result: string | undefined;
+                    const p1 = score.player1;
+                    const p2 = score.player2;
+                    if (typeof playerPosition === 'number') {
+                      const myScore = playerPosition === 1 ? p1 : p2;
+                      const opScore = playerPosition === 1 ? p2 : p1;
+                      if (myScore > opScore) result = 'win';
+                      else if (myScore < opScore) result = 'loss';
+                      else result = 'draw';
+                    } else {
+                      // Fallback: determine winner by comparing absolute scores (may be inaccurate if we don't know who's who)
+                      if (p1 > p2) result = 'win';
+                      else if (p1 < p2) result = 'loss';
+                      else result = 'draw';
+                    }
+
                     if (mode === 'tournament') {
                         // pour les tournois, la sauvegarde sera gérée par le flow de tournoi
-                        // (on enregistre seulement le dernier match joué par l'utilisateur)
                     } else {
-                        await historyService.saveMatch(user.id, scoreString, duration, mode);
+                        await historyService.saveMatch(user.id, scoreString, duration, mode, undefined, undefined, playerPosition, result);
                         console.log("✅ Partie sauvegardée !");
                     }
                 } catch (e) {
