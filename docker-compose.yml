@@ -32,8 +32,8 @@ services:
     depends_on:
       - back_to_back
     ports:
-      - "443:443"
-      - "80:80"
+      - "8443:443"
+      - "8080:80"
     volumes:
       - ./web/dist:/usr/share/nginx/html:ro
       - ./certs:/etc/nginx/certs:ro
