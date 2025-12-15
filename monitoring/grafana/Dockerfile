@@ -1,6 +1,6 @@
 FROM alpine:3.21
 
-RUN apk update && apk upgrade && apk add libc6-compat curl
+RUN apk update && apk upgrade && apk add libc6-compat curl openssl
 RUN curl -L -O https://dl.grafana.com/oss/release/grafana-12.2.0.linux-amd64.tar.gz
 RUN tar -zxvf grafana-12.2.0.linux-amd64.tar.gz
 RUN mv grafana-12.2.0 /grafana
@@ -10,12 +10,12 @@ RUN adduser -D grafana
 
 WORKDIR /
 
-COPY grafana.ini /grafana.ini
-#COPY ./grafana.key /grafana/grafana.key
-#COPY ./grafana.crt /grafana/grafana.crt
+RUN openssl req -x509 -newkey rsa:4096 -keyout /grafana/grafana.key -out /grafana/grafana.crt -days 365 -nodes -subj "/CN=localhost"
 
-#RUN chgrp -R grafana /grafana/grafana.crt /grafana/grafana.key
-#RUN chmod 440 /grafana/grafana.crt /grafana/grafana.key
+COPY grafana.ini /grafana.ini
+
+RUN chgrp -R grafana /grafana/grafana.crt /grafana/grafana.key
+RUN chmod 440 /grafana/grafana.crt /grafana/grafana.key
 
 ENTRYPOINT ["/grafana/bin/grafana", "server", "--homepath", "/grafana", "--config", "/grafana.ini"]
 
