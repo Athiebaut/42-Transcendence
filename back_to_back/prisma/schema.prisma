@@ -47,7 +47,7 @@ model RefreshToken {
 model GameHistory {
   id         Int      @id @default(autoincrement())
   durationMs Int
-  playerId   Int
+  opponentId Int
   score      String
   date       DateTime @default(now())
   User       User?    @relation(fields: [userId], references: [id])
