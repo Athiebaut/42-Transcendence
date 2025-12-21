@@ -1,6 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { prisma } from "../middleware/prisma.js";
-import jwt from "jsonwebtoken";
+import type { Prisma } from "@prisma/client";
 import { z } from "zod";
 import bcrypt from "bcrypt";
 import {verifToken2FA} from "../middleware/auth.js";
@@ -51,33 +51,39 @@ export default async function profileAccountRoutes(app: FastifyInstance) {
 			data.usernameLower = body.username.toLowerCase();
 		}
 
-		// Prevent collisions (case-insensitive via *Lower fields)
-		if (data.emailLower || data.usernameLower) {
-			const exists = await prisma.user.findFirst({
-				where: {
-					AND: [
-						{ id: { not: userId } },
-						{
-							OR: [
-								data.emailLower ? { emailLower: data.emailLower as string } : undefined,
-								data.usernameLower ? { usernameLower: data.usernameLower as string } : undefined,
-							].filter(Boolean) as any,
-						},
-					],
-				},
-				select: { id: true },
+		try {
+			// Prevent collisions (case-insensitive via *Lower fields)
+			if (data.emailLower || data.usernameLower) {
+				const exists = await prisma.user.findFirst({
+					where: {
+						AND: [
+							{ id: { not: userId } },
+							{
+								OR: [
+									data.emailLower ? { emailLower: data.emailLower as string } : undefined,
+									data.usernameLower ? { usernameLower: data.usernameLower as string } : undefined,
+								].filter(Boolean) as any,
+							},
+						],
+					},
+					select: { id: true },
+				});
+
+				if (exists) return reply.status(409).send({ error: "Email or username already taken" });
+			}
+
+			const user = await prisma.user.update({
+				where: { id: userId },
+				data,
+				select: { id: true, email: true, username: true, avatarUrl: true },
 			});
 
-			if (exists) return reply.status(409).send({ error: "Email or username already taken" });
+			return reply.send({ message: "Profile updated", user });
+		} catch (error) {
+			request.log.error({ err: error, userId }, "Profile update failed");
+			const message = error instanceof Error ? error.message : "Unexpected error";
+			return reply.status(500).send({ error: message });
 		}
-
-		const user = await prisma.user.update({
-			where: { id: userId },
-			data,
-			select: { id: true, email: true, username: true, avatarUrl: true },
-		});
-
-		return reply.send({ message: "Profile updated", user });
 	});
 
 	// PUT /profile/password : update password only

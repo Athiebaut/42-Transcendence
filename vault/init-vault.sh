@@ -88,6 +88,7 @@ echo "[Config] Injecting secrets from environment..."
 
 # On écrit toutes les variables importantes dans un chemin dédié 'secret/backend/config'
 # Note: Les variables $DATABASE_URL, $JWT_SECRET, etc. doivent être passées au conteneur Vault via docker-compose
+GOOGLE_REDIRECT_URI=${GOOGLE_REDIRECT_URI:-${GOOGLE_CALLBACK_URL:-https://localhost:8443/auth/google/callback}}
 vault kv put secret/backend/config \
     NODE_ENV="$NODE_ENV" \
     PORT="$PORT" \

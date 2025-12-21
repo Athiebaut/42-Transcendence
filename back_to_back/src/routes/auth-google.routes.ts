@@ -5,6 +5,11 @@ import { SignJWT } from 'jose';
 
 const ARGON_OPTS = { type: argon2.argon2id, timeCost: 3, memoryCost: 19456, parallelism: 1 };
 const FRONT = process.env.FRONT_ORIGIN ?? 'https://front.localhost';
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID ?? '';
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET ?? '';
+const GOOGLE_REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI
+  ?? process.env.GOOGLE_CALLBACK_URL
+  ?? 'https://localhost:8443/auth/google/callback';
 const encSecret = () => new TextEncoder().encode(process.env.JWT_SECRET ?? 'dev-secret');
 const makeState = () => crypto.randomBytes(16).toString('hex');
 const sanitizeUsername = (s: string) => s.toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 24) || 'user';
@@ -43,8 +48,8 @@ export default async function authGoogleRoutes(app: FastifyInstance) {
     reply.setCookie('g_state', state, { httpOnly: true, secure: true, sameSite: 'lax', path: '/', maxAge: 300 });
 
     const params = new URLSearchParams({
-      client_id: process.env.GOOGLE_CLIENT_ID ?? '',
-      redirect_uri: process.env.GOOGLE_REDIRECT_URI ?? '',
+      client_id: GOOGLE_CLIENT_ID,
+      redirect_uri: GOOGLE_REDIRECT_URI,
       response_type: 'code',
       scope: 'openid email profile',
       include_granted_scopes: 'true',
@@ -72,9 +77,9 @@ export default async function authGoogleRoutes(app: FastifyInstance) {
       headers: { 'content-type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
         code,
-        client_id: process.env.GOOGLE_CLIENT_ID ?? '',
-        client_secret: process.env.GOOGLE_CLIENT_SECRET ?? '',
-        redirect_uri: process.env.GOOGLE_REDIRECT_URI ?? '',
+        client_id: GOOGLE_CLIENT_ID,
+        client_secret: GOOGLE_CLIENT_SECRET,
+        redirect_uri: GOOGLE_REDIRECT_URI,
         grant_type: 'authorization_code',
       }),
     });

@@ -78,7 +78,7 @@ Points clés : Auth **locale** + **Google OAuth**, routes utilisateurs, schéma 
 ```
 
 * **Ports** : Nginx écoute en `443` et reverse‑proxy vers l’API (`:3000`).
-* **Callback OAuth** : exposé publiquement via Nginx (`GOOGLE_CALLBACK_URL`).
+* **Callback OAuth** : exposé publiquement via Nginx (`GOOGLE_REDIRECT_URI`).
 * **Certifs dev** : `certs/selfsigned.crt` & `certs/selfsigned.key`.
 
 ## Stack & prérequis
@@ -106,9 +106,11 @@ Points clés : Auth **locale** + **Google OAuth**, routes utilisateurs, schéma 
 | `CORS_ORIGIN`          | `https://localhost`                      | Origine autorisée côté front            |
 | `GOOGLE_CLIENT_ID`     | `xxxx.apps.googleusercontent.com`        | OAuth Google                            |
 | `GOOGLE_CLIENT_SECRET` | `xxxxx`                                  | OAuth Google                            |
-| `GOOGLE_CALLBACK_URL`  | `https://localhost/auth/google/callback` | URL publique de callback via Nginx      |
+| `GOOGLE_REDIRECT_URI`  | `https://localhost:8443/auth/google/callback` | URL publique de callback via Nginx      |
 | `SSL_CERT_FILE`        | `./certs/selfsigned.crt`                 | Chemin cert TLS pour Nginx              |
 | `SSL_KEY_FILE`         | `./certs/selfsigned.key`                 | Chemin clé TLS pour Nginx               |
+
+> Ancien nom conservé en alias : `GOOGLE_CALLBACK_URL`.
 
 ### Exemple `.env.example`
 
@@ -121,7 +123,7 @@ SESSION_SECRET=change-me-too
 CORS_ORIGIN=https://localhost
 GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
-GOOGLE_CALLBACK_URL=https://localhost/auth/google/callback
+GOOGLE_REDIRECT_URI=https://localhost:8443/auth/google/callback
 SSL_CERT_FILE=./certs/selfsigned.crt
 SSL_KEY_FILE=./certs/selfsigned.key
 ```

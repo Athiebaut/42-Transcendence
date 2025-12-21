@@ -165,7 +165,7 @@ env-init:
 
 
 # -------- Utilities --------
-reset:
+re:
 	$(MAKE) down
 	$(MAKE) build
 	$(MAKE) up
@@ -181,13 +181,8 @@ clean-api:
 	@rm -rf api/node_modules api/dist
 	$(call ok,API nettoyée (api/node_modules, api/dist).)
 
-kill-port:
-	@echo "→ Recherche d'un conteneur Docker exposant :$(PORT)…"
-	@cid="$$(docker ps --format '{{.ID}}\t{{.Ports}}' | awk '/:$(PORT)->/ {print $$1}')" ; \
-	if [ -n "$$cid" ]; then \
-	  echo "  - Arrêt du conteneur $$cid"; docker stop $$cid >/dev/null; \
-	else \
-	  echo "→ Recherche d'un process hôte sur :$(PORT)…"; \
-	  pid="$$(ss -ltnp | awk '/:$(PORT) / {print $$7}' | sed -E 's/.*pid=([0-9]+).*/\1/' | head -n1)"; \
-	  if [ -n "$$pid" ]; then echo "  - kill $$pid"; kill $$pid 2>/dev/null || sudo kill $$pid; else echo "  - rien à tuer"; fi; \
-	fi
+reset: 
+	docker compose down --remove-orphans \
+  	&& docker system prune -af \
+  	&& docker volume prune -f \
+  	&& rm -rf web/node_modules web/dist back_to_back/node_modules back_to_back/dist
